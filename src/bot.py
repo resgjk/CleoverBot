@@ -1,4 +1,6 @@
 from config import BOT_TOKEN
+from phrases import ru, en
+from keyboards import start_keyboard
 
 import asyncio
 import logging
@@ -11,11 +13,20 @@ from aiogram.types import Message
 
 
 dp = Dispatcher()
+phrases = {}
 
 
 @dp.message(CommandStart())
 async def cmd_start_handler(message: Message):
-    await message.answer('Hello!')
+    lg = message.from_user.language_code
+    if lg == "ru":
+        phrases = ru.phrases
+    else:
+        phrases = en.phrases
+
+    msg = await message.answer(
+        phrases["hello"], reply_markup=start_keyboard.get_start_keyboard(phrases)
+    )
 
 
 async def main():
@@ -23,6 +34,6 @@ async def main():
     await dp.start_polling(bot)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, stream=sys.stdout)
     asyncio.run(main())
