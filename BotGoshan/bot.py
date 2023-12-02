@@ -1,6 +1,6 @@
-from config import BOT_TOKEN
-from phrases import ru, en
-from keyboards import start_keyboard
+from core.config import BOT_TOKEN
+from core.phrases import ru, en
+from core.keyboards import start_keyboard
 
 import asyncio
 import logging
@@ -15,6 +15,7 @@ from aiogram.types import Message
 dp = Dispatcher()
 phrases = {}
 
+#BOT_TOKEN=6365560334:AAG0ofF9BCOw0y6fOQuvV0A7U21-UqEmX74
 
 @dp.message(CommandStart())
 async def cmd_start_handler(message: Message):
