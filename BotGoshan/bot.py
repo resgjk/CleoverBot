@@ -1,6 +1,4 @@
 from core.config import BOT_TOKEN
-from core.keyboards import start_keyboard
-from core.phrases import ru, en
 
 import asyncio
 import logging
