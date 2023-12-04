@@ -8,31 +8,11 @@ import sys
 
 from aiogram import Bot, Dispatcher
 from aiogram.enums import ParseMode
-from aiogram.types import Message
-from aiogram.filters import CommandStart
-
-
-dp = Dispatcher()
-
-
-@dp.message(CommandStart())
-async def cmd_start_handler(message: Message):
-    lg = message.from_user.language_code
-    if lg == "ru":
-        phrases = ru.phrases
-    else:
-        phrases = en.phrases
-
-    await message.answer(
-        phrases["hello"]
-    )
-    await message.answer(
-        phrases["description"], reply_markup=start_keyboard.get_start_keyboard(phrases)
-    )
 
 
 async def main():
     bot = Bot(BOT_TOKEN, parse_mode=ParseMode.HTML)
+    dp = Dispatcher()
 
     await dp.start_polling(bot)
 
