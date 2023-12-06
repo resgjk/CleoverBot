@@ -1,21 +1,22 @@
 import datetime
 
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy import Column, Integer, VARCHAR, Boolean, DateTime
 from sqlalchemy import ForeignKey
-from db.database import Base
+from db.database import BaseModel
 
 
-class TransactionModel(Base):
+class TransactionModel(BaseModel):
     __tablename__ = "transactions"
 
-    id: Mapped[int] = mapped_column(
-        primary_key=True, nullable=False, autoincrement=True
+    id = Column(Integer, primary_key=True, unique=True, nullable=False)
+    uuid = Column(VARCHAR(36), nullable=False, unique=True)
+    category = Column(
+        Integer, ForeignKey("categories.id"), nullable=False, unique=False
     )
-    uuid: Mapped[str] = mapped_column(nullable=False, unique=True)
-    category: Mapped[int] = mapped_column(ForeignKey("categories.id"), nullable=False)
-    user: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
-    date: Mapped[datetime.datetime] = mapped_column(
-        nullable=False, default=datetime.datetime.now()
+    user = Column(Integer, ForeignKey("users.id"), nullable=False, unique=False)
+    is_success = Column(Boolean, nullable=False, default=False, unique=False)
+    date = Column(
+        DateTime, nullable=False, default=datetime.datetime.now(), unique=False
     )
 
     def __repr__(self) -> str:

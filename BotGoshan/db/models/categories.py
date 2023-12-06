@@ -1,17 +1,12 @@
-import datetime
-
-from sqlalchemy.orm import Mapped, mapped_column
-from sqlalchemy import ForeignKey
-from db.database import Base
+from sqlalchemy import Column, Integer, Text
+from db.database import BaseModel
 
 
-class CategoryModel(Base):
+class CategoryModel(BaseModel):
     __tablename__ = "categories"
 
-    id: Mapped[int] = mapped_column(
-        primary_key=True, nullable=False, autoincrement=True
-    )
-    title: Mapped[str] = mapped_column(nullable=False, unique=True)
+    id = Column(Integer, primary_key=True, unique=True, nullable=False)
+    title = Column(Text, nullable=False, unique=True)
 
     def __repr__(self) -> str:
         return f"{self.id} {self.title}"
