@@ -1,12 +1,12 @@
-from sqlalchemy import Column, Integer, Text
-from db.database import BaseModel
+from sqlalchemy import Column, INTEGER, TEXT
+from db.base import Base
 
 
-class CategoryModel(BaseModel):
+class CategoryModel(Base):
     __tablename__ = "categories"
 
-    id = Column(Integer, primary_key=True, unique=True, nullable=False)
-    title = Column(Text, nullable=False, unique=True)
+    id = Column(INTEGER, primary_key=True, unique=True, nullable=False)
+    title = Column(TEXT, nullable=False, unique=True)
 
     def __repr__(self) -> str:
         return f"{self.id} {self.title}"

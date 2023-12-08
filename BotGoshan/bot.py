@@ -1,8 +1,8 @@
 from core.config import BOT_TOKEN, postgres_url
-from core.handlers.basic import start_handler
-from core.middlewares.register_check import RegisterCheckMiddleware
 
-from db.database import create_async_engine, get_session_maker, proceed_models, BaseModel
+from db.base import Base
+from db.engine import create_async_engine, get_session_maker, proceed_models
+from core.handlers.start_handler import start_router
 
 import asyncio
 import logging
@@ -10,7 +10,6 @@ import sys
 
 from aiogram import Bot, Dispatcher
 from aiogram.enums import ParseMode
-from aiogram.filters import Command
 
 
 async def main():
@@ -19,13 +18,11 @@ async def main():
     bot = Bot(BOT_TOKEN, parse_mode=ParseMode.HTML)
     dp = Dispatcher()
 
+    dp.include_routers(start_router)
+
     async_engine = create_async_engine(postgres_url)
     session_maker = get_session_maker(async_engine)
-    await proceed_models(async_engine, BaseModel.metadata)
-
-    dp.message.middleware.register(RegisterCheckMiddleware())
-
-    dp.message.register(start_handler, Command(commands="start"))
+    await proceed_models(async_engine, Base.metadata)
 
     await dp.start_polling(bot, session_maker=session_maker)
 

@@ -1,22 +1,23 @@
 import datetime
 
-from sqlalchemy import Column, Integer, VARCHAR, Boolean, DateTime
+from sqlalchemy import Column, INTEGER, VARCHAR, BOOLEAN, DATETIME
 from sqlalchemy import ForeignKey
-from db.database import BaseModel
+from db.base import Base
 
 
-class TransactionModel(BaseModel):
+
+class TransactionModel(Base):
     __tablename__ = "transactions"
 
-    id = Column(Integer, primary_key=True, unique=True, nullable=False)
+    id = Column(INTEGER, primary_key=True, unique=True, nullable=False)
     uuid = Column(VARCHAR(36), nullable=False, unique=True)
     category = Column(
-        Integer, ForeignKey("categories.id"), nullable=False, unique=False
+        INTEGER, ForeignKey("categories.id"), nullable=False, unique=False
     )
-    user = Column(Integer, ForeignKey("users.id"), nullable=False, unique=False)
-    is_success = Column(Boolean, nullable=False, default=False, unique=False)
+    user = Column(INTEGER, ForeignKey("users.id"), nullable=False, unique=False)
+    is_success = Column(BOOLEAN, nullable=False, default=False, unique=False)
     date = Column(
-        DateTime, nullable=False, default=datetime.datetime.now(), unique=False
+        DATETIME, nullable=False, default=datetime.datetime.now(), unique=False
     )
 
     def __repr__(self) -> str:
