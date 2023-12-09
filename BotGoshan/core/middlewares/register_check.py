@@ -24,13 +24,13 @@ class RegisterCheckMiddleware(BaseMiddleware):
                 res: ScalarResult = await session.execute(
                     select(UserModel).where(UserModel.user_id == event.from_user.id)
                 )
-                current_user = res.one_or_none()
+                current_user: UserModel = res.scalars().one_or_none()
 
                 if current_user:
-                    await event.answer(f"USER IS REGISTERED {current_user}")
+                    data["is_subscriber"] = current_user.is_subscriber
                 else:
                     new_user = UserModel(user_id=event.from_user.id)
                     await session.merge(new_user)
                     await session.commit()
-                    await event.answer("REGISTRATION IS SUCCESS")
+                    data["is_subscriber"] = False
         return await handler(event, data)

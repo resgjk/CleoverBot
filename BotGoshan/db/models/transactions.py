@@ -5,7 +5,6 @@ from sqlalchemy import ForeignKey
 from db.base import Base
 
 
-
 class TransactionModel(Base):
     __tablename__ = "transactions"
 
