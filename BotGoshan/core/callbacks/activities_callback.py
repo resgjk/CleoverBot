@@ -10,7 +10,7 @@ activities_router = Router()
 
 async def get_activities(call: CallbackQuery, bot: Bot):
     await call.message.edit_text(text=phrases["activities_text"])
-    #await call.message.answer(text=" ", reply_markup=get_activities_keyboard())
+    # await call.message.answer(text=" ", reply_markup=get_activities_keyboard())
 
 
 activities_router.callback_query.register(get_activities, F.data == "activities")
