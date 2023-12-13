@@ -11,7 +11,7 @@ from sqlalchemy import select
 from sqlalchemy.engine import ScalarResult
 
 
-class GetExpirationDateMiddleware(BaseMiddleware):
+class GetChoiseNotificationMiddleware(BaseMiddleware):
     async def __call__(
         self,
         handler: Callable[[CallbackQuery, Dict[str, Any]], Awaitable[Any]],
@@ -25,5 +25,5 @@ class GetExpirationDateMiddleware(BaseMiddleware):
                     select(UserModel).where(UserModel.user_id == event.from_user.id)
                 )
                 current_user: UserModel = res.scalars().one_or_none()
-                data["expiration_date"] = current_user.subscriber_until
+                data["choise_notification"] = current_user.notification
         return await handler(event, data)

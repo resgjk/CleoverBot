@@ -11,6 +11,8 @@ from core.callbacks.buy_subscription_callback import new_subscription_router
 from core.callbacks.extend_subscription_callback import renew_subscription_router
 from core.callbacks.support_callback import support_router
 from core.callbacks.instruction_callback import instruction_router
+from core.callbacks.notifications_menu_callback import notifications_menu_router
+from core.callbacks.bank_menu_callback import bank_menu_router
 
 import asyncio
 import logging
@@ -36,6 +38,8 @@ async def main():
         renew_subscription_router,
         support_router,
         instruction_router,
+        notifications_menu_router,
+        bank_menu_router,
     )
 
     async_engine = create_async_engine(postgres_url)

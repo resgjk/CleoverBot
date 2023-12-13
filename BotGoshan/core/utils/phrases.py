@@ -9,4 +9,6 @@ phrases = {
     "renew_subscription": "\n\nHere you can renew your bot subscription:",
     "support_text": "❓ *Support*\n\nIf you have any problems with the bot you can write to our manager: @contact",
     "instruction_text": "📜 *Instruction*\n\nOur team has written a detailed guide for using Cleover Bot. If you are experiencing any difficulties we advise you to read it.",
+    "notification_text": "🔔 *Notification*\n\nTime of the first activity reminder",
+    "bank_text": "💸 *Your bank*\n\nPick your bank for better news selection",
 }

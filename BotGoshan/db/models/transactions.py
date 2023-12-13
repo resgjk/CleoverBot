@@ -10,8 +10,8 @@ class TransactionModel(Base):
 
     id = Column(INTEGER, primary_key=True, unique=True, nullable=False)
     uuid = Column(VARCHAR(36), nullable=False, unique=True)
-    category = Column(
-        INTEGER, ForeignKey("categories.id"), nullable=False, unique=False
+    type = Column(
+        INTEGER, ForeignKey("transactions_types.id"), nullable=False, unique=False
     )
     user = Column(INTEGER, ForeignKey("users.id"), nullable=False, unique=False)
     is_success = Column(BOOLEAN, nullable=False, default=False, unique=False)

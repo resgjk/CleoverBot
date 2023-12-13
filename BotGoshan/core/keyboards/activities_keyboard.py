@@ -11,7 +11,7 @@ def get_activities_keyboard() -> ReplyKeyboardMarkup:
     keyboard_builder.button(text="5 Activity", callback_data="5_activity")
     keyboard_builder.button(text="6 Activity", callback_data="6_activity")
     keyboard_builder.button(
-        text="< Return to main menu", callback_data="return_to_main_menu"
+        text="⬅️ Return to main menu", callback_data="return_to_main_menu"
     )
     keyboard_builder.adjust(1, repeat=True)
     return keyboard_builder.as_markup(resize_keyboard=True, one_time_keyboard=True)

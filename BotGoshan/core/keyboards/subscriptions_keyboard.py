@@ -21,7 +21,7 @@ def get_subscriptions_keyboard(callbacks_type: str) -> InlineKeyboardMarkup:
             callback_data="new_twelve_month_subscription",
         )
         keyboard_builder.button(
-            text="< Return to main menu", callback_data="return_to_main_menu"
+            text="⬅️ Return to main menu", callback_data="return_to_main_menu"
         )
     elif callbacks_type == "renew_sub":
         keyboard_builder.button(
@@ -39,6 +39,6 @@ def get_subscriptions_keyboard(callbacks_type: str) -> InlineKeyboardMarkup:
             text="💸 Extend for twelve months / 90$",
             callback_data="renew_twelve_month_subscription",
         )
-        keyboard_builder.button(text="< Return to settings", callback_data="settings")
+        keyboard_builder.button(text="⬅️ Return to settings", callback_data="settings")
     keyboard_builder.adjust(1, repeat=True)
     return keyboard_builder.as_markup()
