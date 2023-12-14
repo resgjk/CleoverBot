@@ -6,13 +6,13 @@ from core.handlers.start_handler import start_router
 from core.callbacks.feedback_callback import feedback_router
 from core.callbacks.return_to_main_menu_callback import main_menu_router
 from core.callbacks.settings_callback import settings_router
-from core.callbacks.activities_callback import activities_router
 from core.callbacks.buy_subscription_callback import new_subscription_router
 from core.callbacks.extend_subscription_callback import renew_subscription_router
 from core.callbacks.support_callback import support_router
 from core.callbacks.instruction_callback import instruction_router
 from core.callbacks.notifications_menu_callback import notifications_menu_router
 from core.callbacks.bank_menu_callback import bank_menu_router
+from core.callbacks.activities_menu_callback import activities_menu_router
 
 import asyncio
 import logging
@@ -33,13 +33,13 @@ async def main():
         feedback_router,
         main_menu_router,
         settings_router,
-        activities_router,
         new_subscription_router,
         renew_subscription_router,
         support_router,
         instruction_router,
         notifications_menu_router,
         bank_menu_router,
+        activities_menu_router,
     )
 
     async_engine = create_async_engine(postgres_url)

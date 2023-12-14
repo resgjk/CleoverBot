@@ -1,17 +1,39 @@
-from aiogram.types import ReplyKeyboardMarkup
-from aiogram.utils.keyboard import ReplyKeyboardBuilder
+from aiogram.types import InlineKeyboardMarkup
+from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 
-def get_activities_keyboard() -> ReplyKeyboardMarkup:
-    keyboard_builder = ReplyKeyboardBuilder()
-    keyboard_builder.button(text="1 Activity", callback_data="1_activity")
-    keyboard_builder.button(text="2 Activity", callback_data="2_activity")
-    keyboard_builder.button(text="3 Activity", callback_data="3_activity")
-    keyboard_builder.button(text="4 Activity", callback_data="4_activity")
-    keyboard_builder.button(text="5 Activity", callback_data="5_activity")
-    keyboard_builder.button(text="6 Activity", callback_data="6_activity")
+def get_activities_keyboard(choise_activities) -> InlineKeyboardMarkup:
+    buttons_texts = {
+        "defi": "✅ DeFi 📚" if choise_activities["defi"] else "DeFi 📚",
+        "airdrops": "✅ Airdrops 💸" if choise_activities["airdrops"] else "Airdrops 💸",
+        "news": "✅ News 🗞" if choise_activities["news"] else "News 🗞",
+        "ido_ico": "✅ IDO | ICO 🤑" if choise_activities["ido_ico"] else "IDO | ICO 🤑",
+        "ambassador_programs": "✅ Ambassador Programs 👥"
+        if choise_activities["ambassador_programs"]
+        else "Ambassador Programs 👥",
+        "nft": "✅ NFT 🖼" if choise_activities["nft"] else "NFT 🖼",
+    }
+
+    keyboard_builder = InlineKeyboardBuilder()
+    keyboard_builder.button(
+        text=buttons_texts["defi"], callback_data="set_activity_defi"
+    )
+    keyboard_builder.button(
+        text=buttons_texts["airdrops"], callback_data="set_activity_airdrops"
+    )
+    keyboard_builder.button(
+        text=buttons_texts["news"], callback_data="set_activity_news"
+    )
+    keyboard_builder.button(
+        text=buttons_texts["ido_ico"], callback_data="set_activity_ido_ico"
+    )
+    keyboard_builder.button(
+        text=buttons_texts["ambassador_programs"],
+        callback_data="set_activity_ambassador_programs",
+    )
+    keyboard_builder.button(text=buttons_texts["nft"], callback_data="set_activity_nft")
     keyboard_builder.button(
         text="⬅️ Return to main menu", callback_data="return_to_main_menu"
     )
     keyboard_builder.adjust(1, repeat=True)
-    return keyboard_builder.as_markup(resize_keyboard=True, one_time_keyboard=True)
+    return keyboard_builder.as_markup()
