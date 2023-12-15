@@ -13,6 +13,9 @@ from core.callbacks.instruction_callback import instruction_router
 from core.callbacks.notifications_menu_callback import notifications_menu_router
 from core.callbacks.bank_menu_callback import bank_menu_router
 from core.callbacks.activities_menu_callback import activities_menu_router
+from core.callbacks.set_notificatioin_callback import set_notifications_router
+from core.callbacks.set_bank_callback import set_bank_router
+from core.callbacks.set_activity_callback import set_activity_router
 
 import asyncio
 import logging
@@ -40,6 +43,9 @@ async def main():
         notifications_menu_router,
         bank_menu_router,
         activities_menu_router,
+        set_notifications_router,
+        set_bank_router,
+        set_activity_router,
     )
 
     async_engine = create_async_engine(postgres_url)

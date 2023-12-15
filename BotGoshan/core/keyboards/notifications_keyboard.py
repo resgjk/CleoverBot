@@ -12,16 +12,16 @@ def get_notifications_keyboard(choise_time) -> InlineKeyboardMarkup:
 
     keyboard_builder = InlineKeyboardBuilder()
     keyboard_builder.button(
-        text=buttons_texts["1 Hour"], callback_data="set_1_hour_notification"
+        text=buttons_texts["1 Hour"], callback_data="set_hours_notification_1"
     )
     keyboard_builder.button(
-        text=buttons_texts["3 Hours"], callback_data="set_3_hours_notification"
+        text=buttons_texts["3 Hours"], callback_data="set_hours_notification_3"
     )
     keyboard_builder.button(
-        text=buttons_texts["6 Hours"], callback_data="set_6_hours_notification"
+        text=buttons_texts["6 Hours"], callback_data="set_hours_notification_6"
     )
     keyboard_builder.button(
-        text=buttons_texts["12 Hours"], callback_data="set_12_hours_notification"
+        text=buttons_texts["12 Hours"], callback_data="set_hours_notification_12"
     )
     keyboard_builder.button(text="⬅️ Return to settings", callback_data="settings")
     keyboard_builder.adjust(1, repeat=True)
