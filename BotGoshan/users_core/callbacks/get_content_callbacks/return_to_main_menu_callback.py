@@ -1,9 +1,9 @@
-from core.utils.phrases import phrases
-from core.keyboards.main_menu import (
+from users_core.utils.phrases import phrases
+from users_core.keyboards.main_menu import (
     get_main_menu_keyboard_is_not_sub,
     get_main_menu_keyboard_is_sub,
 )
-from core.middlewares.register_check import RegisterCheckMiddleware
+from users_core.middlewares.register_check import RegisterCheckMiddleware
 
 from aiogram import Bot, Router, F
 from aiogram.types import CallbackQuery

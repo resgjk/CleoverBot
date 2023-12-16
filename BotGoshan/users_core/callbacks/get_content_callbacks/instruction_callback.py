@@ -1,5 +1,5 @@
-from core.utils.phrases import phrases
-from core.keyboards.return_to_main_keyboard import get_keyboard
+from users_core.utils.phrases import phrases
+from users_core.keyboards.return_to_main_keyboard import get_keyboard
 
 from aiogram import Bot, Router, F
 from aiogram.types import CallbackQuery

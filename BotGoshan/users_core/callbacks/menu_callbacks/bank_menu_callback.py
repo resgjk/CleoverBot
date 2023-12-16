@@ -1,6 +1,8 @@
-from core.utils.phrases import phrases
-from core.keyboards.bank_settings_keyboard import get_bank_keyboard
-from core.middlewares.get_choise_bank import GetChoiseBankMiddleware
+from users_core.utils.phrases import phrases
+from users_core.keyboards.bank_settings_keyboard import get_bank_keyboard
+from users_core.middlewares.get_middlewares.get_choise_bank import (
+    GetChoiseBankMiddleware,
+)
 
 from aiogram import Bot, Router, F
 from aiogram.types import CallbackQuery

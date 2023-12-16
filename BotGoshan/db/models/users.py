@@ -19,4 +19,4 @@ class UserModel(Base):
     nft_activity = Column(BOOLEAN, default=False)
 
     def __repr__(self) -> str:
-        return f"{self.id} {self.user_id} {self.is_subscriber} {self.subscriber_until}"
+        return f"{self.id} {self.user_id} {self.is_subscriber} {self.subscriber_until} {self.bank} {self.notification}"

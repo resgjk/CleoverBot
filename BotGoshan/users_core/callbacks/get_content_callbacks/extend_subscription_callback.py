@@ -1,8 +1,10 @@
 from datetime import datetime
 
-from core.utils.phrases import phrases
-from core.keyboards.subscriptions_keyboard import get_subscriptions_keyboard
-from core.middlewares.get_expiration_date import GetExpirationDateMiddleware
+from users_core.utils.phrases import phrases
+from users_core.keyboards.subscriptions_keyboard import get_subscriptions_keyboard
+from users_core.middlewares.get_middlewares.get_expiration_date import (
+    GetExpirationDateMiddleware,
+)
 
 from aiogram import Bot, Router, F
 from aiogram.types import CallbackQuery

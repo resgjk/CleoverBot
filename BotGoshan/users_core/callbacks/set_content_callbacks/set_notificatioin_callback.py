@@ -1,6 +1,8 @@
-from core.utils.phrases import phrases
-from core.keyboards.notifications_keyboard import get_notifications_keyboard
-from core.middlewares.set_notifications import SetNotificationsMiddleware
+from users_core.utils.phrases import phrases
+from users_core.keyboards.notifications_keyboard import get_notifications_keyboard
+from users_core.middlewares.set_middlewares.set_notifications import (
+    SetNotificationsMiddleware,
+)
 
 from aiogram import Bot, Router, F
 from aiogram.types import CallbackQuery

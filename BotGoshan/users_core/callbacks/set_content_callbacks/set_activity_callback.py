@@ -1,6 +1,8 @@
-from core.utils.phrases import phrases
-from core.keyboards.activities_keyboard import get_activities_keyboard
-from core.middlewares.set_activities import SetActivitiesMiddleware
+from users_core.utils.phrases import phrases
+from users_core.keyboards.activities_keyboard import get_activities_keyboard
+from users_core.middlewares.set_middlewares.set_activities import (
+    SetActivitiesMiddleware,
+)
 
 from aiogram import Bot, Router, F
 from aiogram.types import CallbackQuery
