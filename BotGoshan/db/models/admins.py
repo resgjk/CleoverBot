@@ -6,7 +6,7 @@ class AdminModel(Base):
     __tablename__ = "admins"
 
     id = Column(INTEGER, primary_key=True, unique=True, nullable=False)
-    user_id = Column(BIGINT, ForeignKey("users.id"), unique=True, nullable=False)
+    user_id = Column(BIGINT, unique=True, nullable=False)
     is_super_admin = Column(BOOLEAN, nullable=False, default=False, unique=False)
 
     def __repr__(self) -> str:

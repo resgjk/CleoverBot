@@ -20,4 +20,4 @@ class TransactionModel(Base):
     )
 
     def __repr__(self) -> str:
-        return f"{self.id} {self.uuid} {self.category} {self.user} {self.date}"
+        return f"{self.id} {self.uuid} {self.user} {self.date}"

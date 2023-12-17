@@ -2,6 +2,7 @@ from typing import Any
 
 from admins_core.utils.phrases import phrases
 from admins_core.keyboards.start_keyboard import get_start_keyboard
+from admins_core.middlewares.check_middlewares.chekc_admin import CheckAdminMiddleware
 
 from aiogram.types import Message
 from aiogram import Bot, Router
@@ -20,9 +21,7 @@ async def start_admin_panel(
         )
 
 
-start_admin_panel_router.mess
-
 start_admin_panel_router.message.register(
     start_admin_panel, Command(commands=("admin"))
 )
-start_admin_panel_router.message.middleware.register()
+start_admin_panel_router.message.middleware.register(CheckAdminMiddleware())

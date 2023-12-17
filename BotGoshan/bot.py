@@ -35,6 +35,7 @@ from users_core.callbacks.set_content_callbacks.set_activity_callback import (
 from users_core.utils.commands import set_commands
 
 from admins_core.handlers.start_admin_panel_handler import start_admin_panel_router
+from admins_core.callbacks.create_post_callbacks import create_post_router
 
 import asyncio
 import logging
@@ -66,6 +67,7 @@ async def main():
         set_bank_router,
         set_activity_router,
         start_admin_panel_router,
+        create_post_router,
     )
     await set_commands(bot)
 
