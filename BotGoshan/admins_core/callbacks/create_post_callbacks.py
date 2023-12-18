@@ -3,6 +3,7 @@ from admins_core.utils.post_form import PostForm
 from admins_core.keyboards.choise_bank_keyboard import get_banks_keyboard
 from admins_core.keyboards.choise_category_keyboard import get_activities_keyboard
 from admins_core.keyboards.finish_create_post_keyboard import get_media_keyboard
+from admins_core.keyboards.publick_post_keyboard import get_publick_keyboard
 
 from aiogram import Bot, Router, F
 from aiogram.types import (
@@ -12,6 +13,7 @@ from aiogram.types import (
     InputMediaPhoto,
     InputMediaVideo,
     FSInputFile,
+    ReplyKeyboardRemove,
 )
 from aiogram.fsm.context import FSMContext
 
@@ -53,7 +55,9 @@ async def get_category(message: Message, bot: Bot, state: FSMContext):
 
 
 async def get_bank(message: Message, bot: Bot, state: FSMContext):
-    await message.answer(text=phrases["input_start_date"])
+    await message.answer(
+        text=phrases["input_start_date"], reply_markup=ReplyKeyboardRemove()
+    )
     await state.update_data(bank=message.text)
     await state.set_state(PostForm.GET_START_DATE)
 
@@ -238,15 +242,21 @@ async def save_media_and_show_post(call: CallbackQuery, bot: Bot, state: FSMCont
                 )
             else:
                 media.append(
-                    InputMediaVideo(
-                        type="video", media=FSInputFile(path=video)
-                    )
+                    InputMediaVideo(type="video", media=FSInputFile(path=video))
                 )
 
     if media:
-        await bot.send_media_group(chat_id=call.message.chat.id, media=media, )
+        await bot.send_media_group(
+            chat_id=call.message.chat.id,
+            media=media,
+        )
     else:
         await call.message.answer(text=text)
+    await bot.send_message(
+        text=phrases["finish_message"],
+        chat_id=call.message.chat.id,
+        reply_markup=get_publick_keyboard(),
+    )
     await state.clear()
 
 
@@ -263,4 +273,6 @@ create_post_router.message.register(
 )
 create_post_router.message.register(get_full_description, PostForm.GET_FULL_DESCRIPTION)
 create_post_router.message.register(get_media_files, PostForm.GET_MEDIA_FILES)
-create_post_router.callback_query.register(save_media_and_show_post, F.data == "save_media")
+create_post_router.callback_query.register(
+    save_media_and_show_post, F.data == "save_media"
+)

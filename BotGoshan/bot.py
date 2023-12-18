@@ -36,6 +36,26 @@ from users_core.utils.commands import set_commands
 
 from admins_core.handlers.start_admin_panel_handler import start_admin_panel_router
 from admins_core.callbacks.create_post_callbacks import create_post_router
+from admins_core.callbacks.users_settings import users_settings_router
+from admins_core.callbacks.return_to_admin_pannel_callback import (
+    return_to_admin_panel_router,
+)
+from admins_core.callbacks.admins_route_callback import admins_route_router
+from admins_core.callbacks.simple_admins_settings_callback import (
+    simple_admins_settings_router,
+)
+from admins_core.callbacks.super_admins_settings_callback import (
+    super_admins_settings_router,
+)
+from admins_core.callbacks.payment_info_callback import payment_info_router
+from admins_core.callbacks.show_payment_info_callback import show_payment_info_router
+from admins_core.callbacks.add_cancel_sub_callbacks import add_cancel_sub_router
+from admins_core.callbacks.add_delele_simple_admins_callbacks import (
+    add_delete_simple_admins_router,
+)
+from admins_core.callbacks.add_delete_super_admins_callbacks import (
+    add_delete_super_admins_router,
+)
 
 import asyncio
 import logging
@@ -68,6 +88,16 @@ async def main():
         set_activity_router,
         start_admin_panel_router,
         create_post_router,
+        users_settings_router,
+        return_to_admin_panel_router,
+        admins_route_router,
+        simple_admins_settings_router,
+        super_admins_settings_router,
+        payment_info_router,
+        show_payment_info_router,
+        add_cancel_sub_router,
+        add_delete_simple_admins_router,
+        add_delete_super_admins_router,
     )
     await set_commands(bot)
 
