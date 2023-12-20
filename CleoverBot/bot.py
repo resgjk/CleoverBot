@@ -56,6 +56,12 @@ from admins_core.callbacks.add_delele_simple_admins_callbacks import (
 from admins_core.callbacks.add_delete_super_admins_callbacks import (
     add_delete_super_admins_router,
 )
+from admins_core.callbacks.add_cancel_sub_callbacks import (
+    add_cancel_sub_router,
+    get_end_date_for_add_sub_router,
+    get_id_for_add_sub_router,
+    delete_sub_router,
+)
 
 import asyncio
 import logging
@@ -98,6 +104,9 @@ async def main():
         add_cancel_sub_router,
         add_delete_simple_admins_router,
         add_delete_super_admins_router,
+        get_end_date_for_add_sub_router,
+        get_id_for_add_sub_router,
+        delete_sub_router,
     )
     await set_commands(bot)
 
