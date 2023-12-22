@@ -19,7 +19,7 @@ async def get_calendar(
     await call.answer()
     context_data = await state.get_data()
     date = ".".join(context_data.get("curr_date").split("-")[::-1])
-    text = [f"<b>{date}</b>", "EVENTS:"]
+    text = [f"<b>{date}</b>\nEVENTS:"]
     for event in events_news:
         text.append(f"{event[0]} - {event[1]}")
     text = "\n\n".join(text)
@@ -46,21 +46,21 @@ async def show_event(
         videos = event_datails["videos"].split(";")[:-1]
 
     text = []
-    text.append(f"<b>{title}</b>")
-    text.append(f"{full_description}")
+    text.append(f"🗞️ <b>{title}</b>\n\n")
+    text.append(f"📜 {full_description}\n\n")
     if start_date:
         date = ".".join(start_date.split("-")[::-1])
         if start_time:
-            text.append(f"Start date: {date}, {start_time}")
+            text.append(f"🗓️ Start date: {date}, {start_time}\n")
         else:
-            text.append(f"Start date: {date}")
+            text.append(f"🗓️ Start date: {date}\n")
     if end_date:
         date = ".".join(end_date.split("-")[::-1])
         if end_time:
-            text.append(f"End date: {date}, {end_time}")
+            text.append(f"🏁 End date: {date}, {end_time}")
         else:
-            text.append(f"End date: {date}")
-    text = "\n\n".join(text)
+            text.append(f"🏁 End date: {date}")
+    text = "".join(text)
 
     media = []
     if photos:

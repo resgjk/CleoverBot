@@ -1,0 +1,44 @@
+version: '3.9'
+
+services:
+  db:
+    container_name: cleover_db
+    image: postgres:15.5-alpine
+    environment:
+      POSTGRES_USER: cleover_database_user
+      POSTGRES_PASSWORD: o3oO6JjzmiHBbN0UZs5M
+      POSTGRES_DB: cleover_bot_database
+      PGDATA: /data/postgres
+    volumes:
+      - postgres:/data/postgres
+    ports:
+      - "5432:5432"
+    restart: always
+
+  pgadmin:
+    container_name: pgadmin
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: your_email@gmail.com
+      PGADMIN_DEFAULT_PASSWORD: Ph49qyY6cTYQ4TGGJ60j
+    volumes:
+      - pgadmin:/var/lib/pgadmin
+    ports:
+      - "5050:80"
+    restart: always
+
+  bot:
+    container_name: cleover_bot
+    build: .
+    command: sh -c "python3 CleoverBot/bot.py"
+    env_file:
+      - ./.env
+    restart: always
+    depends_on:
+      - db
+      - pgadmin
+
+
+volumes:
+  postgres:
+  pgadmin:

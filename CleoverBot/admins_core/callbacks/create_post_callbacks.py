@@ -286,21 +286,21 @@ async def send_post_to_users(
         videos = context_data.get("videos").split(";")[:-1]
 
         text = []
-        text.append(f"<b>{title}</b>")
-        text.append(f"{full_description}")
+        text.append(f"🗞️ <b>{title}</b>\n\n")
+        text.append(f"📜 {full_description}\n\n")
         if start_date:
             date = ".".join(start_date.split("-")[::-1])
             if start_time:
-                text.append(f"Start date: {date}, {start_time}")
+                text.append(f"🗓️ Start date: {date}, {start_time}\n")
             else:
-                text.append(f"Start date: {date}")
+                text.append(f"🗓️ Start date: {date}\n")
         if end_date:
             date = ".".join(end_date.split("-")[::-1])
             if end_time:
-                text.append(f"End date: {date}, {end_time}")
+                text.append(f"🏁 End date: {date}, {end_time}")
             else:
-                text.append(f"End date: {date}")
-        text = "\n\n".join(text)
+                text.append(f"🏁 End date: {date}")
+        text = "".join(text)
 
         media = []
         if photos:
