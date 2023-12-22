@@ -1,8 +1,9 @@
 import datetime
 
+from db.base import Base
+
 from sqlalchemy import Column, INTEGER, VARCHAR, BOOLEAN, DATETIME
 from sqlalchemy import ForeignKey
-from db.base import Base
 
 
 class TransactionModel(Base):

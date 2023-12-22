@@ -16,7 +16,7 @@ async def show_info(call: CallbackQuery, bot: Bot):
         + phrases["three_month_payment_info"]
         + phrases["six_month_payment_info"]
         + phrases["twelve_month_payment_info"]
-        + "\n\n<b>Итог:</b>\n- Продано подписок: 0шт.\n- Заработано: 0$"
+        + "\n\n<b>Итог:</b>\n- Продано подписок: 0 шт.\n- Заработано: 0$"
     )
 
     match data:

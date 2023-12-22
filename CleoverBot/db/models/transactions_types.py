@@ -1,5 +1,6 @@
-from sqlalchemy import Column, INTEGER, TEXT
 from db.base import Base
+
+from sqlalchemy import Column, INTEGER, TEXT
 
 
 class TransactionTypeModel(Base):

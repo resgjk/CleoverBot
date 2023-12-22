@@ -35,7 +35,10 @@ from users_core.callbacks.set_content_callbacks.set_activity_callback import (
 from users_core.utils.commands import set_commands
 
 from admins_core.handlers.start_admin_panel_handler import start_admin_panel_router
-from admins_core.callbacks.create_post_callbacks import create_post_router
+from admins_core.callbacks.create_post_callbacks import (
+    create_post_router,
+    send_post_router,
+)
 from admins_core.callbacks.users_settings import users_settings_router
 from admins_core.callbacks.return_to_admin_pannel_callback import (
     return_to_admin_panel_router,
@@ -43,6 +46,8 @@ from admins_core.callbacks.return_to_admin_pannel_callback import (
 from admins_core.callbacks.admins_route_callback import admins_route_router
 from admins_core.callbacks.simple_admins_settings_callback import (
     simple_admins_settings_router,
+    add_simple_admin_router,
+    delete_simple_admin_router,
 )
 from admins_core.callbacks.super_admins_settings_callback import (
     super_admins_settings_router,
@@ -61,6 +66,10 @@ from admins_core.callbacks.add_cancel_sub_callbacks import (
     get_end_date_for_add_sub_router,
     get_id_for_add_sub_router,
     delete_sub_router,
+)
+from users_core.callbacks.get_content_callbacks.calendar_callbacks import (
+    calendar_router,
+    show_event_router,
 )
 
 import asyncio
@@ -107,12 +116,17 @@ async def main():
         get_end_date_for_add_sub_router,
         get_id_for_add_sub_router,
         delete_sub_router,
+        send_post_router,
+        calendar_router,
+        add_simple_admin_router,
+        delete_simple_admin_router,
+        show_event_router,
     )
     await set_commands(bot)
 
     async_engine = create_async_engine(postgres_url)
     session_maker = get_session_maker(async_engine)
-    await proceed_models(async_engine, Base.metadata)
+    await proceed_models(async_engine)
 
     await dp.start_polling(bot, session_maker=session_maker)
 
