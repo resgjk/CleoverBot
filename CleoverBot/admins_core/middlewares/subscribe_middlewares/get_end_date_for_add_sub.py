@@ -44,7 +44,7 @@ class GetEndDateForAddSubMiddleware(BaseMiddleware):
                             new_user = UserModel(user_id=user_id)
                             new_user.is_subscriber = True
                             new_user.subscriber_until = str(end_date.date())
-                            await session.add(new_user)
+                            session.add(new_user)
                         await session.commit()
                         data["result"] = "success"
                         await state.update_data(end_date=event.text)

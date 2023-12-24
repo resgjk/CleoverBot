@@ -71,6 +71,11 @@ from users_core.callbacks.get_content_callbacks.calendar_callbacks import (
     calendar_router,
     show_event_router,
 )
+from admins_core.callbacks.super_admins_settings_callback import (
+    add_super_admin_router,
+    delete_super_admin_router,
+    super_admins_settings_router,
+)
 
 import asyncio
 import logging
@@ -121,6 +126,8 @@ async def main():
         add_simple_admin_router,
         delete_simple_admin_router,
         show_event_router,
+        add_super_admin_router,
+        delete_super_admin_router,
     )
     await set_commands(bot)
 

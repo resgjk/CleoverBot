@@ -30,7 +30,7 @@ class AddSimpleAdminMiddleware(BaseMiddleware):
                         data["result"] = "in_db"
                     else:
                         new_admin: AdminModel = AdminModel(user_id=int(event.text))
-                        await session.add(new_admin)
+                        session.add(new_admin)
                         await session.commit()
                         data["result"] = "success"
                 except ValueError:

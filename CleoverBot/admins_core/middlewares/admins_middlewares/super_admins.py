@@ -34,8 +34,10 @@ class AddSuperAdminMiddleware(BaseMiddleware):
                             await session.commit()
                             data["result"] = "success"
                     else:
-                        new_admin: AdminModel = AdminModel(user_id=int(event.text), is_super_admin=True)
-                        await session.add(new_admin)
+                        new_admin: AdminModel = AdminModel(
+                            user_id=int(event.text), is_super_admin=True
+                        )
+                        session.add(new_admin)
                         await session.commit()
                         data["result"] = "success"
                 except ValueError:
@@ -55,11 +57,14 @@ class DeleteSuperAdminMiddleware(BaseMiddleware):
             async with session.begin():
                 try:
                     res: ScalarResult = await session.execute(
-                        select(AdminModel).where(AdminModel.user_id == int(event.text) and AdminModel.is_super_admin)
+                        select(AdminModel).where(
+                            AdminModel.user_id == int(event.text)
+                            and AdminModel.is_super_admin
+                        )
                     )
                     current_admin: AdminModel = res.scalars().one_or_none()
                     if current_admin:
-                        await session.delete(current_admin)
+                        current_admin.is_super_admin = False
                         await session.commit()
                         data["result"] = "success"
                     else:
