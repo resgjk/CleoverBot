@@ -30,7 +30,7 @@ class RegisterCheckMiddleware(BaseMiddleware):
                     data["is_subscriber"] = current_user.is_subscriber
                 else:
                     new_user = UserModel(user_id=event.from_user.id)
-                    await session.merge(new_user)
+                    await session.add(new_user)
                     await session.commit()
                     data["is_subscriber"] = False
         return await handler(event, data)

@@ -76,6 +76,6 @@ class SendPostMiddleware(BaseMiddleware):
                             if user.is_subscriber:
                                 users_id.append(user.user_id)
                 data["users_id"] = users_id
-                await session.merge(new_post)
+                await session.add(new_post)
                 await session.commit()
         return await handler(event, data)

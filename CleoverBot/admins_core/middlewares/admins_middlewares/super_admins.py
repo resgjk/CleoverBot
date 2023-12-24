@@ -11,7 +11,7 @@ from sqlalchemy import select
 from sqlalchemy.engine import ScalarResult
 
 
-class AddSimpleAdminMiddleware(BaseMiddleware):
+class AddSuperAdminMiddleware(BaseMiddleware):
     async def __call__(
         self,
         handler: Callable[[Message, Dict[str, Any]], Awaitable[Any]],
@@ -27,9 +27,14 @@ class AddSimpleAdminMiddleware(BaseMiddleware):
                     )
                     current_admin: AdminModel = res.scalars().one_or_none()
                     if current_admin:
-                        data["result"] = "in_db"
+                        if current_admin.is_super_admin:
+                            data["result"] = "in_db"
+                        else:
+                            current_admin.is_super_admin = True
+                            await session.commit()
+                            data["result"] = "success"
                     else:
-                        new_admin: AdminModel = AdminModel(user_id=int(event.text))
+                        new_admin: AdminModel = AdminModel(user_id=int(event.text), is_super_admin=True)
                         await session.add(new_admin)
                         await session.commit()
                         data["result"] = "success"
@@ -38,7 +43,7 @@ class AddSimpleAdminMiddleware(BaseMiddleware):
         return await handler(event, data)
 
 
-class DeleteSimpleAdminMiddleware(BaseMiddleware):
+class DeleteSuperAdminMiddleware(BaseMiddleware):
     async def __call__(
         self,
         handler: Callable[[Message, Dict[str, Any]], Awaitable[Any]],
@@ -50,7 +55,7 @@ class DeleteSimpleAdminMiddleware(BaseMiddleware):
             async with session.begin():
                 try:
                     res: ScalarResult = await session.execute(
-                        select(AdminModel).where(AdminModel.user_id == int(event.text))
+                        select(AdminModel).where(AdminModel.user_id == int(event.text) and AdminModel.is_super_admin)
                     )
                     current_admin: AdminModel = res.scalars().one_or_none()
                     if current_admin:
