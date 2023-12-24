@@ -4,6 +4,8 @@ from dotenv import load_dotenv
 
 from sqlalchemy.engine import URL
 
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+
 
 load_dotenv()
 
@@ -23,3 +25,4 @@ postgres_url = URL.create(
     port=DB_PORT,
     password=DB_PASSWORD,
 )
+scheduler = AsyncIOScheduler()

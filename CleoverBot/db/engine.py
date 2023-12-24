@@ -14,7 +14,7 @@ def create_async_engine(url: Union[URL, str]) -> AsyncEngine:
 async def proceed_models(engine: AsyncEngine) -> None:
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
-        conn.commit()
+        await conn.commit()
 
 
 def get_session_maker(engine: AsyncEngine) -> async_sessionmaker:

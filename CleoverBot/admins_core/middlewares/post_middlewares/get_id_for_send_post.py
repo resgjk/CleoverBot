@@ -15,14 +15,20 @@ from sqlalchemy.orm import sessionmaker, selectinload
 from sqlalchemy import select
 from sqlalchemy.engine import ScalarResult
 
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+
 
 class SendPostMiddleware(BaseMiddleware):
+    def __init__(self, scheduler: AsyncIOScheduler) -> None:
+        self.scheduler = scheduler
+
     async def __call__(
         self,
         handler: Callable[[CallbackQuery, Dict[str, Any]], Awaitable[Any]],
         event: CallbackQuery,
         data: Dict[str, Any],
     ) -> Any:
+        data["scheduler"] = self.scheduler
         session_maker: sessionmaker = data["session_maker"]
         state: FSMContext = data["state"]
         context_data = await state.get_data()

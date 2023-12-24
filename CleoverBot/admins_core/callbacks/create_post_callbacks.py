@@ -1,6 +1,8 @@
 import asyncio
 from uuid import uuid4
+from datetime import datetime, timedelta
 
+from users_core.config import scheduler
 from admins_core.utils.phrases import phrases
 from admins_core.utils.post_form import PostForm
 from admins_core.keyboards.choise_bank_keyboard import get_banks_keyboard
@@ -13,6 +15,7 @@ from admins_core.middlewares.post_middlewares.get_id_for_send_post import (
 from admins_core.keyboards.return_to_admin_panel_keyboard import (
     return_to_admin_panel_keyboard,
 )
+from apsched.send_notification import send_notifications
 
 from aiogram import Bot, Router, F
 from aiogram.types import (
@@ -25,6 +28,10 @@ from aiogram.types import (
     ReplyKeyboardRemove,
 )
 from aiogram.fsm.context import FSMContext
+
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+
+from sqlalchemy.orm import sessionmaker
 
 
 create_post_router = Router()
@@ -272,19 +279,96 @@ async def save_media_and_show_post(call: CallbackQuery, bot: Bot, state: FSMCont
 
 
 async def send_post_to_users(
-    call: CallbackQuery, bot: Bot, state: FSMContext, users_id: list
+    call: CallbackQuery,
+    bot: Bot,
+    state: FSMContext,
+    users_id: list,
+    scheduler: AsyncIOScheduler,
+    session_maker: sessionmaker,
 ):
-    if users_id:
-        context_data = await state.get_data()
-        title = context_data.get("title")
-        start_date = context_data.get("start_date")
-        start_time = context_data.get("start_time")
-        end_date = context_data.get("end_date")
-        end_time = context_data.get("end_time")
-        full_description = context_data.get("full_description")
-        photos = context_data.get("photos").split(";")[:-1]
-        videos = context_data.get("videos").split(";")[:-1]
+    context_data = await state.get_data()
+    title = context_data.get("title")
+    category = context_data.get("category")
+    bank = context_data.get("bank")
+    start_date = context_data.get("start_date")
+    start_time = context_data.get("start_time")
+    end_date = context_data.get("end_date")
+    end_time = context_data.get("end_time")
+    full_description = context_data.get("full_description")
+    photos = context_data.get("photos").split(";")[:-1]
+    videos = context_data.get("videos").split(";")[:-1]
 
+    if start_date and start_time:
+        valid_date = list(map(int, start_date.split("-")[::-1]))
+        valid_time = list(map(int, start_time.split(":")))
+        datetime_start_date_time = datetime(
+            day=valid_date[0],
+            month=valid_date[1],
+            year=valid_date[2],
+            hour=valid_time[0],
+            minute=valid_time[1],
+        )
+
+        post_details = {
+            "title": title,
+            "category": category,
+            "bank": bank,
+            "start_date": start_date,
+            "start_time": start_time,
+            "end_date": end_date,
+            "end_time": end_time,
+            "full_description": full_description,
+            "photos": photos,
+            "videos": videos,
+            "title": title,
+        }
+
+        scheduler.add_job(
+            send_notifications,
+            trigger="date",
+            run_date=datetime_start_date_time - timedelta(hours=12),
+            kwargs={
+                "bot": bot,
+                "session_maker": session_maker,
+                "post_details": post_details,
+                "notification": "12 Hours",
+            },
+        )
+        scheduler.add_job(
+            send_notifications,
+            trigger="date",
+            run_date=datetime_start_date_time - timedelta(hours=6),
+            kwargs={
+                "bot": bot,
+                "session_maker": session_maker,
+                "post_details": post_details,
+                "notification": "6 Hours",
+            },
+        )
+        scheduler.add_job(
+            send_notifications,
+            trigger="date",
+            run_date=datetime_start_date_time - timedelta(hours=3),
+            kwargs={
+                "bot": bot,
+                "session_maker": session_maker,
+                "post_details": post_details,
+                "notification": "3 Hours",
+            },
+        )
+        scheduler.add_job(
+            send_notifications,
+            trigger="date",
+            run_date=datetime_start_date_time - timedelta(hours=1),
+            kwargs={
+                "bot": bot,
+                "session_maker": session_maker,
+                "post_details": post_details,
+                "notification": "1 Hour",
+            },
+        )
+
+    if users_id:
         text = []
         text.append(f"🗞️ <b>{title}</b>\n\n")
         text.append(f"📜 {full_description}\n\n")
@@ -379,4 +463,4 @@ create_post_router.callback_query.register(
 )
 
 send_post_router.callback_query.register(send_post_to_users, F.data == "publick_post")
-send_post_router.callback_query.middleware.register(SendPostMiddleware())
+send_post_router.callback_query.middleware.register(SendPostMiddleware(scheduler))

@@ -1,4 +1,6 @@
-from users_core.config import BOT_TOKEN, postgres_url
+from datetime import datetime
+
+from users_core.config import BOT_TOKEN, postgres_url, scheduler
 
 from db.base import Base
 from db.engine import create_async_engine, get_session_maker, proceed_models
@@ -84,12 +86,21 @@ import sys
 from aiogram import Bot, Dispatcher
 from aiogram.enums import ParseMode
 
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from apsched.check_subscribs import check_subscribs
+
 
 async def main():
     logging.basicConfig(level=logging.DEBUG, stream=sys.stdout)
 
     bot = Bot(BOT_TOKEN, parse_mode=ParseMode.HTML)
     dp = Dispatcher()
+
+    await set_commands(bot)
+
+    async_engine = create_async_engine(postgres_url)
+    session_maker = get_session_maker(async_engine)
+    await proceed_models(async_engine)
 
     dp.include_routers(
         start_router,
@@ -129,11 +140,15 @@ async def main():
         add_super_admin_router,
         delete_super_admin_router,
     )
-    await set_commands(bot)
 
-    async_engine = create_async_engine(postgres_url)
-    session_maker = get_session_maker(async_engine)
-    await proceed_models(async_engine)
+    scheduler.add_job(
+        check_subscribs,
+        trigger="cron",
+        hour=12,
+        start_date=datetime.now(),
+        kwargs={"bot": bot, "session_maker": session_maker},
+    )
+    scheduler.start()
 
     await dp.start_polling(bot, session_maker=session_maker)
 
