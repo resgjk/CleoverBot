@@ -30,13 +30,13 @@ async def simple_admins_settings(call: CallbackQuery, bot: Bot):
 
 async def start_add_simple_admin(call: CallbackQuery, bot: Bot, state: FSMContext):
     await call.answer()
-    await call.message.answer(text=phrases["add_simple_admin"])
+    await call.message.answer(text=phrases["add_simple_admin"] + phrases["ps_id"])
     await state.set_state(SimpleAdminRoute.GET_ID_FOR_ADD_ADMIN)
 
 
 async def start_delete_simple_admin(call: CallbackQuery, bot: Bot, state: FSMContext):
     await call.answer()
-    await call.message.answer(text=phrases["delete_simple_admin"])
+    await call.message.answer(text=phrases["delete_simple_admin"] + phrases["ps_id"])
     await state.set_state(SimpleAdminRoute.GET_ID_FOR_DELETE_ADMIN)
 
 

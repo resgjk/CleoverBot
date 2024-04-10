@@ -70,12 +70,6 @@ from admins_core.callbacks.super_admins_settings_callback import (
 from admins_core.callbacks.payment_info_callback import payment_info_router
 from admins_core.callbacks.show_payment_info_callback import show_payment_info_router
 from admins_core.callbacks.add_cancel_sub_callbacks import add_cancel_sub_router
-from admins_core.callbacks.add_delele_simple_admins_callbacks import (
-    add_delete_simple_admins_router,
-)
-from admins_core.callbacks.add_delete_super_admins_callbacks import (
-    add_delete_super_admins_router,
-)
 from admins_core.callbacks.add_cancel_sub_callbacks import (
     add_cancel_sub_router,
     get_end_date_for_add_sub_router,
@@ -153,8 +147,6 @@ async def lifespan(app: FastAPI):
             payment_info_router,
             show_payment_info_router,
             add_cancel_sub_router,
-            add_delete_simple_admins_router,
-            add_delete_super_admins_router,
             get_end_date_for_add_sub_router,
             get_id_for_add_sub_router,
             delete_sub_router,
