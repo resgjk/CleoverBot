@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 from db.models.users import UserModel
 
@@ -10,7 +10,7 @@ from sqlalchemy.engine import ScalarResult
 
 
 async def check_subscribs(bot: Bot, session_maker: sessionmaker):
-    date = str(datetime.now().date())
+    date = str(datetime.now(tz=timezone.utc).date())
     async with session_maker() as session:
         async with session.begin():
             res: ScalarResult = await session.execute(

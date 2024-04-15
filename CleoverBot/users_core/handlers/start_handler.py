@@ -1,5 +1,3 @@
-from typing import Any
-
 from users_core.utils.phrases import phrases
 from users_core.keyboards.main_menu import (
     get_main_menu_keyboard_is_sub,
@@ -15,7 +13,7 @@ from aiogram.filters import Command
 start_router = Router()
 
 
-async def start_handler(message: Message, bot: Bot, is_subscriber: bool) -> Any:
+async def start_handler(message: Message, bot: Bot, is_subscriber: bool):
     if is_subscriber:
         await message.answer(
             phrases["start_message"], reply_markup=get_main_menu_keyboard_is_sub()

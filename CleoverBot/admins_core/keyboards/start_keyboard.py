@@ -12,8 +12,5 @@ def get_start_keyboard(is_super_admin: bool) -> InlineKeyboardMarkup:
         keyboard_builder.button(
             text="🤵‍♂️ Управление администраторами", callback_data="admins_settings"
         )
-        # keyboard_builder.button(
-        #    text="🧾 Платежная информация", callback_data="payment_info"
-        # )
     keyboard_builder.adjust(1, repeat=True)
     return keyboard_builder.as_markup()

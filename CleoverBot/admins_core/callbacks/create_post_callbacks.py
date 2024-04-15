@@ -1,6 +1,6 @@
 import asyncio
 from uuid import uuid4
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 from users_core.config import scheduler
 from admins_core.utils.phrases import phrases
@@ -307,6 +307,7 @@ async def send_post_to_users(
             year=valid_date[2],
             hour=valid_time[0],
             minute=valid_time[1],
+            tzinfo=timezone.utc,
         )
 
         post_details = {

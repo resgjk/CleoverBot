@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Any
 
 from users_core.config import (
@@ -47,7 +47,12 @@ from users_core.callbacks.set_content_callbacks.set_activity_callback import (
 from users_core.callbacks.payment_callbacks.create_invoice_callback import (
     create_invoice_router,
 )
+from users_core.callbacks.get_content_callbacks.calendar_callbacks import (
+    calendar_router,
+    show_event_router,
+)
 from users_core.utils.commands import set_commands
+
 
 from admins_core.handlers.start_admin_panel_handler import start_admin_panel_router
 from admins_core.callbacks.create_post_callbacks import (
@@ -67,8 +72,6 @@ from admins_core.callbacks.simple_admins_settings_callback import (
 from admins_core.callbacks.super_admins_settings_callback import (
     super_admins_settings_router,
 )
-from admins_core.callbacks.payment_info_callback import payment_info_router
-from admins_core.callbacks.show_payment_info_callback import show_payment_info_router
 from admins_core.callbacks.add_cancel_sub_callbacks import add_cancel_sub_router
 from admins_core.callbacks.add_cancel_sub_callbacks import (
     add_cancel_sub_router,
@@ -76,16 +79,13 @@ from admins_core.callbacks.add_cancel_sub_callbacks import (
     get_id_for_add_sub_router,
     delete_sub_router,
 )
-from users_core.callbacks.get_content_callbacks.calendar_callbacks import (
-    calendar_router,
-    show_event_router,
-)
 from admins_core.callbacks.super_admins_settings_callback import (
     add_super_admin_router,
     delete_super_admin_router,
     super_admins_settings_router,
 )
 
+import os
 import logging
 from contextlib import asynccontextmanager
 
@@ -100,6 +100,15 @@ from fastapi import FastAPI, Request
 from sqlalchemy import select
 from sqlalchemy.engine import ScalarResult
 from sqlalchemy.orm import joinedload
+
+
+def check_posts_media_folder():
+    if not os.path.exists("posts_media"):
+        os.mkdir("posts_media")
+    if not os.path.exists("posts_media/photos"):
+        os.mkdir(os.path.join("posts_media", "photos"))
+    if not os.path.exists("posts_media/videos"):
+        os.mkdir(os.path.join("posts_media", "videos"))
 
 
 logging.basicConfig(
@@ -121,6 +130,8 @@ async def lifespan(app: FastAPI):
         await set_commands(bot)
 
         await proceed_models(async_engine)
+
+        check_posts_media_folder()
 
         dp.include_routers(
             start_router,
@@ -144,8 +155,6 @@ async def lifespan(app: FastAPI):
             admins_route_router,
             simple_admins_settings_router,
             super_admins_settings_router,
-            payment_info_router,
-            show_payment_info_router,
             add_cancel_sub_router,
             get_end_date_for_add_sub_router,
             get_id_for_add_sub_router,
@@ -164,7 +173,7 @@ async def lifespan(app: FastAPI):
             check_subscribs,
             trigger="cron",
             hour=12,
-            start_date=datetime.now(),
+            start_date=datetime.now(tz=timezone.utc),
             kwargs={"bot": bot, "session_maker": session_maker},
         )
         scheduler.start()
@@ -207,7 +216,7 @@ async def payment_callback(request: Request):
             if current_user.is_subscriber:
                 old_date = list(map(int, current_user.subscriber_until.split("-")))
                 old_date = datetime(
-                    day=old_date[-1], month=old_date[-2], year=old_date[-3]
+                    day=old_date[-1], month=old_date[-2], year=old_date[-3], tzinfo=timezone.utc
                 )
                 new_date = old_date + timedelta(days=days)
                 current_user.subscriber_until = str(new_date.date())
@@ -218,7 +227,7 @@ async def payment_callback(request: Request):
                     + f"<b>{new_date[2]} {new_date[1]} {new_date[-1]}</b>",
                 )
             else:
-                date = datetime.now() + timedelta(days=days)
+                date = datetime.now(tz=timezone.utc) + timedelta(days=days)
                 current_user.subscriber_until = str(date.date())
                 current_user.is_subscriber = True
                 date = date.date().ctime().split()

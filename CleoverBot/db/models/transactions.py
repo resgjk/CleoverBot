@@ -2,7 +2,6 @@ import datetime
 
 from db.base import Base
 
-from sqlalchemy import BIGINT, DATE
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import relationship, mapped_column, Mapped
 

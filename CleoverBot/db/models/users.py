@@ -1,6 +1,6 @@
 from db.base import Base
 
-from sqlalchemy import BIGINT, DATE
+from sqlalchemy import BIGINT
 from sqlalchemy.orm import relationship, mapped_column, Mapped
 
 
@@ -15,7 +15,7 @@ class UserModel(Base):
     subscriber_until: Mapped[str] = mapped_column(nullable=True, unique=False)
     bank: Mapped[str] = mapped_column(nullable=False, default="Zero bank")
     notification: Mapped[str] = mapped_column(nullable=False, default="1 Hour")
-    activities: Mapped[list["ActivityModel"]] = relationship(
+    activities: Mapped[list["ActivityModel"]] = relationship(  # type: ignore
         back_populates="users", secondary="users_to_activities"
     )
     transactions = relationship("TransactionModel", back_populates="user", lazy=True)

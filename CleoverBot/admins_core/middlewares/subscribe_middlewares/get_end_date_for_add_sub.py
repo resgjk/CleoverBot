@@ -1,8 +1,6 @@
 from datetime import datetime
 
 from db.models.users import UserModel
-from admins_core.utils.route_users_subs import UserSubscribeRoute
-
 
 from typing import Callable, Dict, Any, Awaitable
 

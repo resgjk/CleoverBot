@@ -1,9 +1,6 @@
-from datetime import datetime
-
 from db.models.users import UserModel
 from db.models.activities import ActivityModel
 from db.models.posts import PostModel
-
 
 from typing import Callable, Dict, Any, Awaitable
 

@@ -30,7 +30,7 @@ async def super_admins_settings(call: CallbackQuery, bot: Bot):
 
 async def start_add_super_admin(call: CallbackQuery, bot: Bot, state: FSMContext):
     await call.answer()
-    await call.message.answer(text=phrases["add_super_admin"]  + phrases["ps_id"])
+    await call.message.answer(text=phrases["add_super_admin"] + phrases["ps_id"])
     await state.set_state(SuperAdminRoute.GET_ID_FOR_ADD_ADMIN)
 
 
