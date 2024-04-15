@@ -2,20 +2,19 @@ from datetime import datetime, timezone
 
 from db.base import Base
 
-from sqlalchemy import BIGINT
+from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column
 
 
-class PostModel(Base):
-    __tablename__ = "posts"
+class ProjectNewsModel(Base):
+    __tablename__ = "projects_news"
 
     id: Mapped[int] = mapped_column(
         primary_key=True, unique=True, nullable=False, autoincrement=True
     )
-    owner_id: Mapped[int] = mapped_column(BIGINT, nullable=False, unique=False)
+    project_id: Mapped[int] = mapped_column(ForeignKey("projects.id"), nullable=False)
+    project: Mapped["ProjectModel"] = relationship("ProjectModel", back_populates="news")  # type: ignore
     title: Mapped[str] = mapped_column(nullable=False)
-    category: Mapped[str] = mapped_column(nullable=False, unique=False)
-    bank: Mapped[str] = mapped_column(nullable=True)
     create_date: Mapped[str] = mapped_column(
         nullable=False, default=str(datetime.now(tz=timezone.utc).date())
     )
@@ -29,4 +28,4 @@ class PostModel(Base):
     videos: Mapped[str] = mapped_column(nullable=True)
 
     def __repr__(self) -> str:
-        return f"{self.title} {self.owner_id}"
+        return f"{self.title} {self.project}"

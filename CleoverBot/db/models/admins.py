@@ -7,7 +7,9 @@ from sqlalchemy.orm import mapped_column, Mapped
 class AdminModel(Base):
     __tablename__ = "admins"
 
-    id: Mapped[int] = mapped_column(primary_key=True, unique=True, nullable=False)
+    id: Mapped[int] = mapped_column(
+        primary_key=True, unique=True, nullable=False, autoincrement=True
+    )
     user_id: Mapped[int] = mapped_column(BIGINT, unique=True, nullable=False)
     is_super_admin: Mapped[bool] = mapped_column(
         nullable=False, default=False, unique=False

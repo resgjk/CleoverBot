@@ -216,7 +216,10 @@ async def payment_callback(request: Request):
             if current_user.is_subscriber:
                 old_date = list(map(int, current_user.subscriber_until.split("-")))
                 old_date = datetime(
-                    day=old_date[-1], month=old_date[-2], year=old_date[-3], tzinfo=timezone.utc
+                    day=old_date[-1],
+                    month=old_date[-2],
+                    year=old_date[-3],
+                    tzinfo=timezone.utc,
                 )
                 new_date = old_date + timedelta(days=days)
                 current_user.subscriber_until = str(new_date.date())

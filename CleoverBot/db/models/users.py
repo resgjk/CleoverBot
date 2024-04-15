@@ -7,7 +7,9 @@ from sqlalchemy.orm import relationship, mapped_column, Mapped
 class UserModel(Base):
     __tablename__ = "users"
 
-    id: Mapped[int] = mapped_column(primary_key=True, unique=True, nullable=False)
+    id: Mapped[int] = mapped_column(
+        primary_key=True, unique=True, nullable=False, autoincrement=True
+    )
     user_id: Mapped[int] = mapped_column(BIGINT, unique=True, nullable=False)
     is_subscriber: Mapped[bool] = mapped_column(
         nullable=False, default=False, unique=False
@@ -18,7 +20,9 @@ class UserModel(Base):
     activities: Mapped[list["ActivityModel"]] = relationship(  # type: ignore
         back_populates="users", secondary="users_to_activities"
     )
-    transactions = relationship("TransactionModel", back_populates="user", lazy=True)
+    transactions: Mapped[list["TransactionModel"]] = relationship(
+        "TransactionModel", back_populates="user", lazy=True
+    )
 
     def __repr__(self) -> str:
         return f"{self.id} {self.user_id} {self.is_subscriber} {self.subscriber_until} {self.bank} {self.notification}"
