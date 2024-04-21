@@ -87,6 +87,11 @@ from admins_core.callbacks.super_admins_settings_callback import (
 from admins_core.callbacks.projects_settings_callback import projects_settings_router
 from admins_core.callbacks.categories_route_callback import categories_route_router
 from admins_core.callbacks.projects_route_callback import projects_route_router
+from admins_core.callbacks.add_projects_category_callback import (
+    add_projects_category_router,
+    get_ptojects_category_title_router,
+    save_projects_category_in_db_router,
+)
 
 import os
 import logging
@@ -106,12 +111,22 @@ from sqlalchemy.orm import joinedload
 
 
 def check_posts_media_folder():
-    if not os.path.exists("posts_media"):
-        os.mkdir("posts_media")
-    if not os.path.exists("posts_media/photos"):
-        os.mkdir(os.path.join("posts_media", "photos"))
-    if not os.path.exists("posts_media/videos"):
-        os.mkdir(os.path.join("posts_media", "videos"))
+    if not os.path.exists("media"):
+        os.mkdir("media")
+
+    dirs = [
+        "posts_media",
+        "posts_media/photos",
+        "posts_media/videos",
+        "projects_media",
+        "projects_media/categories",
+        "projects_media/categories/photos",
+        "projects_media/categories/videos",
+    ]
+
+    for direction in dirs:
+        if not os.path.exists("media/" + direction):
+            os.mkdir("media/" + direction)
 
 
 logging.basicConfig(
@@ -173,6 +188,9 @@ async def lifespan(app: FastAPI):
             projects_settings_router,
             categories_route_router,
             projects_route_router,
+            add_projects_category_router,
+            get_ptojects_category_title_router,
+            save_projects_category_in_db_router,
         )
 
         scheduler.add_job(

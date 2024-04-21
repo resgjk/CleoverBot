@@ -180,17 +180,13 @@ async def get_media_files(message: Message, bot: Bot, state: FSMContext):
     videos = context_data.get("videos")
     if message.content_type == ContentType.PHOTO:
         file = await bot.get_file(message.photo[-1].file_id)
-        photo_title = (
-            f"posts_media/photos/{post_uuid}_photo_{len(photos.split(';')) - 1}.jpg"
-        )
+        photo_title = f"media/posts_media/photos/{post_uuid}_photo_{len(photos.split(';')) - 1}.jpg"
         photos += photo_title + ";"
         await state.update_data(photos=photos)
         await bot.download_file(file.file_path, photo_title)
     elif message.content_type == ContentType.VIDEO:
         file = await bot.get_file(message.video.file_id)
-        video_title = (
-            f"posts_media/videos/{post_uuid}_video_{len(videos.split(';')) - 1}.mp4"
-        )
+        video_title = f"media/posts_media/videos/{post_uuid}_video_{len(videos.split(';')) - 1}.mp4"
         videos += video_title + ";"
         await state.update_data(videos=videos)
         await bot.download_file(file.file_path, video_title)
