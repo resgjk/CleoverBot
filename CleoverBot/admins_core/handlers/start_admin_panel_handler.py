@@ -5,15 +5,17 @@ from admins_core.middlewares.check_middlewares.chekc_admin import CheckAdminMidd
 from aiogram.types import Message
 from aiogram import Bot, Router
 from aiogram.filters import Command
+from aiogram.fsm.context import FSMContext
 
 
 start_admin_panel_router = Router()
 
 
 async def start_admin_panel(
-    message: Message, bot: Bot, is_admin: bool, is_super_admin: bool
+    message: Message, bot: Bot, is_admin: bool, is_super_admin: bool, state: FSMContext
 ):
     if is_admin:
+        await state.clear()
         await message.answer(
             phrases["start_message"], reply_markup=get_start_keyboard(is_super_admin)
         )

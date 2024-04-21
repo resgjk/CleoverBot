@@ -11,16 +11,19 @@ class ProjectModel(Base):
         primary_key=True, unique=True, nullable=False, autoincrement=True
     )
     title: Mapped[str] = mapped_column(nullable=False)
-    category_id: Mapped[int] = mapped_column(
+    project_category_id: Mapped[int] = mapped_column(
         ForeignKey("projects_categories.id"), nullable=False
     )
-    category: Mapped["ProjectCategoryModel"] = relationship("projects_categories", back_populates="projects")  # type: ignore
+    project_category: Mapped["ProjectCategoryModel"] = relationship("ProjectCategoryModel", back_populates="projects")  # type: ignore
     description: Mapped[str] = mapped_column(unique=False, nullable=True)
     photos: Mapped[str] = mapped_column(nullable=True)
     videos: Mapped[str] = mapped_column(nullable=True)
     links: Mapped[str] = mapped_column(nullable=True)
     news: Mapped[list["ProjectNewsModel"]] = relationship(
         "ProjectNewsModel", back_populates="project", lazy=True
+    )
+    users: Mapped[list["UserModel"]] = relationship(  # type: ignore
+        back_populates="projects", secondary="users_to_projects"
     )
 
     def __repr__(self) -> str:

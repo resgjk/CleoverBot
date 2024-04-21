@@ -84,6 +84,9 @@ from admins_core.callbacks.super_admins_settings_callback import (
     delete_super_admin_router,
     super_admins_settings_router,
 )
+from admins_core.callbacks.projects_settings_callback import projects_settings_router
+from admins_core.callbacks.categories_route_callback import categories_route_router
+from admins_core.callbacks.projects_route_callback import projects_route_router
 
 import os
 import logging
@@ -167,6 +170,9 @@ async def lifespan(app: FastAPI):
             add_super_admin_router,
             delete_super_admin_router,
             create_invoice_router,
+            projects_settings_router,
+            categories_route_router,
+            projects_route_router,
         )
 
         scheduler.add_job(

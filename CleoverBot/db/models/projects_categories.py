@@ -14,7 +14,7 @@ class ProjectCategoryModel(Base):
     photos: Mapped[str] = mapped_column(nullable=True)
     videos: Mapped[str] = mapped_column(nullable=True)
     projects: Mapped[list["ProjectModel"]] = relationship(
-        "ProjectModel", back_populates="category", lazy=True
+        "ProjectModel", back_populates="project_category", lazy=True
     )
 
     def __repr__(self) -> str:

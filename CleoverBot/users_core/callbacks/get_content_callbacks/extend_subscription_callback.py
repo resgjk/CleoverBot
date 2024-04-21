@@ -24,7 +24,7 @@ async def extend_subscription(call: CallbackQuery, bot: Bot, expiration_date):
         .split()
     )
     await call.message.edit_text(
-        text="🔑 *Subscription*\n\n"
+        text="🔑 <b>Subscription</b>\n\n"
         + " ".join(
             (
                 phrases["expiration_sub_date"],

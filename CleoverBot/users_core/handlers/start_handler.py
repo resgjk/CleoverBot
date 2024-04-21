@@ -8,12 +8,16 @@ from users_core.middlewares.register_check import RegisterCheckMiddleware
 from aiogram.types import Message
 from aiogram import Bot, Router
 from aiogram.filters import Command
+from aiogram.fsm.context import FSMContext
 
 
 start_router = Router()
 
 
-async def start_handler(message: Message, bot: Bot, is_subscriber: bool):
+async def start_handler(
+    message: Message, bot: Bot, is_subscriber: bool, state: FSMContext
+):
+    await state.clear()
     if is_subscriber:
         await message.answer(
             phrases["start_message"], reply_markup=get_main_menu_keyboard_is_sub()

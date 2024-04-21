@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 from db.base import Base
 
 from sqlalchemy import ForeignKey
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 
 class ProjectNewsModel(Base):

@@ -1,10 +1,10 @@
 import asyncio
 from uuid import uuid4
-from datetime import datetime, timedelta, timezone
 
 from users_core.config import scheduler
 from admins_core.utils.phrases import phrases
 from admins_core.utils.post_form import PostForm
+from admins_core.utils.post_sender import PostSender
 from admins_core.keyboards.choise_bank_keyboard import get_banks_keyboard
 from admins_core.keyboards.choise_category_keyboard import get_activities_keyboard
 from admins_core.keyboards.finish_create_post_keyboard import get_media_keyboard
@@ -15,18 +15,9 @@ from admins_core.middlewares.post_middlewares.get_id_for_send_post import (
 from admins_core.keyboards.return_to_admin_panel_keyboard import (
     return_to_admin_panel_keyboard,
 )
-from apsched.send_notification import send_notifications
 
 from aiogram import Bot, Router, F
-from aiogram.types import (
-    CallbackQuery,
-    Message,
-    ContentType,
-    InputMediaPhoto,
-    InputMediaVideo,
-    FSInputFile,
-    ReplyKeyboardRemove,
-)
+from aiogram.types import CallbackQuery, Message, ReplyKeyboardRemove, ContentType
 from aiogram.fsm.context import FSMContext
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
@@ -209,59 +200,9 @@ async def save_media_and_show_post(call: CallbackQuery, bot: Bot, state: FSMCont
     await call.answer()
 
     context_data = await state.get_data()
-    title = context_data.get("title")
-    category = context_data.get("category")
-    bank = context_data.get("bank")
-    start_date = context_data.get("start_date")
-    start_time = context_data.get("start_time")
-    end_date = context_data.get("end_date")
-    end_time = context_data.get("end_time")
-    short_description = context_data.get("short_description")
-    full_description = context_data.get("full_description")
-    photos = context_data.get("photos").split(";")[:-1]
-    videos = context_data.get("videos").split(";")[:-1]
+    sender = PostSender(bot=bot, context_data=context_data)
 
-    text = []
-    text.append(f"<b>Название</b>: {title}")
-    text.append(f"<b>Категория</b>: {category}")
-    text.append(f"<b>Бюджет</b>: {bank}")
-    if start_date:
-        text.append(f"<b>Дата начала</b>: {'.'.join(start_date.split('-')[::-1])}")
-    if start_time:
-        text.append(f"<b>Время начала</b>: {start_time}")
-    if end_date:
-        text.append(f"<b>Дата окончания</b>: {'.'.join(end_date.split('-')[::-1])}")
-    if end_time:
-        text.append(f"<b>Время окончания</b>: {end_time}")
-    text.append(f"<b>Краткое описание</b>: {short_description}")
-    text.append(f"<b>Подробное описание</b>: {full_description}")
-    text = "\n\n".join(text)
-
-    media = []
-    if photos:
-        for photo in photos:
-            if not media:
-                media.append(
-                    InputMediaPhoto(
-                        type="photo", media=FSInputFile(path=photo), caption=text
-                    )
-                )
-            else:
-                media.append(
-                    InputMediaPhoto(type="photo", media=FSInputFile(path=photo))
-                )
-    if videos:
-        for video in videos:
-            if not media:
-                media.append(
-                    InputMediaVideo(
-                        type="video", media=FSInputFile(path=video), caption=text
-                    )
-                )
-            else:
-                media.append(
-                    InputMediaVideo(type="video", media=FSInputFile(path=video))
-                )
+    text, media = sender.show_post_detail_for_admin()
 
     if media:
         await bot.send_media_group(
@@ -287,131 +228,12 @@ async def send_post_to_users(
     session_maker: sessionmaker,
 ):
     context_data = await state.get_data()
-    title = context_data.get("title")
-    category = context_data.get("category")
-    bank = context_data.get("bank")
-    start_date = context_data.get("start_date")
-    start_time = context_data.get("start_time")
-    end_date = context_data.get("end_date")
-    end_time = context_data.get("end_time")
-    full_description = context_data.get("full_description")
-    photos = context_data.get("photos").split(";")[:-1]
-    videos = context_data.get("videos").split(";")[:-1]
-
-    if start_date and start_time:
-        valid_date = list(map(int, start_date.split("-")[::-1]))
-        valid_time = list(map(int, start_time.split(":")))
-        datetime_start_date_time = datetime(
-            day=valid_date[0],
-            month=valid_date[1],
-            year=valid_date[2],
-            hour=valid_time[0],
-            minute=valid_time[1],
-            tzinfo=timezone.utc,
-        )
-
-        post_details = {
-            "title": title,
-            "category": category,
-            "bank": bank,
-            "start_date": start_date,
-            "start_time": start_time,
-            "end_date": end_date,
-            "end_time": end_time,
-            "full_description": full_description,
-            "photos": photos,
-            "videos": videos,
-            "title": title,
-        }
-
-        scheduler.add_job(
-            send_notifications,
-            trigger="date",
-            run_date=datetime_start_date_time - timedelta(hours=12),
-            kwargs={
-                "bot": bot,
-                "session_maker": session_maker,
-                "post_details": post_details,
-                "notification": "12 Hours",
-            },
-        )
-        scheduler.add_job(
-            send_notifications,
-            trigger="date",
-            run_date=datetime_start_date_time - timedelta(hours=6),
-            kwargs={
-                "bot": bot,
-                "session_maker": session_maker,
-                "post_details": post_details,
-                "notification": "6 Hours",
-            },
-        )
-        scheduler.add_job(
-            send_notifications,
-            trigger="date",
-            run_date=datetime_start_date_time - timedelta(hours=3),
-            kwargs={
-                "bot": bot,
-                "session_maker": session_maker,
-                "post_details": post_details,
-                "notification": "3 Hours",
-            },
-        )
-        scheduler.add_job(
-            send_notifications,
-            trigger="date",
-            run_date=datetime_start_date_time - timedelta(hours=1),
-            kwargs={
-                "bot": bot,
-                "session_maker": session_maker,
-                "post_details": post_details,
-                "notification": "1 Hour",
-            },
-        )
+    sender = PostSender(bot=bot, context_data=context_data)
 
     if users_id:
-        text = []
-        text.append(f"🗞️ <b>{title}</b>\n\n")
-        text.append(f"{full_description}\n\n")
-        if start_date:
-            date = ".".join(start_date.split("-")[::-1])
-            if start_time:
-                text.append(f"🗓️ Start date: {date}, {start_time}\n")
-            else:
-                text.append(f"🗓️ Start date: {date}\n")
-        if end_date:
-            date = ".".join(end_date.split("-")[::-1])
-            if end_time:
-                text.append(f"🏁 End date: {date}, {end_time}")
-            else:
-                text.append(f"🏁 End date: {date}")
-        text = "".join(text)
-
-        media = []
-        if photos:
-            for photo in photos:
-                if not media:
-                    media.append(
-                        InputMediaPhoto(
-                            type="photo", media=FSInputFile(path=photo), caption=text
-                        )
-                    )
-                else:
-                    media.append(
-                        InputMediaPhoto(type="photo", media=FSInputFile(path=photo))
-                    )
-        if videos:
-            for video in videos:
-                if not media:
-                    media.append(
-                        InputMediaVideo(
-                            type="video", media=FSInputFile(path=video), caption=text
-                        )
-                    )
-                else:
-                    media.append(
-                        InputMediaVideo(type="video", media=FSInputFile(path=video))
-                    )
+        text, media = sender.send_post_to_users(
+            session_maker=session_maker, scheduler=scheduler
+        )
 
         tasks = []
         try:

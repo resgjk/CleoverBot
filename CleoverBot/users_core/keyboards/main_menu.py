@@ -4,12 +4,13 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 def get_main_menu_keyboard_is_sub() -> InlineKeyboardMarkup:
     keyboard_builder = InlineKeyboardBuilder()
-    keyboard_builder.button(text="📥 Feedback", callback_data="feedback")
-    keyboard_builder.button(text="⚙️ Settings", callback_data="settings")
+    keyboard_builder.button(text="📅 Calendar", callback_data="calendar")
+    keyboard_builder.button(text="🗃 Projects", callback_data="projects")
     keyboard_builder.button(text="💡 Activities", callback_data="activities")
     keyboard_builder.button(text="📜 Instruction", callback_data="instruction")
-    keyboard_builder.button(text="📅 Calendar", callback_data="calendar")
+    keyboard_builder.button(text="📥 Feedback", callback_data="feedback")
     keyboard_builder.button(text="❓ Support", callback_data="support")
+    keyboard_builder.button(text="⚙️ Settings", callback_data="settings")
     keyboard_builder.adjust(2, repeat=True)
     return keyboard_builder.as_markup()
 

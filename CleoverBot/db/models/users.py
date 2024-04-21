@@ -20,6 +20,9 @@ class UserModel(Base):
     activities: Mapped[list["ActivityModel"]] = relationship(  # type: ignore
         back_populates="users", secondary="users_to_activities"
     )
+    projects: Mapped[list["ProjectModel"]] = relationship(  # type: ignore
+        back_populates="users", secondary="users_to_projects"
+    )
     transactions: Mapped[list["TransactionModel"]] = relationship(
         "TransactionModel", back_populates="user", lazy=True
     )

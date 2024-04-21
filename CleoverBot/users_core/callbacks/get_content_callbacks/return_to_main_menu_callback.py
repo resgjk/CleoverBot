@@ -7,12 +7,15 @@ from users_core.middlewares.register_check import RegisterCheckMiddleware
 
 from aiogram import Bot, Router, F
 from aiogram.types import CallbackQuery
-
+from aiogram.fsm.context import FSMContext
 
 main_menu_router = Router()
 
 
-async def return_to_main_menu(call: CallbackQuery, bot: Bot, is_subscriber: bool):
+async def return_to_main_menu(
+    call: CallbackQuery, bot: Bot, is_subscriber: bool, state: FSMContext
+):
+    await state.clear()
     if is_subscriber:
         await call.message.edit_text(
             text=phrases["start_message"], reply_markup=get_main_menu_keyboard_is_sub()

@@ -4,15 +4,21 @@ from admins_core.middlewares.check_middlewares.chekc_admin import CheckAdminMidd
 
 from aiogram.types import CallbackQuery
 from aiogram import Bot, Router, F
+from aiogram.fsm.context import FSMContext
 
 
 return_to_admin_panel_router = Router()
 
 
 async def return_to_admin_panel(
-    call: CallbackQuery, bot: Bot, is_admin: bool, is_super_admin: bool
+    call: CallbackQuery,
+    bot: Bot,
+    is_admin: bool,
+    is_super_admin: bool,
+    state: FSMContext,
 ):
     if is_admin:
+        await state.clear()
         await call.message.edit_text(
             phrases["start_message"], reply_markup=get_start_keyboard(is_super_admin)
         )

@@ -6,6 +6,9 @@ def get_start_keyboard(is_super_admin: bool) -> InlineKeyboardMarkup:
     keyboard_builder = InlineKeyboardBuilder()
     keyboard_builder.button(text="✍️ Создать пост", callback_data="create_post")
     keyboard_builder.button(
+        text="🗃 Управление проектами", callback_data="projects_settings"
+    )
+    keyboard_builder.button(
         text="👥 Настройки пользователей", callback_data="users_settings"
     )
     if is_super_admin:
