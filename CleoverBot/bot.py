@@ -92,6 +92,10 @@ from admins_core.callbacks.add_projects_category_callback import (
     get_ptojects_category_title_router,
     save_projects_category_in_db_router,
 )
+from admins_core.callbacks.delete_projects_category_callback import (
+    delete_projects_category_router,
+    start_delete_projects_category_router,
+)
 
 import os
 import logging
@@ -191,6 +195,8 @@ async def lifespan(app: FastAPI):
             add_projects_category_router,
             get_ptojects_category_title_router,
             save_projects_category_in_db_router,
+            delete_projects_category_router,
+            start_delete_projects_category_router,
         )
 
         scheduler.add_job(

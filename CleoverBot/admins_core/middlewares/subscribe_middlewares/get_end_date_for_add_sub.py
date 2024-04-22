@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 from db.models.users import UserModel
 
@@ -22,8 +22,13 @@ class GetEndDateForAddSubMiddleware(BaseMiddleware):
     ) -> Any:
         try:
             date = event.text.split(".")
-            now_date = datetime.now()
-            end_date = datetime(day=int(date[0]), month=int(date[1]), year=int(date[2]))
+            now_date = datetime.now(tz=timezone.utc)
+            end_date = datetime(
+                day=int(date[0]),
+                month=int(date[1]),
+                year=int(date[2]),
+                tzinfo=timezone.utc,
+            )
             if end_date > now_date:
                 session_maker: sessionmaker = data["session_maker"]
                 state: FSMContext = data["state"]

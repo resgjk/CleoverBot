@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 from db.models.posts import PostModel
 
@@ -24,12 +24,15 @@ class CalendarMiddleware(BaseMiddleware):
         state: FSMContext = data["state"]
         context_data = await state.get_data()
         if event.data == "calendar":
-            await state.update_data(curr_date=str(datetime.now().date()))
+            await state.update_data(curr_date=str(datetime.now(tz=timezone.utc).date()))
             context_data = await state.get_data()
         else:
             loc_date = context_data.get("curr_date").split("-")
             datetime_date = datetime(
-                day=int(loc_date[2]), month=int(loc_date[1]), year=int(loc_date[0])
+                day=int(loc_date[2]),
+                month=int(loc_date[1]),
+                year=int(loc_date[0]),
+                tzinfo=timezone.utc,
             )
             if event.data == "next_date":
                 new_date = datetime_date + timedelta(days=1)

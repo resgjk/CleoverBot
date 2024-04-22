@@ -20,7 +20,10 @@ class ProjectModel(Base):
     videos: Mapped[str] = mapped_column(nullable=True)
     links: Mapped[str] = mapped_column(nullable=True)
     news: Mapped[list["ProjectNewsModel"]] = relationship(
-        "ProjectNewsModel", back_populates="project", lazy=True
+        "ProjectNewsModel",
+        back_populates="project",
+        lazy=True,
+        cascade="save-update, merge, delete",
     )
     users: Mapped[list["UserModel"]] = relationship(  # type: ignore
         back_populates="projects", secondary="users_to_projects"
