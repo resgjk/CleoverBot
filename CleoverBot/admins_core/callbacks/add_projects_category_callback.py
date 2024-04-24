@@ -7,6 +7,7 @@ from admins_core.keyboards.save_new_projects_category_media_keyboard import (
 from admins_core.keyboards.return_to_categories_route_menu import (
     return_to_categories_route_keyboard,
 )
+from admins_core.keyboards.return_to_admin_panel_keyboard import return_to_admin_panel_keyboard
 from admins_core.keyboards.save_projects_category_keyboard import get_save_keyboard
 from admins_core.middlewares.check_middlewares.check_projects_category import (
     CheckProjectsCategoryMiddleware,
@@ -111,7 +112,7 @@ async def save_category_id_db(
         await call.answer()
         await call.message.answer(
             text="✅ Категория успешно сохранена!",
-            reply_markup=return_to_categories_route_keyboard(),
+            reply_markup=return_to_admin_panel_keyboard(),
         )
         await state.clear()
     elif result == "fail":
