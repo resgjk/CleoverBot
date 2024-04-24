@@ -96,6 +96,13 @@ from admins_core.callbacks.delete_projects_category_callback import (
     delete_projects_category_router,
     start_delete_projects_category_router,
 )
+from admins_core.callbacks.add_project_callback import (
+    add_project_router,
+    choise_category_for_add_project_router,
+    save_project_and_save_router,
+    get_title_for_add_project_router,
+    save_media_and_links_router,
+)
 
 import os
 import logging
@@ -124,8 +131,11 @@ def check_posts_media_folder():
         "posts_media/videos",
         "projects_media",
         "projects_media/categories",
+        "projects_media/projects",
         "projects_media/categories/photos",
         "projects_media/categories/videos",
+        "projects_media/projects/photos",
+        "projects_media/projects/videos",
     ]
 
     for direction in dirs:
@@ -197,6 +207,11 @@ async def lifespan(app: FastAPI):
             save_projects_category_in_db_router,
             delete_projects_category_router,
             start_delete_projects_category_router,
+            add_project_router,
+            choise_category_for_add_project_router,
+            save_project_and_save_router,
+            get_title_for_add_project_router,
+            save_media_and_links_router,
         )
 
         scheduler.add_job(

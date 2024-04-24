@@ -7,9 +7,6 @@ from admins_core.keyboards.save_new_projects_category_media_keyboard import (
 from admins_core.keyboards.return_to_categories_route_menu import (
     return_to_categories_route_keyboard,
 )
-from admins_core.keyboards.return_to_admin_panel_keyboard import (
-    return_to_admin_panel_keyboard,
-)
 from admins_core.keyboards.save_projects_category_keyboard import get_save_keyboard
 from admins_core.middlewares.check_middlewares.check_projects_category import (
     CheckProjectsCategoryMiddleware,
@@ -100,7 +97,7 @@ async def save_media_and_show_category(
     else:
         await call.message.answer(text=text)
     await bot.send_message(
-        text=phrases["finish_message"],
+        text=phrases["finish_category_message"],
         chat_id=call.message.chat.id,
         reply_markup=get_save_keyboard(),
     )
@@ -113,14 +110,14 @@ async def save_category_id_db(
     if result == "success":
         await call.answer()
         await call.message.answer(
-            text="Категория успешно опубликована!",
-            reply_markup=return_to_admin_panel_keyboard(),
+            text="✅ Категория успешно сохранена!",
+            reply_markup=return_to_categories_route_keyboard(),
         )
         await state.clear()
     elif result == "fail":
         await call.answer()
         await call.message.answer(
-            text="Не удалось опубликовать пост, попробуйте еще раз!"
+            text="Не удалось сохранить категорию, попробуйте еще раз!"
         )
 
 

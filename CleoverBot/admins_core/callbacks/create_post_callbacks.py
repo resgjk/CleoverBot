@@ -247,7 +247,7 @@ async def send_post_to_users(
             await state.clear()
             await call.answer()
             await call.message.answer(
-                text="Пост успешно опубликован!",
+                text="✅ Пост успешно опубликован!",
                 reply_markup=return_to_admin_panel_keyboard(),
             )
         except Exception as e:
@@ -258,7 +258,7 @@ async def send_post_to_users(
     else:
         await call.answer()
         await call.message.answer(
-            text="Пост успешно опубликован!",
+            text="✅ Пост успешно опубликован!",
             reply_markup=return_to_admin_panel_keyboard(),
         )
     await state.clear()
