@@ -223,6 +223,7 @@ async def send_post_to_users(
     scheduler: AsyncIOScheduler,
     session_maker: sessionmaker,
 ):
+    await call.answer()
     context_data = await state.get_data()
     sender = PostSender(bot=bot, context_data=context_data)
 
@@ -245,19 +246,16 @@ async def send_post_to_users(
                     tasks.append(task)
             await asyncio.gather(*tasks)
             await state.clear()
-            await call.answer()
-            await call.message.answer(
+            await call.message.edit_text(
                 text="✅ Пост успешно опубликован!",
                 reply_markup=return_to_admin_panel_keyboard(),
             )
-        except Exception as e:
-            await call.answer()
+        except Exception:
             await call.message.answer(
                 text="Не удалось опубликовать пост, попробуйте еще раз!"
             )
     else:
-        await call.answer()
-        await call.message.answer(
+        await call.message.edit_text(
             text="✅ Пост успешно опубликован!",
             reply_markup=return_to_admin_panel_keyboard(),
         )
@@ -278,7 +276,7 @@ create_post_router.message.register(
 create_post_router.message.register(get_full_description, PostForm.GET_FULL_DESCRIPTION)
 create_post_router.message.register(get_media_files, PostForm.GET_MEDIA_FILES)
 create_post_router.callback_query.register(
-    save_media_and_show_post, F.data == "save_media"
+    save_media_and_show_post, F.data == "save_media", PostForm.GET_MEDIA_FILES
 )
 
 send_post_router.callback_query.register(

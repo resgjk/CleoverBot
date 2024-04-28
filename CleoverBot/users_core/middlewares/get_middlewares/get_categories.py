@@ -21,21 +21,21 @@ class CategoriesPagesMiddleware(BaseMiddleware):
         state: FSMContext = data["state"]
         context_data = await state.get_data()
         try:
-            if event.data in ["add_project", "choise_project"]:
-                await state.update_data(categories_page=1)
+            if event.data == "projects":
+                await state.update_data(user_categories_page=1)
                 context_data = await state.get_data()
             else:
-                page = context_data.get("categories_page")
+                page = context_data.get("user_categories_page")
                 if "next_categories_page" in event.data:
                     new_page = page + 1
                 elif "back_categories_page" in event.data:
                     new_page = page - 1
-                await state.update_data(categories_page=new_page)
+                await state.update_data(user_categories_page=new_page)
                 context_data = await state.get_data()
 
             async with session_maker() as session:
                 async with session.begin():
-                    categories_page = context_data.get("categories_page")
+                    categories_page = context_data.get("user_categories_page")
                     res: ScalarResult = await session.execute(
                         select(ProjectCategoryModel)
                     )

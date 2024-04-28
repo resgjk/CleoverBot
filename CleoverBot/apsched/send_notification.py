@@ -41,8 +41,8 @@ async def send_notifications(
                             users_id.append(user.user_id)
             if users_id:
                 text = []
-                text.append(f"🗞️ <b>{post_details['title']}</b>\n\n")
-                text.append(f"{post_details['full_description']}\n\n")
+                text.append(f"📢 <b>{post_details['title']}</b>\n\n")
+                text.append(f"ℹ️ {post_details['full_description']}\n\n")
                 if post_details["start_date"]:
                     date = ".".join(post_details["start_date"].split("-")[::-1])
                     if post_details["start_time"]:

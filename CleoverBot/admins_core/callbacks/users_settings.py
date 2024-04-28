@@ -3,12 +3,14 @@ from admins_core.keyboards.users_settings_keyboard import get_users_settings_key
 
 from aiogram import Bot, Router, F
 from aiogram.types import CallbackQuery
+from aiogram.fsm.context import FSMContext
 
 
 users_settings_router = Router()
 
 
-async def users_settings(call: CallbackQuery, bot: Bot):
+async def users_settings(call: CallbackQuery, bot: Bot, state: FSMContext):
+    await state.clear()
     await call.message.edit_text(
         text=phrases["users_settings"], reply_markup=get_users_settings_keyboard()
     )

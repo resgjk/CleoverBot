@@ -7,9 +7,6 @@ from admins_core.keyboards.choise_project_category_keyboard import (
 from admins_core.keyboards.return_to_projects_route_menu import (
     return_to_projects_route_keyboard,
 )
-from admins_core.keyboards.return_to_admin_panel_keyboard import (
-    return_to_admin_panel_keyboard,
-)
 from admins_core.keyboards.save_new_project_media_keyboard import get_media_keyboard
 from admins_core.keyboards.save_new_project_links_keyboard import get_links_keyboard
 from admins_core.keyboards.save_new_project_keyboard import get_save_keyboard
@@ -75,7 +72,7 @@ async def choise_category(
             text="Не удалось выбрать категорию, попробуйте еще раз!"
         )
     else:
-        await call.message.answer(
+        await call.message.edit_text(
             text=f"Выбрана категория <b>{choisen_category['title']}</b>"
         )
         await call.message.answer(text=phrases["get_project_title"])
@@ -176,47 +173,49 @@ async def save_media_and_show_project(call: CallbackQuery, bot: Bot, state: FSMC
 
 
 async def send_project_to_users(
-    call: CallbackQuery,
-    bot: Bot,
-    state: FSMContext,
-    users_id: list,
+    call: CallbackQuery, bot: Bot, state: FSMContext, users_id: list, result: str
 ):
+    await call.answer()
     context_data = await state.get_data()
     sender = ProjectSender(context_data=context_data)
 
-    if users_id:
-        text, media = sender.send_project_to_users()
+    if result == "success":
+        if users_id:
+            text, media = sender.send_project_to_users()
 
-        tasks = []
-        try:
-            for id in users_id:
-                if media:
-                    task = bot.send_media_group(
-                        chat_id=id,
-                        media=media,
-                    )
-                    tasks.append(task)
-                else:
-                    task = bot.send_message(chat_id=id, text=text)
-                    tasks.append(task)
-            await asyncio.gather(*tasks)
-            await state.clear()
-            await call.answer()
-            await call.message.answer(
+            tasks = []
+            try:
+                for id in users_id:
+                    if media:
+                        task = bot.send_media_group(
+                            chat_id=id,
+                            media=media,
+                        )
+                        tasks.append(task)
+                    else:
+                        task = bot.send_message(chat_id=id, text=text)
+                        tasks.append(task)
+                await asyncio.gather(*tasks)
+                await call.message.edit_text(
+                    text="✅ Проект успешно опубликован!",
+                    reply_markup=return_to_projects_route_keyboard(),
+                )
+            except Exception:
+                await call.message.answer(
+                    text="Не удалось опубликовать проект, попробуйте еще раз!",
+                    reply_markup=return_to_projects_route_keyboard(),
+                )
+        else:
+            await call.message.edit_text(
                 text="✅ Проект успешно опубликован!",
-                reply_markup=return_to_admin_panel_keyboard(),
-            )
-        except Exception as e:
-            await call.answer()
-            await call.message.answer(
-                text="Не удалось опубликовать проект, попробуйте еще раз!"
+                reply_markup=return_to_projects_route_keyboard(),
             )
     else:
-        await call.answer()
         await call.message.answer(
-            text="✅ Проект успешно опубликован!",
-            reply_markup=return_to_admin_panel_keyboard(),
+            text="Не удалось опубликовать проект, попробуйте еще раз!",
+            reply_markup=return_to_projects_route_keyboard(),
         )
+
     await state.clear()
 
 
@@ -233,11 +232,11 @@ add_project_router.message.register(
 )
 save_media_and_links_router.message.register(get_project_links, ProjectForm.GET_LINKS)
 save_media_and_links_router.callback_query.register(
-    start_get_media, F.data == "save_project_links"
+    start_get_media, F.data == "save_project_links", ProjectForm.GET_LINKS
 )
 save_media_and_links_router.message.register(get_media_files, ProjectForm.GET_MEDIA)
 save_media_and_links_router.callback_query.register(
-    save_media_and_show_project, F.data == "save_project_media"
+    save_media_and_show_project, F.data == "save_project_media", ProjectForm.GET_MEDIA
 )
 
 choise_category_for_add_project_router.callback_query.register(

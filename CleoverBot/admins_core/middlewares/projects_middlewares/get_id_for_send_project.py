@@ -32,23 +32,28 @@ class SendProjectMiddleware(BaseMiddleware):
         users_id = []
         async with session_maker() as session:
             async with session.begin():
-                new_project: ProjectModel = ProjectModel(
-                    title=title,
-                    project_category_id=category,
-                    description=description,
-                    photos=photos,
-                    videos=videos,
-                    links=links,
-                )
-                session.add(new_project)
+                try:
+                    new_project: ProjectModel = ProjectModel(
+                        title=title,
+                        project_category_id=category,
+                        description=description,
+                        photos=photos,
+                        videos=videos,
+                        links=links,
+                    )
+                    session.add(new_project)
 
-                res: ScalarResult = await session.execute(
-                    select(UserModel).where(UserModel.is_subscriber)
-                )
-                users: list[UserModel] = res.scalars().all()
-                for user in users:
-                    if user.user_id != owner_id:
-                        users_id.append(user.user_id)
-                data["users_id"] = users_id
-                await session.commit()
+                    res: ScalarResult = await session.execute(
+                        select(UserModel).where(UserModel.is_subscriber)
+                    )
+                    users: list[UserModel] = res.scalars().all()
+                    for user in users:
+                        if user.user_id != owner_id:
+                            users_id.append(user.user_id)
+                    data["users_id"] = users_id
+                    data["result"] = "success"
+                    await session.commit()
+                except Exception:
+                    data["users_id"] = []
+                    data["result"] = "error"
         return await handler(event, data)

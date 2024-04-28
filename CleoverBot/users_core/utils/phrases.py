@@ -15,4 +15,5 @@ phrases = {
     "create_payment_text": "🧾 Your subscription invoice:\n\n",
     "error_create_payment": "🤷 Failed to create an invoice, please try again!",
     "subscription_date": "🎉 Congratulations! Your subscription is valid until ",
+    "choise_project_category": "📚 Select the category of projects that interest you:",
 }

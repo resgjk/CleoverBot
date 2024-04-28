@@ -34,4 +34,5 @@ class ChoiseCategoryMiddleware(BaseMiddleware):
                     data["choisen_category"] = choisen_category
                 else:
                     data["error"] = True
+                    data["choisen_category"] = None
         return await handler(event, data)

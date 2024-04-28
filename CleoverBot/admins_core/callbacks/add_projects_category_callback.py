@@ -7,7 +7,6 @@ from admins_core.keyboards.save_new_projects_category_media_keyboard import (
 from admins_core.keyboards.return_to_categories_route_menu import (
     return_to_categories_route_keyboard,
 )
-from admins_core.keyboards.return_to_admin_panel_keyboard import return_to_admin_panel_keyboard
 from admins_core.keyboards.save_projects_category_keyboard import get_save_keyboard
 from admins_core.middlewares.check_middlewares.check_projects_category import (
     CheckProjectsCategoryMiddleware,
@@ -110,16 +109,17 @@ async def save_category_id_db(
 ):
     if result == "success":
         await call.answer()
-        await call.message.answer(
+        await call.message.edit_text(
             text="✅ Категория успешно сохранена!",
-            reply_markup=return_to_admin_panel_keyboard(),
+            reply_markup=return_to_categories_route_keyboard(),
         )
-        await state.clear()
     elif result == "fail":
         await call.answer()
         await call.message.answer(
-            text="Не удалось сохранить категорию, попробуйте еще раз!"
+            text="Не удалось сохранить категорию, попробуйте еще раз!",
+            reply_markup=return_to_categories_route_keyboard(),
         )
+    await state.clear()
 
 
 add_projects_category_router.callback_query.register(
@@ -136,7 +136,9 @@ add_projects_category_router.message.register(
 )
 add_projects_category_router.message.register(get_media_files, CategoryForm.GET_MEDIA)
 add_projects_category_router.callback_query.register(
-    save_media_and_show_category, F.data == "save_projects_category_media"
+    save_media_and_show_category,
+    F.data == "save_projects_category_media",
+    CategoryForm.GET_MEDIA,
 )
 
 save_projects_category_in_db_router.callback_query.register(

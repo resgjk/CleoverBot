@@ -23,35 +23,40 @@ class CalendarMiddleware(BaseMiddleware):
         session_maker: sessionmaker = data["session_maker"]
         state: FSMContext = data["state"]
         context_data = await state.get_data()
-        if event.data == "calendar":
-            await state.update_data(curr_date=str(datetime.now(tz=timezone.utc).date()))
-            context_data = await state.get_data()
-        else:
-            loc_date = context_data.get("curr_date").split("-")
-            datetime_date = datetime(
-                day=int(loc_date[2]),
-                month=int(loc_date[1]),
-                year=int(loc_date[0]),
-                tzinfo=timezone.utc,
-            )
-            if event.data == "next_date":
-                new_date = datetime_date + timedelta(days=1)
-            elif event.data == "back_date":
-                new_date = datetime_date - timedelta(days=1)
-            await state.update_data(curr_date=str(new_date.date()))
-            context_data = await state.get_data()
-        async with session_maker() as session:
-            async with session.begin():
-                curr_date = context_data.get("curr_date")
-                res: ScalarResult = await session.execute(
-                    select(PostModel).where(PostModel.start_date == curr_date)
+        try:
+            if event.data == "calendar":
+                await state.update_data(
+                    curr_date=str(datetime.now(tz=timezone.utc).date())
                 )
-                posts = res.unique().scalars().all()
-                events = []
-                for event_news in posts:
-                    events.append([event_news.title, event_news.short_description])
-                data["events_news"] = events
-        return await handler(event, data)
+                context_data = await state.get_data()
+            else:
+                loc_date = context_data.get("curr_date").split("-")
+                datetime_date = datetime(
+                    day=int(loc_date[2]),
+                    month=int(loc_date[1]),
+                    year=int(loc_date[0]),
+                    tzinfo=timezone.utc,
+                )
+                if event.data == "next_date":
+                    new_date = datetime_date + timedelta(days=1)
+                elif event.data == "back_date":
+                    new_date = datetime_date - timedelta(days=1)
+                await state.update_data(curr_date=str(new_date.date()))
+                context_data = await state.get_data()
+            async with session_maker() as session:
+                async with session.begin():
+                    curr_date = context_data.get("curr_date")
+                    res: ScalarResult = await session.execute(
+                        select(PostModel).where(PostModel.start_date == curr_date)
+                    )
+                    posts = res.unique().scalars().all()
+                    events = []
+                    for event_news in posts:
+                        events.append([event_news.title, event_news.short_description])
+                    data["events_news"] = events
+            return await handler(event, data)
+        except Exception:
+            pass
 
 
 class GetEventDetails(BaseMiddleware):

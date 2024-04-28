@@ -43,9 +43,8 @@ def choise_category_keyboard(
                     )
                 ]
             )
-    if type == "for_choise_project":
-        buttons.append(
-            [InlineKeyboardButton(text="🔙 Назад", callback_data=f"projects_route")]
-        )
+    buttons.append(
+        [InlineKeyboardButton(text="🔙 Back", callback_data=f"return_to_main_menu")]
+    )
     keyboard = InlineKeyboardMarkup(inline_keyboard=buttons)
     return keyboard

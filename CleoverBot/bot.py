@@ -51,6 +51,9 @@ from users_core.callbacks.get_content_callbacks.calendar_callbacks import (
     calendar_router,
     show_event_router,
 )
+from users_core.callbacks.get_content_callbacks.project_callback import (
+    user_choise_project_category_router,
+)
 from users_core.utils.commands import set_commands
 
 
@@ -103,6 +106,12 @@ from admins_core.callbacks.add_project_callback import (
     get_title_for_add_project_router,
     save_media_and_links_router,
 )
+from admins_core.callbacks.choise_project_callback import (
+    choise_project_category_router,
+    choise_project_router,
+    view_project_router,
+)
+from admins_core.callbacks.project_route_callback import delete_project_router
 
 import os
 import logging
@@ -212,6 +221,11 @@ async def lifespan(app: FastAPI):
             save_project_and_save_router,
             get_title_for_add_project_router,
             save_media_and_links_router,
+            choise_project_category_router,
+            choise_project_router,
+            view_project_router,
+            delete_project_router,
+            user_choise_project_category_router,
         )
 
         scheduler.add_job(

@@ -125,8 +125,8 @@ class PostSender:
             )
 
         text = []
-        text.append(f"🗞️ <b>{self.title}</b>\n\n")
-        text.append(f"{self.full_description}\n\n")
+        text.append(f"📢 <b>{self.title}</b>\n\n")
+        text.append(f"ℹ️ {self.full_description}\n\n")
         if self.start_date:
             date = ".".join(self.start_date.split("-")[::-1])
             if self.start_time:
