@@ -53,6 +53,7 @@ from users_core.callbacks.get_content_callbacks.calendar_callbacks import (
 )
 from users_core.callbacks.get_content_callbacks.project_callback import (
     user_choise_project_category_router,
+    user_choise_project_router,
 )
 from users_core.utils.commands import set_commands
 
@@ -226,6 +227,7 @@ async def lifespan(app: FastAPI):
             view_project_router,
             delete_project_router,
             user_choise_project_category_router,
+            user_choise_project_router,
         )
 
         scheduler.add_job(
