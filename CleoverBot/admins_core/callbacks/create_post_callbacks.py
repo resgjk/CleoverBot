@@ -19,6 +19,7 @@ from admins_core.keyboards.return_to_admin_panel_keyboard import (
 from aiogram import Bot, Router, F
 from aiogram.types import CallbackQuery, Message, ReplyKeyboardRemove, ContentType
 from aiogram.fsm.context import FSMContext
+from aiogram.exceptions import TelegramNetworkError
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
@@ -169,7 +170,7 @@ async def get_short_description(message: Message, bot: Bot, state: FSMContext):
 
 async def get_full_description(message: Message, bot: Bot, state: FSMContext):
     await message.answer(text=phrases["input_media"], reply_markup=get_media_keyboard())
-    await state.update_data(full_description=message.text)
+    await state.update_data(full_description=message.html_text)
     await state.set_state(PostForm.GET_MEDIA_FILES)
 
 
@@ -201,10 +202,13 @@ async def save_media_and_show_post(call: CallbackQuery, bot: Bot, state: FSMCont
     text, media = sender.show_post_detail_for_admin()
 
     if media:
-        await bot.send_media_group(
-            chat_id=call.message.chat.id,
-            media=media,
-        )
+        try:
+            await bot.send_media_group(
+                chat_id=call.message.chat.id,
+                media=media,
+            )
+        except TelegramNetworkError:
+            await call.message.answer(text=text)
     else:
         await call.message.answer(text=text)
     await bot.send_message(
@@ -236,14 +240,16 @@ async def send_post_to_users(
         try:
             for id in users_id:
                 if media:
-                    task = bot.send_media_group(
-                        chat_id=id,
-                        media=media,
-                    )
-                    tasks.append(task)
+                    try:
+                        task = bot.send_media_group(
+                            chat_id=id,
+                            media=media,
+                        )
+                    except TelegramNetworkError:
+                        task = bot.send_message(chat_id=id, text=text)
                 else:
                     task = bot.send_message(chat_id=id, text=text)
-                    tasks.append(task)
+                tasks.append(task)
             await asyncio.gather(*tasks)
             await state.clear()
             await call.message.edit_text(

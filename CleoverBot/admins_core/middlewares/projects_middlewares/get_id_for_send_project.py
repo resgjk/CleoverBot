@@ -48,7 +48,7 @@ class SendProjectMiddleware(BaseMiddleware):
                     )
                     users: list[UserModel] = res.scalars().all()
                     for user in users:
-                        if user.user_id != owner_id:
+                        if user.user_id != owner_id and user.is_subscriber:
                             users_id.append(user.user_id)
                     data["users_id"] = users_id
                     data["result"] = "success"

@@ -18,6 +18,7 @@ from admins_core.middlewares.projects_middlewares.save_projects_category_in_db i
 from aiogram import Bot, Router, F
 from aiogram.types import CallbackQuery, Message, ContentType
 from aiogram.fsm.context import FSMContext
+from aiogram.exceptions import TelegramNetworkError
 
 
 add_projects_category_router = Router()
@@ -54,7 +55,7 @@ async def get_category_description(message: Message, bot: Bot, state: FSMContext
             text=phrases["get_projects_category_media"],
             reply_markup=get_media_keyboard(),
         )
-        await state.update_data(description=message.text)
+        await state.update_data(description=message.html_text)
         await state.set_state(CategoryForm.GET_MEDIA)
     else:
         await message.answer(text="Неверный формат описания. Введите описание еще раз:")
@@ -90,10 +91,13 @@ async def save_media_and_show_category(
     text, media = sender.show_category_detail_for_admin()
 
     if media:
-        await bot.send_media_group(
-            chat_id=call.message.chat.id,
-            media=media,
-        )
+        try:
+            await bot.send_media_group(
+                chat_id=call.message.chat.id,
+                media=media,
+            )
+        except TelegramNetworkError:
+            await call.message.answer(text=text)
     else:
         await call.message.answer(text=text)
     await bot.send_message(

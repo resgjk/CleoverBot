@@ -1,4 +1,4 @@
-from aiogram.types import InputMediaPhoto, InputMediaVideo, FSInputFile
+from users_core.utils.add_media_function import add_media
 
 
 class CalendarEventSender:
@@ -15,34 +15,6 @@ class CalendarEventSender:
         self.videos = event_datails["videos"]
         if self.videos:
             self.videos = event_datails["videos"].split(";")[:-1]
-
-    def add_media(self, text):
-        media = []
-        if self.photos:
-            for photo in self.photos:
-                if not media:
-                    media.append(
-                        InputMediaPhoto(
-                            type="photo", media=FSInputFile(path=photo), caption=text
-                        )
-                    )
-                else:
-                    media.append(
-                        InputMediaPhoto(type="photo", media=FSInputFile(path=photo))
-                    )
-        if self.videos:
-            for video in self.videos:
-                if not media:
-                    media.append(
-                        InputMediaVideo(
-                            type="video", media=FSInputFile(path=video), caption=text
-                        )
-                    )
-                else:
-                    media.append(
-                        InputMediaVideo(type="video", media=FSInputFile(path=video))
-                    )
-        return media
 
     def send_event(self):
         text = []
@@ -61,6 +33,6 @@ class CalendarEventSender:
             else:
                 text.append(f"🏁 End date: {date}")
         text = "".join(text)
-        media = self.add_media(text)
+        media = add_media(text, self.photos, self.videos)
 
         return text, media

@@ -54,6 +54,12 @@ from users_core.callbacks.get_content_callbacks.calendar_callbacks import (
 from users_core.callbacks.get_content_callbacks.project_callback import (
     user_choise_project_category_router,
     user_choise_project_router,
+    user_view_project_category_details_router,
+)
+from users_core.callbacks.get_content_callbacks.project_news_callback import (
+    user_view_project_news_router,
+    user_view_project_description_router,
+    user_view_project_news_details_router,
 )
 from users_core.utils.commands import set_commands
 
@@ -112,7 +118,12 @@ from admins_core.callbacks.choise_project_callback import (
     choise_project_router,
     view_project_router,
 )
-from admins_core.callbacks.project_route_callback import delete_project_router
+from admins_core.callbacks.project_route_callback import (
+    delete_project_router,
+    add_project_news_router,
+    send_project_news_router,
+    check_project_router,
+)
 
 import os
 import logging
@@ -142,10 +153,13 @@ def check_posts_media_folder():
         "projects_media",
         "projects_media/categories",
         "projects_media/projects",
+        "projects_media/news",
         "projects_media/categories/photos",
         "projects_media/categories/videos",
         "projects_media/projects/photos",
         "projects_media/projects/videos",
+        "projects_media/news/photos",
+        "projects_media/news/videos",
     ]
 
     for direction in dirs:
@@ -228,6 +242,13 @@ async def lifespan(app: FastAPI):
             delete_project_router,
             user_choise_project_category_router,
             user_choise_project_router,
+            add_project_news_router,
+            send_project_news_router,
+            check_project_router,
+            user_view_project_news_router,
+            user_view_project_description_router,
+            user_view_project_news_details_router,
+            user_view_project_category_details_router,
         )
 
         scheduler.add_job(

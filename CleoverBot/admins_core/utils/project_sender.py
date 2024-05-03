@@ -1,7 +1,4 @@
-from apsched.send_notification import send_notifications
-
-from aiogram.types import InputMediaPhoto, InputMediaVideo, FSInputFile
-from datetime import datetime, timedelta, timezone
+from admins_core.utils.add_media_function import add_media
 
 
 class ProjectSender:
@@ -20,34 +17,6 @@ class ProjectSender:
             self.photos = project_data["photos"].split(";")[:-1]
             self.videos = project_data["videos"].split(";")[:-1]
 
-    def add_media(self, text):
-        media = []
-        if self.photos:
-            for photo in self.photos:
-                if not media:
-                    media.append(
-                        InputMediaPhoto(
-                            type="photo", media=FSInputFile(path=photo), caption=text
-                        )
-                    )
-                else:
-                    media.append(
-                        InputMediaPhoto(type="photo", media=FSInputFile(path=photo))
-                    )
-        if self.videos:
-            for video in self.videos:
-                if not media:
-                    media.append(
-                        InputMediaVideo(
-                            type="video", media=FSInputFile(path=video), caption=text
-                        )
-                    )
-                else:
-                    media.append(
-                        InputMediaVideo(type="video", media=FSInputFile(path=video))
-                    )
-        return media
-
     def show_project_detail_for_admin(self):
         text = []
         text.append(f"<b>Название</b>: {self.title}")
@@ -59,7 +28,7 @@ class ProjectSender:
                 links_str += link + "\n"
             text.append(links_str)
         text = "\n\n".join(text)
-        media = self.add_media(text)
+        media = add_media(text, self.photos, self.videos)
 
         return text, media
 
@@ -72,7 +41,7 @@ class ProjectSender:
                 if link:
                     text.append(f"🔗 {link}\n")
         text = "".join(text)
-        media = self.add_media(text)
+        media = add_media(text, self.photos, self.videos)
 
         return text, media
 
@@ -85,6 +54,6 @@ class ProjectSender:
                 if link:
                     text.append(f"🔗 {link}\n")
         text = "".join(text)
-        media = self.add_media(text)
+        media = add_media(text, self.photos, self.videos)
 
         return text, media

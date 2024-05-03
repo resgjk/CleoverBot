@@ -34,7 +34,7 @@ def choise_project_keyboard(projects: dict, page: str) -> InlineKeyboardMarkup:
                 [InlineKeyboardButton(text="⬅️", callback_data=f"back_projects_page")]
             )
     buttons.append(
-        [InlineKeyboardButton(text="🔙 Назад", callback_data=f"choise_project")]
+        [InlineKeyboardButton(text="< Назад", callback_data=f"choise_project")]
     )
     keyboard = InlineKeyboardMarkup(inline_keyboard=buttons)
     return keyboard

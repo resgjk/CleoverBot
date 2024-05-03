@@ -8,6 +8,7 @@ from users_core.utils.calendar_event_sender import CalendarEventSender
 from aiogram import Bot, Router, F
 from aiogram.types import CallbackQuery
 from aiogram.fsm.context import FSMContext
+from aiogram.exceptions import TelegramNetworkError
 
 
 calendar_router = Router()
@@ -20,12 +21,13 @@ async def get_calendar(
     await call.answer()
     context_data = await state.get_data()
     date = ".".join(context_data.get("curr_date").split("-")[::-1])
-    text = [f"<b>{date}</b>\nEVENTS:"]
+    text_header = f"🗓️ {date}\n🔻 Events 🔻\n\n"
+    text = []
     for event in events_news:
-        text.append(f"{event[0]} - {event[1]}")
-    text = "\n\n".join(text)
+        text.append(f"🔹 <b>{event[0]}</b>\n\t\t•   {event[1]}")
     await call.message.edit_text(
-        text=text, reply_markup=get_calendar_keyboard(events_news)
+        text=text_header + f"\n{'-' * 50}\n".join(text),
+        reply_markup=get_calendar_keyboard(events_news),
     )
 
 
@@ -38,10 +40,13 @@ async def show_event(
     text, media = sender.send_event()
 
     if media:
-        await bot.send_media_group(
-            chat_id=call.message.chat.id,
-            media=media,
-        )
+        try:
+            await bot.send_media_group(
+                chat_id=call.message.chat.id,
+                media=media,
+            )
+        except TelegramNetworkError:
+            await bot.send_message(chat_id=call.message.chat.id, text=text)
     else:
         await bot.send_message(chat_id=call.message.chat.id, text=text)
 

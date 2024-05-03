@@ -1,6 +1,6 @@
 from apsched.send_notification import send_notifications
 
-from aiogram.types import InputMediaPhoto, InputMediaVideo, FSInputFile
+from admins_core.utils.add_media_function import add_media
 from datetime import datetime, timedelta, timezone
 
 
@@ -19,34 +19,6 @@ class PostSender:
         self.full_description = context_data.get("full_description")
         self.photos = context_data.get("photos").split(";")[:-1]
         self.videos = context_data.get("videos").split(";")[:-1]
-
-    def add_media(self, text):
-        media = []
-        if self.photos:
-            for photo in self.photos:
-                if not media:
-                    media.append(
-                        InputMediaPhoto(
-                            type="photo", media=FSInputFile(path=photo), caption=text
-                        )
-                    )
-                else:
-                    media.append(
-                        InputMediaPhoto(type="photo", media=FSInputFile(path=photo))
-                    )
-        if self.videos:
-            for video in self.videos:
-                if not media:
-                    media.append(
-                        InputMediaVideo(
-                            type="video", media=FSInputFile(path=video), caption=text
-                        )
-                    )
-                else:
-                    media.append(
-                        InputMediaVideo(type="video", media=FSInputFile(path=video))
-                    )
-        return media
 
     def show_post_detail_for_admin(self):
         text = []
@@ -68,7 +40,7 @@ class PostSender:
         text.append(f"<b>Краткое описание</b>: {self.short_description}")
         text.append(f"<b>Подробное описание</b>: {self.full_description}")
         text = "\n\n".join(text)
-        media = self.add_media(text)
+        media = add_media(text, self.photos, self.videos)
 
         return text, media
 
@@ -140,6 +112,6 @@ class PostSender:
             else:
                 text.append(f"🏁 End date: {date}")
         text = "".join(text)
-        media = self.add_media(text)
+        media = add_media(text, self.photos, self.videos)
 
         return text, media

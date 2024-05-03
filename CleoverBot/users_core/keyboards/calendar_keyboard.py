@@ -3,12 +3,6 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 def get_calendar_keyboard(events) -> InlineKeyboardMarkup:
     buttons = []
-    buttons.append(
-        [
-            InlineKeyboardButton(text="⬅️", callback_data="back_date"),
-            InlineKeyboardButton(text="➡️", callback_data="next_date"),
-        ]
-    )
     for event in events:
         buttons.append(
             [
@@ -17,6 +11,12 @@ def get_calendar_keyboard(events) -> InlineKeyboardMarkup:
                 )
             ]
         )
+    buttons.append(
+        [
+            InlineKeyboardButton(text="⬅️", callback_data="back_date"),
+            InlineKeyboardButton(text="➡️", callback_data="next_date"),
+        ]
+    )
     buttons.append(
         [
             InlineKeyboardButton(

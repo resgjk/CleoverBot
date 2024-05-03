@@ -1,4 +1,3 @@
-from db.models.users import UserModel
 from db.models.activities import ActivityModel
 from db.models.posts import PostModel
 
@@ -74,13 +73,11 @@ class SendPostMiddleware(BaseMiddleware):
                 current_activity: ActivityModel = activity_res.scalars().one_or_none()
                 if current_activity:
                     for user in current_activity.users:
-                        if user.user_id != owner_id:
-                            if bank != "Любой бюджет":
-                                if user.is_subscriber and user.bank == bank:
-                                    users_id.append(user.user_id)
+                        if user.user_id != owner_id and user.is_subscriber:
+                            if bank != "Любой бюджет" and user.bank == bank:
+                                users_id.append(user.user_id)
                             else:
-                                if user.is_subscriber:
-                                    users_id.append(user.user_id)
+                                users_id.append(user.user_id)
                 data["users_id"] = users_id
                 await session.commit()
         return await handler(event, data)

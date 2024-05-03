@@ -18,6 +18,7 @@ from admins_core.middlewares.projects_middlewares.get_project_data import (
 from aiogram import Bot, Router, F
 from aiogram.types import CallbackQuery
 from aiogram.fsm.context import FSMContext
+from aiogram.exceptions import TelegramNetworkError
 
 
 type = "for_choise_project"
@@ -56,10 +57,15 @@ async def view_project(
         text, media = sender.show_for_add_news_or_delete()
 
         if media:
-            await bot.send_media_group(
-                chat_id=call.message.chat.id,
-                media=media,
-            )
+            try:
+                await bot.send_media_group(
+                    chat_id=call.message.chat.id,
+                    media=media,
+                )
+            except TelegramNetworkError:
+                await call.message.answer(
+                    text=text,
+                )
         else:
             await call.message.answer(
                 text=text,

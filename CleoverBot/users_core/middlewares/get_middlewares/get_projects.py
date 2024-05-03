@@ -48,7 +48,8 @@ class ProjectsPagesMiddleware(BaseMiddleware):
                             try:
                                 if "enable" in event.data:
                                     for project in projects:
-                                        current_user.projects.append(project)
+                                        if project not in current_user.projects:
+                                            current_user.projects.append(project)
                                 else:
                                     current_user.projects = []
                                 await session.commit()

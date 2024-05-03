@@ -76,6 +76,6 @@ def choise_project_keyboard(
                 ),
             ]
         )
-    buttons.append([InlineKeyboardButton(text="🔙 Back", callback_data=f"projects")])
+    buttons.append([InlineKeyboardButton(text="< Back", callback_data=f"projects")])
     keyboard = InlineKeyboardMarkup(inline_keyboard=buttons)
     return keyboard

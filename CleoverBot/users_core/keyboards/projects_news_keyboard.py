@@ -1,16 +1,14 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 
-def choise_category_keyboard(
-    categories: dict, page: str, type: str
-) -> InlineKeyboardMarkup:
+def choise_project_news_keyboard(news: dict, page: str) -> InlineKeyboardMarkup:
     buttons = []
-    for category in categories.keys():
+    for one_news in news.keys():
         buttons.append(
             [
                 InlineKeyboardButton(
-                    text=category,
-                    callback_data=f"set_project_category_{type}_{categories[category]}",
+                    text=one_news,
+                    callback_data=f"view_project_news_{news[one_news][0]}",
                 )
             ]
         )
@@ -20,7 +18,7 @@ def choise_category_keyboard(
             buttons.append(
                 [
                     InlineKeyboardButton(
-                        text="➡️", callback_data=f"next_categories_page_{type}"
+                        text="➡️", callback_data=f"next_project_news_page"
                     )
                 ]
             )
@@ -28,10 +26,10 @@ def choise_category_keyboard(
             buttons.append(
                 [
                     InlineKeyboardButton(
-                        text="⬅️", callback_data=f"back_categories_page_{type}"
+                        text="⬅️", callback_data=f"back_project_news_page"
                     ),
                     InlineKeyboardButton(
-                        text="➡️", callback_data=f"next_categories_page_{type}"
+                        text="➡️", callback_data=f"next_project_news_page"
                     ),
                 ]
             )
@@ -39,12 +37,10 @@ def choise_category_keyboard(
             buttons.append(
                 [
                     InlineKeyboardButton(
-                        text="⬅️", callback_data=f"back_categories_page_{type}"
+                        text="⬅️", callback_data=f"back_project_news_page"
                     )
                 ]
             )
-    buttons.append(
-        [InlineKeyboardButton(text="< Back", callback_data=f"return_to_main_menu")]
-    )
+    buttons.append([InlineKeyboardButton(text="< Back", callback_data=f"projects")])
     keyboard = InlineKeyboardMarkup(inline_keyboard=buttons)
     return keyboard

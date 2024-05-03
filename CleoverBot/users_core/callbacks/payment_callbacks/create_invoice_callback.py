@@ -14,7 +14,7 @@ create_invoice_router = Router()
 async def create_invoice(call: CallbackQuery, bot: Bot, link, create_status):
     await call.answer()
     if create_status == "success":
-        await call.message.answer(phrases["create_payment_text"] + link)
+        await call.message.answer(f'🧾 <a href="{link}">Your subscription invoice</a>')
     else:
         await call.message.answer(phrases["error_create_payment"])
 

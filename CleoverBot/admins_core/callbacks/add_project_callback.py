@@ -28,6 +28,7 @@ import asyncio
 from aiogram import Bot, Router, F
 from aiogram.types import CallbackQuery, Message, ContentType
 from aiogram.fsm.context import FSMContext
+from aiogram.exceptions import TelegramNetworkError
 
 
 type = "for_add_project"
@@ -103,7 +104,7 @@ async def get_project_description(message: Message, bot: Bot, state: FSMContext)
             text=phrases["get_project_links"],
             reply_markup=get_links_keyboard(),
         )
-        await state.update_data(description=message.text, links="")
+        await state.update_data(description=message.html_text, links="")
         await state.set_state(ProjectForm.GET_LINKS)
     else:
         await message.answer(text="Неверный формат описания. Введите описание еще раз:")
@@ -113,7 +114,7 @@ async def get_project_links(message: Message, bot: Bot, state: FSMContext):
     context_data = await state.get_data()
     links = context_data.get("links")
     if message.content_type == ContentType.TEXT:
-        links += message.text + ";"
+        links += message.html_text + ";"
         await state.update_data(links=links)
 
 
@@ -158,10 +159,13 @@ async def save_media_and_show_project(call: CallbackQuery, bot: Bot, state: FSMC
     text, media = sender.show_project_detail_for_admin()
 
     if media:
-        await bot.send_media_group(
-            chat_id=call.message.chat.id,
-            media=media,
-        )
+        try:
+            await bot.send_media_group(
+                chat_id=call.message.chat.id,
+                media=media,
+            )
+        except TelegramNetworkError:
+            await call.message.answer(text=text)
     else:
         await call.message.answer(text=text)
     await bot.send_message(
@@ -187,14 +191,16 @@ async def send_project_to_users(
             try:
                 for id in users_id:
                     if media:
-                        task = bot.send_media_group(
-                            chat_id=id,
-                            media=media,
-                        )
-                        tasks.append(task)
+                        try:
+                            task = bot.send_media_group(
+                                chat_id=id,
+                                media=media,
+                            )
+                        except TelegramNetworkError:
+                            task = bot.send_message(chat_id=id, text=text)
                     else:
                         task = bot.send_message(chat_id=id, text=text)
-                        tasks.append(task)
+                    tasks.append(task)
                 await asyncio.gather(*tasks)
                 await call.message.edit_text(
                     text="✅ Проект успешно опубликован!",

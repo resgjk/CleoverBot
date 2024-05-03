@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import datetime, timezone, date
 
 from db.base import Base
 
@@ -15,15 +15,10 @@ class ProjectNewsModel(Base):
     project_id: Mapped[int] = mapped_column(ForeignKey("projects.id"), nullable=False)
     project: Mapped["ProjectModel"] = relationship("ProjectModel", back_populates="news")  # type: ignore
     title: Mapped[str] = mapped_column(nullable=False)
-    create_date: Mapped[str] = mapped_column(
-        nullable=False, default=str(datetime.now(tz=timezone.utc).date())
+    create_date: Mapped[date] = mapped_column(
+        nullable=False, default=datetime.now(tz=timezone.utc).date()
     )
-    start_date: Mapped[str] = mapped_column(nullable=True)
-    start_time: Mapped[str] = mapped_column(nullable=True)
-    end_date: Mapped[str] = mapped_column(nullable=True)
-    end_time: Mapped[str] = mapped_column(nullable=True)
-    short_description: Mapped[str] = mapped_column(nullable=False)
-    full_description: Mapped[str] = mapped_column(nullable=False)
+    description: Mapped[str] = mapped_column(nullable=False)
     photos: Mapped[str] = mapped_column(nullable=True)
     videos: Mapped[str] = mapped_column(nullable=True)
 

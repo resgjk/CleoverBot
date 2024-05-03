@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime, timezone
 
 from db.base import Base
 
@@ -20,7 +20,7 @@ class TransactionModel(Base):
         nullable=False, default=False, unique=False
     )
     date: Mapped[str] = mapped_column(
-        nullable=False, default=str(datetime.datetime.now()), unique=False
+        nullable=False, default=str(datetime.now(tz=timezone.utc)), unique=False
     )
 
     def __repr__(self) -> str:
