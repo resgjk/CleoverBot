@@ -5,12 +5,18 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 def get_activities_keyboard(choise_activities) -> InlineKeyboardMarkup:
     buttons_texts = {
         "defi": "✅ DeFi 📚" if choise_activities["defi"] else "DeFi 📚",
-        "airdrops": "✅ Airdrops 💸" if choise_activities["airdrops"] else "Airdrops 💸",
+        "airdrops": (
+            "✅ Airdrops 💸" if choise_activities["airdrops"] else "Airdrops 💸"
+        ),
         "news": "✅ News 🗞" if choise_activities["news"] else "News 🗞",
-        "ido_ico": "✅ IDO | ICO 🤑" if choise_activities["ido_ico"] else "IDO | ICO 🤑",
-        "ambassador_programs": "✅ Ambassador Programs 👥"
-        if choise_activities["ambassador_programs"]
-        else "Ambassador Programs 👥",
+        "ido_ico": (
+            "✅ IDO | ICO 🤑" if choise_activities["ido_ico"] else "IDO | ICO 🤑"
+        ),
+        "ambassador_programs": (
+            "✅ Ambassador Programs 👥"
+            if choise_activities["ambassador_programs"]
+            else "Ambassador Programs 👥"
+        ),
         "nft": "✅ NFT 🖼" if choise_activities["nft"] else "NFT 🖼",
     }
 

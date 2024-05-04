@@ -21,12 +21,8 @@ def choise_project_keyboard(projects: dict, page: str) -> InlineKeyboardMarkup:
         case "middle":
             buttons.append(
                 [
-                    InlineKeyboardButton(
-                        text="⬅️", callback_data=f"back_projects_page"
-                    ),
-                    InlineKeyboardButton(
-                        text="➡️", callback_data=f"next_projects_page"
-                    ),
+                    InlineKeyboardButton(text="⬅️", callback_data=f"back_projects_page"),
+                    InlineKeyboardButton(text="➡️", callback_data=f"next_projects_page"),
                 ]
             )
         case "last":

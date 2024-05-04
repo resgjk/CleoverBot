@@ -5,12 +5,12 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 def get_bank_keyboard(choise_bank) -> InlineKeyboardMarkup:
     buttons_texts = {
         "Zero bank": "✅ Zero bank" if choise_bank == "Zero bank" else "Zero bank",
-        "$100 - 1000": "✅ $100 - 1000"
-        if choise_bank == "$100 - 1000"
-        else "$100 - 1000",
-        "$1000 - 10000": "✅ $1000 - 10000"
-        if choise_bank == "$1000 - 10000"
-        else "$1000 - 10000",
+        "$100 - 1000": (
+            "✅ $100 - 1000" if choise_bank == "$100 - 1000" else "$100 - 1000"
+        ),
+        "$1000 - 10000": (
+            "✅ $1000 - 10000" if choise_bank == "$1000 - 10000" else "$1000 - 10000"
+        ),
         "$10k+": "✅ $10k+" if choise_bank == "$10k+" else "$10k+",
     }
 
