@@ -305,14 +305,14 @@ async def payment_callback(request: Request):
                     + f"<b>{new_date[2]} {new_date[1]} {new_date[-1]}</b>",
                 )
             else:
-                date = datetime.now(tz=timezone.utc) + timedelta(days=days)
-                current_user.subscriber_until = date.date()
+                new_date = datetime.now(tz=timezone.utc) + timedelta(days=days)
+                current_user.subscriber_until = new_date.date()
                 current_user.is_subscriber = True
-                date = date.date().ctime().split()
+                new_date = new_date.date().ctime().split()
                 await bot.send_message(
                     chat_id=current_user.user_id,
                     text=phrases["subscription_date"]
-                    + f"<b>{date[2]} {date[1]} {date[-1]}</b>",
+                    + f"<b>{new_date[2]} {new_date[1]} {new_date[-1]}</b>",
                 )
             await session.commit()
 

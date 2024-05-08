@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import datetime, timezone, time, date
 
 from db.base import Base
 
@@ -19,8 +19,11 @@ class TransactionModel(Base):
     is_success: Mapped[bool] = mapped_column(
         nullable=False, default=False, unique=False
     )
-    date: Mapped[datetime] = mapped_column(
-        nullable=False, default=datetime.now(tz=timezone.utc), unique=False
+    create_date: Mapped[date] = mapped_column(
+        nullable=False, default=datetime.now(tz=timezone.utc).date(), unique=False
+    )
+    create_time: Mapped[time] = mapped_column(
+        nullable=False, default=datetime.now(tz=timezone.utc).time(), unique=False
     )
 
     def __repr__(self) -> str:
