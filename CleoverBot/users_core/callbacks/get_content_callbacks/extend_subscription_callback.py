@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date
 
 from users_core.utils.phrases import phrases
 from users_core.keyboards.subscriptions_keyboard import get_subscriptions_keyboard
@@ -13,16 +13,8 @@ from aiogram.types import CallbackQuery
 renew_subscription_router = Router()
 
 
-async def extend_subscription(call: CallbackQuery, bot: Bot, expiration_date):
-    expiration_date = list(map(int, str(expiration_date).split("-")))
-    date = (
-        datetime(
-            year=expiration_date[0], month=expiration_date[1], day=expiration_date[2]
-        )
-        .date()
-        .ctime()
-        .split()
-    )
+async def extend_subscription(call: CallbackQuery, bot: Bot, expiration_date: date):
+    date = expiration_date.ctime().split()
     await call.message.edit_text(
         text="🔑 <b>Subscription</b>\n\n"
         + " ".join(

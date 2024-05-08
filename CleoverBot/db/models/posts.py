@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import datetime, timezone, date, time
 
 from db.base import Base
 
@@ -16,13 +16,13 @@ class PostModel(Base):
     title: Mapped[str] = mapped_column(nullable=False)
     category: Mapped[str] = mapped_column(nullable=False, unique=False)
     bank: Mapped[str] = mapped_column(nullable=True)
-    create_date: Mapped[str] = mapped_column(
-        nullable=False, default=str(datetime.now(tz=timezone.utc).date())
+    create_date: Mapped[date] = mapped_column(
+        nullable=False, default=datetime.now(tz=timezone.utc).date()
     )
-    start_date: Mapped[str] = mapped_column(nullable=True)
-    start_time: Mapped[str] = mapped_column(nullable=True)
-    end_date: Mapped[str] = mapped_column(nullable=True)
-    end_time: Mapped[str] = mapped_column(nullable=True)
+    start_date: Mapped[date] = mapped_column(nullable=True)
+    start_time: Mapped[time] = mapped_column(nullable=True)
+    end_date: Mapped[date] = mapped_column(nullable=True)
+    end_time: Mapped[time] = mapped_column(nullable=True)
     short_description: Mapped[str] = mapped_column(nullable=False)
     full_description: Mapped[str] = mapped_column(nullable=False)
     photos: Mapped[str] = mapped_column(nullable=True)

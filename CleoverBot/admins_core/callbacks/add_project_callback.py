@@ -24,6 +24,7 @@ from admins_core.middlewares.projects_middlewares.get_id_for_send_project import
 )
 
 import asyncio
+from uuid import uuid4
 
 from aiogram import Bot, Router, F
 from aiogram.types import CallbackQuery, Message, ContentType
@@ -74,7 +75,7 @@ async def choise_category(
         )
     else:
         await call.message.edit_text(
-            text=f"Выбрана категория <b>{choisen_category['title']}</b>"
+            text=f"Выбрана категория: <b>{choisen_category['title']}</b>"
         )
         await call.message.answer(text=phrases["get_project_title"])
         await state.update_data(
@@ -104,7 +105,9 @@ async def get_project_description(message: Message, bot: Bot, state: FSMContext)
             text=phrases["get_project_links"],
             reply_markup=get_links_keyboard(),
         )
-        await state.update_data(description=message.html_text, links="")
+        await state.update_data(
+            description=message.html_text, links="", project_uuid=str(uuid4())
+        )
         await state.set_state(ProjectForm.GET_LINKS)
     else:
         await message.answer(text="Неверный формат описания. Введите описание еще раз:")
@@ -133,18 +136,19 @@ async def start_get_media(
 
 async def get_media_files(message: Message, bot: Bot, state: FSMContext):
     context_data = await state.get_data()
+    project_uuid = context_data.get("project_uuid")
     title = context_data.get("title")
     photos = context_data.get("photos")
     videos = context_data.get("videos")
     if message.content_type == ContentType.PHOTO:
         file = await bot.get_file(message.photo[-1].file_id)
-        photo_title = f"media/projects_media/projects/photos/{title}_photo_{len(photos.split(';')) - 1}.jpg"
+        photo_title = f"media/projects_media/projects/photos/{project_uuid}_photo_{len(photos.split(';')) - 1}.jpg"
         photos += photo_title + ";"
         await state.update_data(photos=photos)
         await bot.download_file(file.file_path, photo_title)
     elif message.content_type == ContentType.VIDEO:
         file = await bot.get_file(message.video.file_id)
-        video_title = f"media/projects_media/projects/videos/{title}_video_{len(photos.split(';')) - 1}.mp4"
+        video_title = f"media/projects_media/projects/videos/{project_uuid}_video_{len(videos.split(';')) - 1}.mp4"
         videos += video_title + ";"
         await state.update_data(videos=videos)
         await bot.download_file(file.file_path, video_title)
@@ -201,14 +205,14 @@ async def send_project_to_users(
                     else:
                         task = bot.send_message(chat_id=id, text=text)
                     tasks.append(task)
-                await asyncio.gather(*tasks)
+                await asyncio.gather(*tasks, return_exceptions=True)
                 await call.message.edit_text(
                     text="✅ Проект успешно опубликован!",
                     reply_markup=return_to_projects_route_keyboard(),
                 )
-            except Exception:
+            except Exception as e:
                 await call.message.answer(
-                    text="Не удалось опубликовать проект, попробуйте еще раз!",
+                    text=f"Не удалось опубликовать проект, попробуйте еще раз!\nОшибка: {str(e)}",
                     reply_markup=return_to_projects_route_keyboard(),
                 )
         else:

@@ -27,16 +27,20 @@ class PostSender:
         text.append(f"<b>Бюджет</b>: {self.bank}")
         if self.start_date:
             text.append(
-                f"<b>Дата начала</b>: {'.'.join(self.start_date.split('-')[::-1])}"
+                f"<b>Дата начала</b>: {'.'.join(str(self.start_date).split('-')[::-1])}"
             )
         if self.start_time:
-            text.append(f"<b>Время начала</b>: {self.start_time}")
+            text.append(
+                f"<b>Время начала</b>: {':'.join(str(self.start_time).split(':')[:2])}"
+            )
         if self.end_date:
             text.append(
-                f"<b>Дата окончания</b>: {'.'.join(self.end_date.split('-')[::-1])}"
+                f"<b>Дата окончания</b>: {'.'.join(str(self.end_date).split('-')[::-1])}"
             )
         if self.end_time:
-            text.append(f"<b>Время окончания</b>: {self.end_time}")
+            text.append(
+                f"<b>Время окончания</b>: {':'.join(str(self.end_time).split(':')[:2])}"
+            )
         text.append(f"<b>Краткое описание</b>: {self.short_description}")
         text.append(f"<b>Подробное описание</b>: {self.full_description}")
         text = "\n\n".join(text)
@@ -80,15 +84,8 @@ class PostSender:
 
     def send_post_to_users(self, session_maker, scheduler):
         if self.start_date and self.start_time:
-            valid_date = list(map(int, self.start_date.split("-")[::-1]))
-            valid_time = list(map(int, self.start_time.split(":")))
-            datetime_start_date_time = datetime(
-                day=valid_date[0],
-                month=valid_date[1],
-                year=valid_date[2],
-                hour=valid_time[0],
-                minute=valid_time[1],
-                tzinfo=timezone.utc,
+            datetime_start_date_time = datetime.combine(
+                self.start_date, self.start_time, tzinfo=timezone.utc
             )
             self.notification_sender(
                 datetime_start_date_time=datetime_start_date_time,
@@ -97,21 +94,9 @@ class PostSender:
             )
 
         text = []
-        text.append(f"📢 <b>{self.title}</b>\n\n")
-        text.append(f"ℹ️ {self.full_description}\n\n")
-        if self.start_date:
-            date = ".".join(self.start_date.split("-")[::-1])
-            if self.start_time:
-                text.append(f"🗓️ Start date: {date}, {self.start_time}\n")
-            else:
-                text.append(f"🗓️ Start date: {date}\n")
-        if self.end_date:
-            date = ".".join(self.end_date.split("-")[::-1])
-            if self.end_time:
-                text.append(f"🏁 End date: {date}, {self.end_time}")
-            else:
-                text.append(f"🏁 End date: {date}")
-        text = "".join(text)
+        text.append(f"<b>{self.title}</b>")
+        text.append(f"{self.full_description}")
+        text = "\n\n".join(text)
         media = add_media(text, self.photos, self.videos)
 
         return text, media

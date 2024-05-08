@@ -87,18 +87,18 @@ async def get_news_description(message: Message, bot: Bot, state: FSMContext):
 
 async def get_media_files(message: Message, bot: Bot, state: FSMContext):
     context_data = await state.get_data()
-    post_uuid = context_data.get("news_uuid")
+    news_uuid = context_data.get("news_uuid")
     photos = context_data.get("photos")
     videos = context_data.get("videos")
     if message.content_type == ContentType.PHOTO:
         file = await bot.get_file(message.photo[-1].file_id)
-        photo_title = f"media/projects_media/news/photos/{post_uuid}_photo_{len(photos.split(';')) - 1}.jpg"
+        photo_title = f"media/projects_media/news/photos/{news_uuid}_photo_{len(photos.split(';')) - 1}.jpg"
         photos += photo_title + ";"
         await state.update_data(photos=photos)
         await bot.download_file(file.file_path, photo_title)
     elif message.content_type == ContentType.VIDEO:
         file = await bot.get_file(message.video.file_id)
-        video_title = f"media/projects_media/news/videos/{post_uuid}_video_{len(videos.split(';')) - 1}.mp4"
+        video_title = f"media/projects_media/news/videos/{news_uuid}_video_{len(videos.split(';')) - 1}.mp4"
         videos += video_title + ";"
         await state.update_data(videos=videos)
         await bot.download_file(file.file_path, video_title)
@@ -157,7 +157,7 @@ async def send_post_to_users(
                 else:
                     task = bot.send_message(chat_id=id, text=text)
                 tasks.append(task)
-            await asyncio.gather(*tasks)
+            await asyncio.gather(*tasks, return_exceptions=True)
             await state.clear()
             await call.message.edit_text(
                 text="✅ Новость успешно опубликована!",

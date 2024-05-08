@@ -15,6 +15,8 @@ from admins_core.middlewares.projects_middlewares.save_projects_category_in_db i
     SaveProjectsCategoryMiddleware,
 )
 
+from uuid import uuid4
+
 from aiogram import Bot, Router, F
 from aiogram.types import CallbackQuery, Message, ContentType
 from aiogram.fsm.context import FSMContext
@@ -55,7 +57,9 @@ async def get_category_description(message: Message, bot: Bot, state: FSMContext
             text=phrases["get_projects_category_media"],
             reply_markup=get_media_keyboard(),
         )
-        await state.update_data(description=message.html_text)
+        await state.update_data(
+            description=message.html_text, project_category_uuid=str(uuid4())
+        )
         await state.set_state(CategoryForm.GET_MEDIA)
     else:
         await message.answer(text="Неверный формат описания. Введите описание еще раз:")
@@ -63,18 +67,19 @@ async def get_category_description(message: Message, bot: Bot, state: FSMContext
 
 async def get_media_files(message: Message, bot: Bot, state: FSMContext):
     context_data = await state.get_data()
+    project_category_uuid = context_data.get("project_category_uuid")
     title = context_data.get("title")
     photos = context_data.get("photos")
     videos = context_data.get("videos")
     if message.content_type == ContentType.PHOTO:
         file = await bot.get_file(message.photo[-1].file_id)
-        photo_title = f"media/projects_media/categories/photos/{title}_photo_{len(photos.split(';')) - 1}.jpg"
+        photo_title = f"media/projects_media/categories/photos/{project_category_uuid}_photo_{len(photos.split(';')) - 1}.jpg"
         photos += photo_title + ";"
         await state.update_data(photos=photos)
         await bot.download_file(file.file_path, photo_title)
     elif message.content_type == ContentType.VIDEO:
         file = await bot.get_file(message.video.file_id)
-        video_title = f"media/projects_media/categories/videos/{title}_video_{len(photos.split(';')) - 1}.mp4"
+        video_title = f"media/projects_media/categories/videos/{project_category_uuid}_video_{len(videos.split(';')) - 1}.mp4"
         videos += video_title + ";"
         await state.update_data(videos=videos)
         await bot.download_file(file.file_path, video_title)

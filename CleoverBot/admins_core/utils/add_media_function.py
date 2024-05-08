@@ -5,32 +5,26 @@ def add_media(text, photos, videos):
     media = []
     if photos:
         for photo in photos:
-            try:
-                if not media:
-                    media.append(
-                        InputMediaPhoto(
-                            type="photo", media=FSInputFile(path=photo), caption=text
-                        )
+            if not media:
+                media.append(
+                    InputMediaPhoto(
+                        type="photo", media=FSInputFile(path=photo), caption=text
                     )
-                else:
-                    media.append(
-                        InputMediaPhoto(type="photo", media=FSInputFile(path=photo))
-                    )
-            except Exception:
-                pass
+                )
+            else:
+                media.append(
+                    InputMediaPhoto(type="photo", media=FSInputFile(path=photo))
+                )
     if videos:
         for video in videos:
-            try:
-                if not media:
-                    media.append(
-                        InputMediaVideo(
-                            type="video", media=FSInputFile(path=video), caption=text
-                        )
+            if not media:
+                media.append(
+                    InputMediaVideo(
+                        type="video", media=FSInputFile(path=video), caption=text
                     )
-                else:
-                    media.append(
-                        InputMediaVideo(type="video", media=FSInputFile(path=video))
-                    )
-            except Exception:
-                pass
+                )
+            else:
+                media.append(
+                    InputMediaVideo(type="video", media=FSInputFile(path=video))
+                )
     return media

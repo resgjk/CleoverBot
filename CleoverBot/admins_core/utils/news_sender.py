@@ -19,9 +19,9 @@ class NewsSender:
 
     def send_news_to_users(self):
         text = []
-        text.append(f"🚨 <b>{self.title}</b>\n\n")
-        text.append(f"ℹ️ {self.description}\n\n")
-        text = "".join(text)
+        text.append(f"<b>{self.title}</b>")
+        text.append(f"{self.description}")
+        text = "\n\n".join(text)
         media = add_media(text, self.photos, self.videos)
 
         return text, media

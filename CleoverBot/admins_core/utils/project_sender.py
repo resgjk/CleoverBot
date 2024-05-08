@@ -34,26 +34,30 @@ class ProjectSender:
 
     def send_project_to_users(self):
         text = []
-        text.append(f"🆕 <b>{self.title}</b>\n\n")
-        text.append(f"ℹ️ {self.description}\n\n")
+        text.append(f"<b>{self.title}</b>")
+        text.append(f"{self.description}")
         if self.links:
+            links_lst = []
             for link in self.links.split(";"):
                 if link:
-                    text.append(f"🔗 {link}\n")
-        text = "".join(text)
+                    links_lst.append(f"🔗 {link}\n")
+            text.append("".join(links_lst))
+        text = "\n\n".join(text)
         media = add_media(text, self.photos, self.videos)
 
         return text, media
 
     def show_for_add_news_or_delete(self):
         text = []
-        text.append(f"<b>{self.title}</b>\n\n")
-        text.append(f"ℹ️ {self.description}\n\n")
+        text.append(f"<b>{self.title}</b>")
+        text.append(f"{self.description}")
         if self.links:
+            links_lst = []
             for link in self.links.split(";"):
                 if link:
-                    text.append(f"🔗 {link}\n")
-        text = "".join(text)
+                    links_lst.append(f"🔗 {link}\n")
+            text.append("".join(links_lst))
+        text = "\n\n".join(text)
         media = add_media(text, self.photos, self.videos)
 
         return text, media

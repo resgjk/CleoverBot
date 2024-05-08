@@ -44,11 +44,11 @@ class SendProjectMiddleware(BaseMiddleware):
                     session.add(new_project)
 
                     res: ScalarResult = await session.execute(
-                        select(UserModel).where(UserModel.is_subscriber)
+                        select(UserModel).where(UserModel.is_subscriber == True)
                     )
                     users: list[UserModel] = res.scalars().all()
                     for user in users:
-                        if user.user_id != owner_id and user.is_subscriber:
+                        if user.user_id != owner_id:
                             users_id.append(user.user_id)
                     data["users_id"] = users_id
                     data["result"] = "success"

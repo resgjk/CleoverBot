@@ -1,5 +1,6 @@
 import asyncio
 from uuid import uuid4
+from datetime import date, time, timezone
 
 from users_core.config import scheduler
 from admins_core.utils.phrases import phrases
@@ -79,18 +80,24 @@ async def get_start_date(message: Message, bot: Bot, state: FSMContext):
         await state.update_data(start_time=None)
         await state.set_state(PostForm.GET_END_DATE)
     else:
-        date = message.text.split(".")
+        str_date = message.text.split(".")
         try:
-            if int(date[0]) <= 31 and int(date[1]) <= 12 and int(date[2]) >= 1000:
+            if (
+                int(str_date[0]) <= 31
+                and int(str_date[1]) <= 12
+                and int(str_date[2]) >= 1000
+            ):
                 await message.answer(phrases["input_start_time"])
-                valid_date = f"{date[2]}-{date[1]}-{date[0]}"
+                valid_date = date(
+                    year=int(str_date[2]), month=int(str_date[1]), day=int(str_date[0])
+                )
                 await state.update_data(start_date=valid_date)
                 await state.set_state(PostForm.GET_START_TIME)
             else:
                 await message.answer(
                     text="Неверный формат даты. Введите дату еще раз в формате дд.мм.гггг UTC"
                 )
-        except Exception:
+        except Exception as e:
             await message.answer(
                 text="Неверный формат даты. Введите дату еще раз в формате дд.мм.гггг UTC"
             )
@@ -101,11 +108,14 @@ async def get_start_time(message: Message, bot: Bot, state: FSMContext):
         await message.answer(phrases["input_end_date"])
         await state.set_state(PostForm.GET_END_DATE)
     else:
-        time = message.text.split(":")
+        str_time = message.text.split(":")
         try:
-            if int(time[0]) <= 23 and int(time[1]) <= 59:
+            if int(str_time[0]) <= 23 and int(str_time[1]) <= 59:
                 await message.answer(phrases["input_end_date"])
-                await state.update_data(start_time=f"{time[0]}:{time[1]}")
+                valid_time = time(
+                    hour=int(str_time[0]), minute=int(str_time[1]), tzinfo=timezone.utc
+                )
+                await state.update_data(start_time=valid_time)
                 await state.set_state(PostForm.GET_END_DATE)
             else:
                 await message.answer(
@@ -124,11 +134,17 @@ async def get_end_date(message: Message, bot: Bot, state: FSMContext):
         await state.update_data(end_time=None)
         await state.set_state(PostForm.GET_SHORT_DESCRIPTION)
     else:
-        date = message.text.split(".")
+        str_date = message.text.split(".")
         try:
-            if int(date[0]) <= 31 and int(date[1]) <= 12 and int(date[2]) >= 1000:
+            if (
+                int(str_date[0]) <= 31
+                and int(str_date[1]) <= 12
+                and int(str_date[2]) >= 1000
+            ):
                 await message.answer(phrases["input_end_time"])
-                valid_date = f"{date[2]}-{date[1]}-{date[0]}"
+                valid_date = date(
+                    year=int(str_date[2]), month=int(str_date[1]), day=int(str_date[0])
+                )
                 await state.update_data(end_date=valid_date)
                 await state.set_state(PostForm.GET_END_TIME)
             else:
@@ -146,11 +162,14 @@ async def get_end_time(message: Message, bot: Bot, state: FSMContext):
         await message.answer(phrases["input_short_description"])
         await state.set_state(PostForm.GET_SHORT_DESCRIPTION)
     else:
-        time = message.text.split(":")
+        str_time = message.text.split(":")
         try:
-            if int(time[0]) <= 23 and int(time[1]) <= 59:
+            if int(str_time[0]) <= 23 and int(str_time[1]) <= 59:
                 await message.answer(phrases["input_short_description"])
-                await state.update_data(end_time=f"{time[0]}:{time[1]}")
+                valid_time = time(
+                    hour=int(str_time[0]), minute=int(str_time[1]), tzinfo=timezone.utc
+                )
+                await state.update_data(end_time=valid_time)
                 await state.set_state(PostForm.GET_SHORT_DESCRIPTION)
             else:
                 await message.answer(
@@ -250,7 +269,7 @@ async def send_post_to_users(
                 else:
                     task = bot.send_message(chat_id=id, text=text)
                 tasks.append(task)
-            await asyncio.gather(*tasks)
+            await asyncio.gather(*tasks, return_exceptions=True)
             await state.clear()
             await call.message.edit_text(
                 text="✅ Пост успешно опубликован!",

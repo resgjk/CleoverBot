@@ -25,23 +25,15 @@ class CalendarMiddleware(BaseMiddleware):
         context_data = await state.get_data()
         try:
             if event.data == "calendar":
-                await state.update_data(
-                    curr_date=str(datetime.now(tz=timezone.utc).date())
-                )
+                await state.update_data(curr_date=datetime.now(tz=timezone.utc).date())
                 context_data = await state.get_data()
             else:
-                loc_date = context_data.get("curr_date").split("-")
-                datetime_date = datetime(
-                    day=int(loc_date[2]),
-                    month=int(loc_date[1]),
-                    year=int(loc_date[0]),
-                    tzinfo=timezone.utc,
-                )
+                loc_date = context_data.get("curr_date")
                 if event.data == "next_date":
-                    new_date = datetime_date + timedelta(days=1)
+                    new_date = loc_date + timedelta(days=1)
                 elif event.data == "back_date":
-                    new_date = datetime_date - timedelta(days=1)
-                await state.update_data(curr_date=str(new_date.date()))
+                    new_date = loc_date - timedelta(days=1)
+                await state.update_data(curr_date=new_date)
                 context_data = await state.get_data()
             async with session_maker() as session:
                 async with session.begin():

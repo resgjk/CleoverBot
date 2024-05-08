@@ -29,35 +29,19 @@ async def send_notifications(
             users_id = []
             if current_activity:
                 for user in current_activity.users:
-                    if post_details["bank"] != "Любой бюджет":
+                    if user.is_subscriber and user.notification == notification:
                         if (
-                            user.is_subscriber
+                            post_details["bank"] != "Любой бюджет"
                             and user.bank == post_details["bank"]
-                            and user.notification == notification
                         ):
                             users_id.append(user.user_id)
-                    else:
-                        if user.is_subscriber and user.notification == notification:
+                        else:
                             users_id.append(user.user_id)
             if users_id:
                 text = []
-                text.append(f"📢 <b>{post_details['title']}</b>\n\n")
-                text.append(f"ℹ️ {post_details['full_description']}\n\n")
-                if post_details["start_date"]:
-                    date = ".".join(post_details["start_date"].split("-")[::-1])
-                    if post_details["start_time"]:
-                        text.append(
-                            f"🗓️ Start date: {date}, {post_details['start_date']}\n"
-                        )
-                    else:
-                        text.append(f"🗓️ Start date: {date}\n")
-                if post_details["end_date"]:
-                    date = ".".join(post_details["end_date"].split("-")[::-1])
-                    if post_details["end_time"]:
-                        text.append(f"🏁 End date: {date}, {post_details['end_time']}")
-                    else:
-                        text.append(f"🏁 End date: {date}")
-                text = "".join(text)
+                text.append(f"<b>{post_details['title']}</b>")
+                text.append(f"{post_details['full_description']}")
+                text = "\n\n".join(text)
 
                 media = []
                 if post_details["photos"]:
@@ -105,6 +89,6 @@ async def send_notifications(
                         else:
                             task = bot.send_message(chat_id=id, text=text)
                             tasks.append(task)
-                    await asyncio.gather(*tasks)
+                    await asyncio.gather(*tasks, return_exceptions=True)
                 except Exception as e:
                     print(e)

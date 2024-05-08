@@ -1,3 +1,19 @@
+__all__ = (
+    "Base",
+    "ActivityModel",
+    "UserModel",
+    "UserToActivityModel",
+    "AdminModel",
+    "PostModel",
+    "TransactionModel",
+    "ProjectCategoryModel",
+    "ProjectModel",
+    "ProjectNewsModel",
+    "UserToProjectModel",
+)
+
+
+from db.base import Base
 from db.models.activities import ActivityModel
 from db.models.users import UserModel
 from db.models.users_to_activities import UserToActivityModel

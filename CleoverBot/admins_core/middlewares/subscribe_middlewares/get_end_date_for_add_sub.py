@@ -42,11 +42,11 @@ class GetEndDateForAddSubMiddleware(BaseMiddleware):
                         current_user: UserModel = res.scalars().one_or_none()
                         if current_user:
                             current_user.is_subscriber = True
-                            current_user.subscriber_until = str(end_date.date())
+                            current_user.subscriber_until = end_date.date()
                         else:
                             new_user = UserModel(user_id=user_id)
                             new_user.is_subscriber = True
-                            new_user.subscriber_until = str(end_date.date())
+                            new_user.subscriber_until = end_date.date()
                             session.add(new_user)
                         await session.commit()
                         data["result"] = "success"

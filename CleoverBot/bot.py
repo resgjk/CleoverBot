@@ -296,15 +296,8 @@ async def payment_callback(request: Request):
                 case "twelve_month":
                     days = 365
             if current_user.is_subscriber:
-                old_date = list(map(int, current_user.subscriber_until.split("-")))
-                old_date = datetime(
-                    day=old_date[-1],
-                    month=old_date[-2],
-                    year=old_date[-3],
-                    tzinfo=timezone.utc,
-                )
-                new_date = old_date + timedelta(days=days)
-                current_user.subscriber_until = str(new_date.date())
+                new_date = current_user.subscriber_until + timedelta(days=days)
+                current_user.subscriber_until = new_date.date()
                 new_date = new_date.date().ctime().split()
                 await bot.send_message(
                     chat_id=current_user.user_id,
@@ -313,7 +306,7 @@ async def payment_callback(request: Request):
                 )
             else:
                 date = datetime.now(tz=timezone.utc) + timedelta(days=days)
-                current_user.subscriber_until = str(date.date())
+                current_user.subscriber_until = date.date()
                 current_user.is_subscriber = True
                 date = date.date().ctime().split()
                 await bot.send_message(

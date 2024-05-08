@@ -20,8 +20,8 @@ async def get_calendar(
 ):
     await call.answer()
     context_data = await state.get_data()
-    date = ".".join(context_data.get("curr_date").split("-")[::-1])
-    text_header = f"🗓️ {date}\n🔻 Events 🔻\n\n"
+    date = ".".join(str(context_data.get("curr_date")).split("-")[::-1])
+    text_header = f"🗓️ {date}\n<b>Qurrent events ✍</b>\n\n"
     text = []
     for event in events_news:
         text.append(f"🔹 <b>{event[0]}</b>\n\t\t•   {event[1]}")

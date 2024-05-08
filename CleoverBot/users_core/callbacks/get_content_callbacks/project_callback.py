@@ -63,7 +63,6 @@ async def show_category_description(
         except TelegramBadRequest:
             await call.answer()
     else:
-        await call.answer()
         await call.message.answer(text="🚫 Can't access the category, try again later!")
 
 

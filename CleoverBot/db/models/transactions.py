@@ -19,8 +19,8 @@ class TransactionModel(Base):
     is_success: Mapped[bool] = mapped_column(
         nullable=False, default=False, unique=False
     )
-    date: Mapped[str] = mapped_column(
-        nullable=False, default=str(datetime.now(tz=timezone.utc)), unique=False
+    date: Mapped[datetime] = mapped_column(
+        nullable=False, default=datetime.now(tz=timezone.utc), unique=False
     )
 
     def __repr__(self) -> str:

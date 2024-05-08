@@ -103,7 +103,6 @@ async def show_project_news_for_user(
         else:
             await bot.send_message(chat_id=call.message.chat.id, text=text)
     else:
-        await call.answer()
         await call.message.answer(text="🚫 Can't access the news, try again later!")
 
 

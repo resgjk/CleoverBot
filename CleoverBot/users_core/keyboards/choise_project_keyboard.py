@@ -8,10 +8,10 @@ def choise_project_keyboard(
     if projects:
         for project in projects.keys():
             if projects[project][1]:
-                notification_btn_text = "<- 🔔"
+                notification_btn_text = "🔔"
                 callback_text = "enable"
             else:
-                notification_btn_text = "<- 🔕"
+                notification_btn_text = "🔕"
                 callback_text = "disable"
 
             buttons.append(
@@ -66,10 +66,6 @@ def choise_project_keyboard(
                     text="✅ Enable all notifications",
                     callback_data=f"enable_notifications_category_{category_id}",
                 ),
-            ]
-        )
-        buttons.append(
-            [
                 InlineKeyboardButton(
                     text="❌ Turn off all notifications",
                     callback_data=f"turn_off_notifications_category_{category_id}",

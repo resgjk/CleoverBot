@@ -1,8 +1,8 @@
-from users_core.config import DB_HOST, DB_NAME, DB_PASSWORD, DB_PORT, DB_USER
-from db.base import Base
-
 import asyncio
 from logging.config import fileConfig
+
+from users_core.config import DB_HOST, DB_NAME, DB_PASSWORD, DB_PORT, DB_USER
+from db.base import Base
 
 from sqlalchemy import pool
 from sqlalchemy.engine import Connection
