@@ -1,4 +1,11 @@
-from users_core.config import API_KEY, SHOP_ID
+from users_core.config import (
+    API_KEY,
+    SHOP_ID,
+    ONE_MONTH_PRICE,
+    THREE_MONTH_PRICE,
+    SIX_MONTH_PRICE,
+    TWELVE_MONTH_PRICE,
+)
 from users_core.utils.phrases import phrases
 from db.models.users import UserModel
 from db.models.transactions import TransactionModel
@@ -41,16 +48,16 @@ class CreateInvoiceMiddleware(BaseMiddleware):
             }
 
             if "one" in event.data:
-                invoice_data["amount"] = 12
+                invoice_data["amount"] = ONE_MONTH_PRICE
                 transaction_type = "one_month"
             elif "three" in event.data:
-                invoice_data["amount"] = 30
+                invoice_data["amount"] = THREE_MONTH_PRICE
                 transaction_type = "three_month"
             elif "six" in event.data:
-                invoice_data["amount"] = 55
+                invoice_data["amount"] = SIX_MONTH_PRICE
                 transaction_type = "six_month"
             elif "twelve" in event.data:
-                invoice_data["amount"] = 90
+                invoice_data["amount"] = TWELVE_MONTH_PRICE
                 transaction_type = "twelve_month"
 
             async with session.post(

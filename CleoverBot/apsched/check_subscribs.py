@@ -1,6 +1,9 @@
 from datetime import datetime, timezone
+import asyncio
 
 from db.models.users import UserModel
+from users_core.utils.phrases import phrases
+from users_core.keyboards.subscriptions_keyboard import get_buy_subscription_keyboard
 
 from aiogram import Bot
 
@@ -17,7 +20,18 @@ async def check_subscribs(bot: Bot, session_maker: sessionmaker):
                 select(UserModel).where(UserModel.subscriber_until == date)
             )
             users: list[UserModel] = res.scalars().all()
+            tasks = []
             for user in users:
                 user.is_subscriber = False
                 user.subscriber_until = None
+                tasks.append(
+                    bot.send_message(
+                        chat_id=user.user_id,
+                        text=phrases["sub_was_canceled"],
+                        reply_markup=get_buy_subscription_keyboard(),
+                    )
+                )
             await session.commit()
+
+            if tasks:
+                await asyncio.gather(*tasks, return_exceptions=True)

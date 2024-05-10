@@ -22,6 +22,11 @@ SHOP_ID = os.getenv("SHOP_ID")
 API_KEY = os.getenv("API_KEY")
 CALLBACK_PATH = os.getenv("CALLBACK_PATH")
 
+ONE_MONTH_PRICE = int(os.getenv("ONE_MONTH_PRICE"))
+THREE_MONTH_PRICE = int(os.getenv("THREE_MONTH_PRICE"))
+SIX_MONTH_PRICE = int(os.getenv("SIX_MONTH_PRICE"))
+TWELVE_MONTH_PRICE = int(os.getenv("TWELVE_MONTH_PRICE"))
+
 
 postgres_url = URL.create(
     "postgresql+asyncpg",

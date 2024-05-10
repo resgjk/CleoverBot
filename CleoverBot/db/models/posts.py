@@ -1,4 +1,5 @@
 from datetime import datetime, timezone, date, time
+from typing import Literal
 
 from db.base import Base
 
@@ -15,7 +16,9 @@ class PostModel(Base):
     owner_id: Mapped[int] = mapped_column(BIGINT, nullable=False, unique=False)
     title: Mapped[str] = mapped_column(nullable=False)
     category: Mapped[str] = mapped_column(nullable=False, unique=False)
-    bank: Mapped[str] = mapped_column(nullable=True)
+    bank: Mapped[
+        Literal["Zero bank", "$100 - 1000", "$1000 - 10000", "$10k+", "Любой бюджет"]
+    ]
     create_date: Mapped[date] = mapped_column(
         nullable=False, default=datetime.now(tz=timezone.utc).date()
     )

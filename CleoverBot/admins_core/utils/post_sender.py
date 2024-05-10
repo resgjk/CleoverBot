@@ -64,10 +64,10 @@ class PostSender:
         }
 
         times = [
-            [1, "Hour"],
-            [3, "Hours"],
-            [6, "Hours"],
-            [12, "Hours"],
+            [1, "1 Hour"],
+            [3, "3 Hours"],
+            [6, "6 Hours"],
+            [12, "12 Hours"],
         ]
         for time in times:
             scheduler.add_job(

@@ -1,3 +1,10 @@
+from users_core.config import (
+    ONE_MONTH_PRICE,
+    THREE_MONTH_PRICE,
+    SIX_MONTH_PRICE,
+    TWELVE_MONTH_PRICE,
+)
+
 from aiogram.types import InlineKeyboardMarkup
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
@@ -6,19 +13,19 @@ def get_subscriptions_keyboard(callbacks_type: str) -> InlineKeyboardMarkup:
     keyboard_builder = InlineKeyboardBuilder()
     if callbacks_type == "new_sub":
         keyboard_builder.button(
-            text="💸 Month subscription / 12$",
+            text=f"💸 Month subscription / {ONE_MONTH_PRICE}$",
             callback_data="new_one_month_subscription",
         )
         keyboard_builder.button(
-            text="💸 Three month subscription / 30$",
+            text=f"💸 Three month subscription / {THREE_MONTH_PRICE}$",
             callback_data="new_three_month_subscription",
         )
         keyboard_builder.button(
-            text="💸 Six month subscription / 55$",
+            text=f"💸 Six month subscription / {SIX_MONTH_PRICE}$",
             callback_data="new_six_month_subscription",
         )
         keyboard_builder.button(
-            text="💸 Twelve month subscription / 90$",
+            text=f"💸 Twelve month subscription / {TWELVE_MONTH_PRICE}$",
             callback_data="new_twelve_month_subscription",
         )
         keyboard_builder.button(
@@ -26,21 +33,29 @@ def get_subscriptions_keyboard(callbacks_type: str) -> InlineKeyboardMarkup:
         )
     elif callbacks_type == "renew_sub":
         keyboard_builder.button(
-            text="💸 Extend for a month / 12$",
+            text=f"💸 Extend for a month / {ONE_MONTH_PRICE}$",
             callback_data="renew_one_month_subscription",
         )
         keyboard_builder.button(
-            text="💸 Extend for three months / 30$",
+            text=f"💸 Extend for three months / {THREE_MONTH_PRICE}$",
             callback_data="renew_three_month_subscription",
         )
         keyboard_builder.button(
-            text="💸 Extend for six months / 55$",
+            text=f"💸 Extend for six months / {SIX_MONTH_PRICE}$",
             callback_data="renew_six_month_subscription",
         )
         keyboard_builder.button(
-            text="💸 Extend for twelve months / 90$",
+            text=f"💸 Extend for twelve months / {TWELVE_MONTH_PRICE}$",
             callback_data="renew_twelve_month_subscription",
         )
         keyboard_builder.button(text="⬅️ Return to settings", callback_data="settings")
     keyboard_builder.adjust(1, repeat=True)
+    return keyboard_builder.as_markup()
+
+
+def get_buy_subscription_keyboard() -> InlineKeyboardMarkup:
+    keyboard_builder = InlineKeyboardBuilder()
+    keyboard_builder.button(
+        text="💰 Buy a subscription", callback_data="buy_a_subscription"
+    )
     return keyboard_builder.as_markup()

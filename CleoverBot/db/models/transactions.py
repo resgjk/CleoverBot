@@ -1,4 +1,5 @@
 from datetime import datetime, timezone, time, date
+from typing import Literal
 
 from db.base import Base
 
@@ -13,7 +14,9 @@ class TransactionModel(Base):
         primary_key=True, unique=True, nullable=False, autoincrement=True
     )
     uuid: Mapped[str] = mapped_column(nullable=False, unique=True)
-    type: Mapped[str] = mapped_column(nullable=False, unique=False)
+    type: Mapped[
+        Literal["one_month", "three_month", "six_month", "twelve_month"]
+    ] = mapped_column(nullable=False, unique=False)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
     user = relationship("UserModel", back_populates="transactions")
     is_success: Mapped[bool] = mapped_column(

@@ -1,3 +1,5 @@
+from typing import Literal
+
 from db.base import Base
 
 from datetime import date
@@ -17,7 +19,9 @@ class UserModel(Base):
         nullable=False, default=False, unique=False
     )
     subscriber_until: Mapped[date] = mapped_column(nullable=True, unique=False)
-    bank: Mapped[str] = mapped_column(nullable=False, default="Zero bank")
+    bank: Mapped[
+        Literal["Zero bank", "$100 - 1000", "$1000 - 10000", "$10k+"]
+    ] = mapped_column(nullable=False, default="Zero bank")
     notification: Mapped[str] = mapped_column(nullable=False, default="1 Hour")
     activities: Mapped[list["ActivityModel"]] = relationship(  # type: ignore
         back_populates="users", secondary="users_to_activities"
