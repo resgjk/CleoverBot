@@ -13,6 +13,12 @@ class ActivityModel(Base):
     users: Mapped[list["UserModel"]] = relationship(  # type: ignore
         back_populates="activities", secondary="users_to_activities"
     )
+    posts: Mapped[list["PostModel"]] = relationship(
+        "PostModel",
+        back_populates="category",
+        lazy=True,
+        cascade="save-update, merge, delete",
+    )
 
     def __repr__(self) -> str:
         return f"{self.id} {self.title}"

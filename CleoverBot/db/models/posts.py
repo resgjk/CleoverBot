@@ -3,8 +3,8 @@ from typing import Literal
 
 from db.base import Base
 
-from sqlalchemy import BIGINT
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy import BIGINT, ForeignKey
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 
 class PostModel(Base):
@@ -15,7 +15,10 @@ class PostModel(Base):
     )
     owner_id: Mapped[int] = mapped_column(BIGINT, nullable=False, unique=False)
     title: Mapped[str] = mapped_column(nullable=False)
-    category: Mapped[str] = mapped_column(nullable=False, unique=False)
+    category_id: Mapped[int] = mapped_column(
+        ForeignKey("activities.id"), nullable=False
+    )
+    category: Mapped["ActivityModel"] = relationship("ActivityModel", back_populates="posts")  # type: ignore
     bank: Mapped[
         Literal["Zero bank", "$100 - 1000", "$1000 - 10000", "$10k+", "Любой бюджет"]
     ]

@@ -44,10 +44,19 @@ class SendPostMiddleware(BaseMiddleware):
         async with session_maker() as session:
             async with session.begin():
                 if title:
+                    activity_res: ScalarResult = await session.execute(
+                        select(ActivityModel)
+                        .options(selectinload(ActivityModel.users))
+                        .where(ActivityModel.title == category)
+                    )
+                    current_activity: ActivityModel = (
+                        activity_res.scalars().one_or_none()
+                    )
+
                     new_post = PostModel()
                     new_post.owner_id = owner_id
                     new_post.title = title
-                    new_post.category = category
+                    new_post.category_id = current_activity.id
                     new_post.bank = bank
                     if start_date:
                         if start_time:
@@ -65,12 +74,6 @@ class SendPostMiddleware(BaseMiddleware):
                         new_post.videos = videos
                     session.add(new_post)
 
-                activity_res: ScalarResult = await session.execute(
-                    select(ActivityModel)
-                    .options(selectinload(ActivityModel.users))
-                    .where(ActivityModel.title == category)
-                )
-                current_activity: ActivityModel = activity_res.scalars().one_or_none()
                 if current_activity:
                     for user in current_activity.users:
                         if user.user_id != owner_id and user.is_subscriber:
