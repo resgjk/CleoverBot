@@ -22,7 +22,7 @@ class ProjectsPagesMiddleware(BaseMiddleware):
         context_data = await state.get_data()
         try:
             if "set_project_category_for_choise_project" in event.data:
-                await state.update_data(projects_page=1)
+                new_page = 0
                 await state.update_data(category_id=int(event.data.split("_")[-1]))
                 context_data = await state.get_data()
             else:
@@ -30,49 +30,42 @@ class ProjectsPagesMiddleware(BaseMiddleware):
                 if "next_projects_page" in event.data:
                     new_page = page + 1
                 elif "back_projects_page" in event.data:
-                    new_page = page - 1
-                await state.update_data(projects_page=new_page)
+                    if page > 0:
+                        new_page = page - 1
                 context_data = await state.get_data()
 
             async with session_maker() as session:
                 async with session.begin():
-                    projects_page = context_data.get("projects_page")
                     category_id = context_data.get("category_id")
                     res: ScalarResult = await session.execute(
-                        select(ProjectModel).where(
-                            ProjectModel.project_category_id == category_id
-                        )
+                        select(ProjectModel)
+                        .where(ProjectModel.project_category_id == category_id)
+                        .offset(new_page * 5)
+                        .limit(5)
                     )
                     projects = res.unique().scalars().all()
-                    projects_dict = {}
-                    if len(projects) <= 5:
+                    if projects:
+                        projects_dict = {}
                         for project in projects:
                             projects_dict[project.title] = str(project.id)
-                        page = "one"
-                    elif projects_page == 1:
-                        for project in projects[:5]:
-                            projects_dict[project.title] = str(project.id)
-                        page = "first"
+                        if not new_page:
+                            if len(projects) < 5:
+                                page = "one"
+                            else:
+                                page = "first"
+                        else:
+                            if len(projects) < 5:
+                                page = "last"
+                            else:
+                                page = "middle"
+                        data["projects"] = projects_dict
+                        data["page"] = page
+                        data["is_full"] = True
+                        await state.update_data(projects_page=new_page)
                     else:
-                        if 5 * projects_page == len(projects):
-                            for project in projects[-5:]:
-                                projects_dict[project.title] = str(project.id)
-                            page = "last"
-                        elif 5 * projects_page < len(projects):
-                            for project in projects[
-                                (5 * projects_page) - 5 : (5 * projects_page)
-                            ]:
-                                projects_dict[project.title] = str(project.id)
-                            page = "middle"
-                        elif (
-                            5 * projects_page > len(projects)
-                            and 5 * projects_page - len(projects) < 5
-                        ):
-                            for project in projects[(5 * (projects_page - 1)) :]:
-                                projects_dict[project.title] = str(project.id)
-                            page = "last"
-                    data["projects"] = projects_dict
-                    data["page"] = page
+                        data["projects"] = {}
+                        data["page"] = ""
+                        data["is_full"] = False
                     return await handler(event, data)
         except TypeError:
             pass

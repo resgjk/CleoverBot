@@ -28,23 +28,38 @@ view_project_router = Router()
 
 
 async def choise_project_category(
-    call: CallbackQuery, bot: Bot, state: FSMContext, categories: dict, page: str
+    call: CallbackQuery,
+    bot: Bot,
+    state: FSMContext,
+    categories: dict,
+    page: str,
+    is_full: bool,
 ):
-    await call.message.edit_text(
-        text=phrases["choise_project_category"],
-        reply_markup=choise_category_keyboard(
-            categories=categories, page=page, type=type
-        ),
-    )
+    await call.answer()
+    if is_full:
+        await call.message.edit_text(
+            text=phrases["choise_project_category"],
+            reply_markup=choise_category_keyboard(
+                categories=categories, page=page, type=type
+            ),
+        )
 
 
 async def choise_project(
-    call: CallbackQuery, bot: Bot, state: FSMContext, projects: dict, page: str
+    call: CallbackQuery,
+    bot: Bot,
+    state: FSMContext,
+    projects: dict,
+    page: str,
+    is_full: bool,
 ):
-    await call.message.edit_text(
-        text=phrases["choise_project"],
-        reply_markup=choise_project_keyboard(projects=projects, page=page),
-    )
+    await call.answer()
+    
+    if is_full:
+        await call.message.edit_text(
+            text=phrases["choise_project"],
+            reply_markup=choise_project_keyboard(projects=projects, page=page),
+        )
 
 
 async def view_project(

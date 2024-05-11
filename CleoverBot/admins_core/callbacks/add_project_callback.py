@@ -41,7 +41,12 @@ save_media_and_links_router = Router()
 
 
 async def start_add_project(
-    call: CallbackQuery, bot: Bot, state: FSMContext, categories: dict, page: str
+    call: CallbackQuery,
+    bot: Bot,
+    state: FSMContext,
+    categories: dict,
+    page: str,
+    is_full: bool,
 ):
     await call.answer()
     if call.data == "add_project":
@@ -53,12 +58,13 @@ async def start_add_project(
         )
         await state.set_state(ProjectForm.CHOISE_CATEGORY)
     else:
-        await call.message.edit_text(
-            text=phrases["choise_project_category"],
-            reply_markup=choise_category_keyboard(
-                categories=categories, page=page, type=type
-            ),
-        )
+        if is_full:
+            await call.message.edit_text(
+                text=phrases["choise_project_category"],
+                reply_markup=choise_category_keyboard(
+                    categories=categories, page=page, type=type
+                ),
+            )
 
 
 async def choise_category(

@@ -35,10 +35,10 @@ async def show_category_description(
     projects: dict,
     page: str,
     category_id: int,
+    is_full: bool,
 ):
     if category:
         await call.answer()
-
         sender = CategorySender(category)
         text, media = sender.show_category_for_user()
 
@@ -67,15 +67,22 @@ async def show_category_description(
 
 
 async def choise_project_category(
-    call: CallbackQuery, bot: Bot, state: FSMContext, categories: dict, page: str
+    call: CallbackQuery,
+    bot: Bot,
+    state: FSMContext,
+    categories: dict,
+    page: str,
+    is_full: bool,
 ):
     await call.answer()
-    await call.message.edit_text(
-        text=phrases["choise_project_category"],
-        reply_markup=choise_category_keyboard(
-            categories=categories, page=page, type=type
-        ),
-    )
+
+    if is_full:
+        await call.message.edit_text(
+            text=phrases["choise_project_category"],
+            reply_markup=choise_category_keyboard(
+                categories=categories, page=page, type=type
+            ),
+        )
 
 
 async def choise_project(
@@ -85,14 +92,18 @@ async def choise_project(
     projects: dict,
     page: str,
     category_id: int,
+    is_full: bool,
 ):
     try:
-        await call.message.edit_text(
-            text=phrases["choise_project"],
-            reply_markup=choise_project_keyboard(
-                projects=projects, page=page, category_id=category_id
-            ),
-        )
+        await call.answer()
+        
+        if is_full:
+            await call.message.edit_text(
+                text=phrases["choise_project"],
+                reply_markup=choise_project_keyboard(
+                    projects=projects, page=page, category_id=category_id
+                ),
+            )
     except TelegramBadRequest:
         await call.answer()
 

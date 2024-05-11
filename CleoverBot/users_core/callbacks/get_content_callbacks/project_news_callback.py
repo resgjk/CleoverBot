@@ -69,16 +69,22 @@ async def show_project_description(
 
 
 async def choise_project_news(
-    call: CallbackQuery, bot: Bot, state: FSMContext, news: dict, page: str
+    call: CallbackQuery,
+    bot: Bot,
+    state: FSMContext,
+    news: dict,
+    page: str,
+    is_full: bool,
 ):
     await call.answer()
 
-    text = get_news_text(news)
+    if is_full:
+        text = get_news_text(news)
 
-    await call.message.edit_text(
-        text=phrases["choise_project_news"] + text,
-        reply_markup=choise_project_news_keyboard(news=news, page=page),
-    )
+        await call.message.edit_text(
+            text=phrases["choise_project_news"] + text,
+            reply_markup=choise_project_news_keyboard(news=news, page=page),
+        )
 
 
 async def show_project_news_for_user(

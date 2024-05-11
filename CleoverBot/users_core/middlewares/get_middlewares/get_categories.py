@@ -22,53 +22,43 @@ class CategoriesPagesMiddleware(BaseMiddleware):
         context_data = await state.get_data()
         try:
             if event.data == "projects":
-                await state.update_data(user_categories_page=1)
-                context_data = await state.get_data()
+                new_page = 0
             else:
                 page = context_data.get("user_categories_page")
                 if "next_categories_page" in event.data:
                     new_page = page + 1
                 elif "back_categories_page" in event.data:
-                    new_page = page - 1
-                await state.update_data(user_categories_page=new_page)
-                context_data = await state.get_data()
+                    if page > 0:
+                        new_page = page - 1
 
             async with session_maker() as session:
                 async with session.begin():
-                    categories_page = context_data.get("user_categories_page")
                     res: ScalarResult = await session.execute(
-                        select(ProjectCategoryModel)
+                        select(ProjectCategoryModel).offset(new_page * 5).limit(5)
                     )
                     categories = res.unique().scalars().all()
-                    categories_dict = {}
-                    if len(categories) <= 5:
+                    if categories:
+                        categories_dict = {}
                         for category in categories:
                             categories_dict[category.title] = str(category.id)
-                        page = "one"
-                    elif categories_page == 1:
-                        for category in categories[:5]:
-                            categories_dict[category.title] = str(category.id)
-                        page = "first"
+                        if not new_page:
+                            if len(categories) < 5:
+                                page = "one"
+                            else:
+                                page = "first"
+                        else:
+                            if len(categories) < 5:
+                                page = "last"
+                            else:
+                                page = "middle"
+                        data["categories"] = categories_dict
+                        data["is_full"] = True
+                        data["page"] = page
+                        await state.update_data(user_categories_page=new_page)
                     else:
-                        if 5 * categories_page == len(categories):
-                            for category in categories[-5:]:
-                                categories_dict[category.title] = str(category.id)
-                            page = "last"
-                        elif 5 * categories_page < len(categories):
-                            for category in categories[
-                                (5 * categories_page) - 5 : (5 * categories_page)
-                            ]:
-                                categories_dict[category.title] = str(category.id)
-                            page = "middle"
-                        elif (
-                            5 * categories_page > len(categories)
-                            and 5 * categories_page - len(categories) < 5
-                        ):
-                            for category in categories[(5 * (categories_page - 1)) :]:
-                                categories_dict[category.title] = str(category.id)
-                            page = "last"
-                    data["categories"] = categories_dict
-                    data["page"] = page
+                        data["categories"] = {}
+                        data["is_full"] = False
+                        data["page"] = ""
                     return await handler(event, data)
         except TypeError:
             pass

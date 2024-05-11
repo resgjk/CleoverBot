@@ -24,26 +24,25 @@ class ProjectsNewsPagesMiddleware(BaseMiddleware):
         context_data = await state.get_data()
         try:
             if "choise_project_for_user_view_" in event.data:
-                await state.update_data(
-                    news_page=1, project_id=int(event.data.split("_")[-1])
-                )
+                new_page = 0
+                await state.update_data(project_id=int(event.data.split("_")[-1]))
                 context_data = await state.get_data()
             else:
                 page = context_data.get("news_page")
                 if "next_project_news_page" == event.data:
                     new_page = page + 1
                 elif "back_project_news_page" == event.data:
-                    new_page = page - 1
-                await state.update_data(news_page=new_page)
+                    if page > 0:
+                        new_page = page - 1
                 context_data = await state.get_data()
 
             async with session_maker() as session:
                 async with session.begin():
-                    news_page = context_data.get("news_page")
                     project_id = context_data.get("project_id")
 
                     res: ScalarResult = await session.execute(
-                        select(ProjectNewsModel).where(
+                        select(ProjectNewsModel)
+                        .where(
                             ProjectNewsModel.project_id == project_id,
                             (
                                 datetime.now(tz=timezone.utc).date()
@@ -51,49 +50,35 @@ class ProjectsNewsPagesMiddleware(BaseMiddleware):
                             )
                             <= 30,
                         )
+                        .offset(new_page * 5)
+                        .limit(5)
                     )
                     news = res.scalars().all()
-                    news_dict = {}
-                    if len(news) <= 5:
+                    if news:
+                        news_dict = {}
                         for one_news in news:
                             news_dict[one_news.title] = [
                                 str(one_news.id),
                                 one_news.description,
                             ]
-                        page = "one"
-                    elif news_page == 1:
-                        for one_news in news[:5]:
-                            news_dict[one_news.title] = [
-                                str(one_news.id),
-                                one_news.description,
-                            ]
-                        page = "first"
+                        if not new_page:
+                            if len(news) < 5:
+                                page = "one"
+                            else:
+                                page = "first"
+                        else:
+                            if len(news) < 5:
+                                page = "last"
+                            else:
+                                page = "middle"
+                        data["news"] = news_dict
+                        data["page"] = page
+                        data["is_full"] = True
+                        await state.update_data(news_page=new_page)
                     else:
-                        if 5 * news_page == len(news):
-                            for one_news in news[-5:]:
-                                news_dict[one_news.title] = [
-                                    str(one_news.id),
-                                    one_news.description,
-                                ]
-                            page = "last"
-                        elif 5 * news_page < len(news):
-                            for one_news in news[(5 * news_page) - 5 : (5 * news_page)]:
-                                news_dict[one_news.title] = [
-                                    str(one_news.id),
-                                    one_news.description,
-                                ]
-                            page = "middle"
-                        elif (
-                            5 * news_page > len(news) and 5 * news_page - len(news) < 5
-                        ):
-                            for one_news in news[(5 * (news_page - 1)) :]:
-                                news_dict[one_news.title] = [
-                                    str(one_news.id),
-                                    one_news.description,
-                                ]
-                            page = "last"
-                    data["news"] = news_dict
-                    data["page"] = page
+                        data["news"] = {}
+                        data["page"] = ""
+                        data["is_full"] = False
                     return await handler(event, data)
         except TypeError:
             pass
