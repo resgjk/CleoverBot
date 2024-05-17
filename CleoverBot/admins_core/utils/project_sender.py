@@ -32,22 +32,7 @@ class ProjectSender:
 
         return text, media
 
-    def send_project_to_users(self):
-        text = []
-        text.append(f"<b>{self.title}</b>")
-        text.append(f"{self.description}")
-        if self.links:
-            links_lst = []
-            for link in self.links.split(";"):
-                if link:
-                    links_lst.append(f"🔗 {link}\n")
-            text.append("".join(links_lst))
-        text = "\n\n".join(text)
-        media = add_media(text, self.photos, self.videos)
-
-        return text, media
-
-    def show_for_add_news_or_delete(self):
+    def send_project(self):
         text = []
         text.append(f"<b>{self.title}</b>")
         text.append(f"{self.description}")

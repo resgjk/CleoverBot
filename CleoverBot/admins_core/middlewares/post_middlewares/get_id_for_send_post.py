@@ -53,11 +53,14 @@ class SendPostMiddleware(BaseMiddleware):
                         activity_res.scalars().one_or_none()
                     )
 
-                    new_post = PostModel()
-                    new_post.owner_id = owner_id
-                    new_post.title = title
-                    new_post.category_id = current_activity.id
-                    new_post.bank = bank
+                    new_post = PostModel(
+                        owner_id=owner_id,
+                        title=title,
+                        category_id=current_activity.id,
+                        bank=bank,
+                        short_description=short_description,
+                        full_description=full_description,
+                    )
                     if start_date:
                         if start_time:
                             new_post.start_time = start_time
@@ -66,8 +69,6 @@ class SendPostMiddleware(BaseMiddleware):
                         if end_time:
                             new_post.end_time = end_time
                         new_post.end_date = end_date
-                    new_post.short_description = short_description
-                    new_post.full_description = full_description
                     if photos:
                         new_post.photos = photos
                     if videos:

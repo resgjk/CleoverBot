@@ -5,15 +5,19 @@ from users_core.middlewares.get_middlewares.get_choise_activities import (
 )
 
 from aiogram import Bot, Router, F
-from aiogram.types import CallbackQuery
+from aiogram.types import CallbackQuery, FSInputFile, InputMediaPhoto
 
 
 activities_menu_router = Router()
 
 
 async def activities_menu(call: CallbackQuery, bot: Bot, choise_activities: dict):
-    await call.message.edit_text(
-        text=phrases["activities_text"],
+    media = InputMediaPhoto(
+        media=FSInputFile("users_core/utils/photos/activities.png"),
+        caption=phrases["activities_text"],
+    )
+    await call.message.edit_media(
+        media=media,
         reply_markup=get_activities_keyboard(choise_activities),
     )
 

@@ -275,9 +275,9 @@ async def send_post_to_users(
                 text="✅ Пост успешно опубликован!",
                 reply_markup=return_to_admin_panel_keyboard(),
             )
-        except Exception:
+        except Exception as e:
             await call.message.answer(
-                text="Не удалось опубликовать пост, попробуйте еще раз!"
+                text=f"Не удалось опубликовать пост, попробуйте еще раз!\nОшибка: {str(e)}"
             )
     else:
         await call.message.edit_text(

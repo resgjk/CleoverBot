@@ -2,6 +2,7 @@ from users_core.utils.phrases import phrases
 from users_core.utils.category_sender import CategorySender
 from users_core.keyboards.choise_project_category_keyboard import (
     choise_category_keyboard,
+    get_back_from_categories_keyboard,
 )
 from users_core.keyboards.choise_project_keyboard import choise_project_keyboard
 from users_core.middlewares.get_middlewares.get_categories import (
@@ -15,7 +16,7 @@ from users_core.middlewares.get_middlewares.get_category_details import (
 from db.models.projects_categories import ProjectCategoryModel
 
 from aiogram import Bot, Router, F
-from aiogram.types import CallbackQuery
+from aiogram.types import CallbackQuery, FSInputFile, InputMediaPhoto
 from aiogram.fsm.context import FSMContext
 from aiogram.exceptions import TelegramBadRequest, TelegramNetworkError
 
@@ -76,12 +77,20 @@ async def choise_project_category(
 ):
     await call.answer()
 
+    media = InputMediaPhoto(
+        media=FSInputFile("users_core/utils/photos/categories.png"),
+        caption=phrases["choise_project_category"],
+    )
     if is_full:
-        await call.message.edit_text(
-            text=phrases["choise_project_category"],
+        await call.message.edit_media(
+            media=media,
             reply_markup=choise_category_keyboard(
                 categories=categories, page=page, type=type
             ),
+        )
+    else:
+        await call.message.edit_media(
+            media=media, reply_markup=get_back_from_categories_keyboard()
         )
 
 
@@ -96,7 +105,7 @@ async def choise_project(
 ):
     try:
         await call.answer()
-        
+
         if is_full:
             await call.message.edit_text(
                 text=phrases["choise_project"],

@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta, timezone
+import logging
 
 from db.models.posts import PostModel
 
@@ -31,9 +32,10 @@ class CalendarMiddleware(BaseMiddleware):
                 loc_date = context_data.get("curr_date")
                 if event.data == "next_date":
                     new_date = loc_date + timedelta(days=1)
+                    await state.update_data(curr_date=new_date)
                 elif event.data == "back_date":
                     new_date = loc_date - timedelta(days=1)
-                await state.update_data(curr_date=new_date)
+                    await state.update_data(curr_date=new_date)
                 context_data = await state.get_data()
             async with session_maker() as session:
                 async with session.begin():
@@ -47,8 +49,8 @@ class CalendarMiddleware(BaseMiddleware):
                         events.append([event_news.title, event_news.short_description])
                     data["events_news"] = events
             return await handler(event, data)
-        except Exception:
-            pass
+        except Exception as e:
+            logging.error(e)
 
 
 class GetEventDetails(BaseMiddleware):

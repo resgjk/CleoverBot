@@ -167,11 +167,6 @@ def check_posts_media_folder():
             os.mkdir("media/" + direction)
 
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(filename)s:%(lineno)d #%(levelname)-8s [%(asctime)s] - %(name)s - %(message)s",
-)
-
 bot = Bot(BOT_TOKEN, parse_mode=ParseMode.HTML)
 dp = Dispatcher(storage=MemoryStorage())
 
@@ -181,6 +176,12 @@ session_maker = get_session_maker(async_engine)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(filename)s:%(lineno)d #%(levelname)-8s [%(asctime)s] - %(name)s - %(message)s",
+        filename="cleover_log.log",
+        filemode="w",
+    )
     webhook_info = await bot.get_webhook_info()
     if webhook_info.url != (WEBHOOK_DOMAIN + WEBHOOK_PATH):
         await set_commands(bot)

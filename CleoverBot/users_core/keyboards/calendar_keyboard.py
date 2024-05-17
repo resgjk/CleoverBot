@@ -1,4 +1,5 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 
 def get_calendar_keyboard(events) -> InlineKeyboardMarkup:
@@ -26,3 +27,12 @@ def get_calendar_keyboard(events) -> InlineKeyboardMarkup:
     )
     keyboard = InlineKeyboardMarkup(inline_keyboard=buttons)
     return keyboard
+
+
+def return_to_calendar_keyboard(media_count: int) -> InlineKeyboardMarkup:
+    keyboard_builder = InlineKeyboardBuilder()
+    keyboard_builder.button(
+        text="⬅️ Return to calendar",
+        callback_data=f"return_to_calendar_{media_count + 1}",
+    )
+    return keyboard_builder.as_markup()

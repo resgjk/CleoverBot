@@ -54,7 +54,7 @@ async def choise_project(
     is_full: bool,
 ):
     await call.answer()
-    
+
     if is_full:
         await call.message.edit_text(
             text=phrases["choise_project"],
@@ -69,7 +69,7 @@ async def view_project(
 
     if result == "success":
         sender = ProjectSender(project_data=project_data)
-        text, media = sender.show_for_add_news_or_delete()
+        text, media = sender.send_project()
 
         if media:
             try:

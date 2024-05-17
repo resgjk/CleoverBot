@@ -5,7 +5,7 @@ from users_core.keyboards.main_menu import (
 )
 from users_core.middlewares.register_check import RegisterCheckMiddleware
 
-from aiogram.types import Message
+from aiogram.types import Message, FSInputFile
 from aiogram import Bot, Router
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
@@ -19,12 +19,15 @@ async def start_handler(
 ):
     await state.clear()
     if is_subscriber:
-        await message.answer(
-            phrases["start_message"], reply_markup=get_main_menu_keyboard_is_sub()
+        await message.answer_photo(
+            photo=FSInputFile("users_core/utils/photos/menu.png"),
+            caption=phrases["start_message"],
+            reply_markup=get_main_menu_keyboard_is_sub(),
         )
     else:
-        await message.answer(
-            phrases["start_message_user_isnt_sub"],
+        await message.answer_photo(
+            photo=FSInputFile("users_core/utils/photos/menu.png"),
+            caption=phrases["start_message_user_isnt_sub"],
             reply_markup=get_main_menu_keyboard_is_not_sub(),
         )
 

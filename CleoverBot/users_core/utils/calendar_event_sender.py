@@ -17,6 +17,6 @@ class CalendarEventSender:
         text.append(f"<b>{self.title}</b>")
         text.append(f"{self.full_description}")
         text = "\n\n".join(text)
-        media = add_media(text, self.photos, self.videos)
+        media = add_media(photos=self.photos, videos=self.videos)
 
         return text, media

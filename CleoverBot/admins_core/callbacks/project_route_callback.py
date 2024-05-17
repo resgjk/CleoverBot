@@ -165,9 +165,9 @@ async def send_post_to_users(
                     context_data.get("project_news_id")
                 ),
             )
-        except Exception:
+        except Exception as e:
             await call.message.answer(
-                text="Не удалось опубликовать новость, попробуйте еще раз!"
+                text=f"Не удалось опубликовать новость, попробуйте еще раз!\nОшибка: {str(e)}"
             )
     else:
         await call.message.edit_text(

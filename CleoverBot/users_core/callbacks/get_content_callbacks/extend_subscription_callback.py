@@ -7,7 +7,7 @@ from users_core.middlewares.get_middlewares.get_expiration_date import (
 )
 
 from aiogram import Bot, Router, F
-from aiogram.types import CallbackQuery
+from aiogram.types import CallbackQuery, FSInputFile, InputMediaPhoto
 
 
 renew_subscription_router = Router()
@@ -15,8 +15,9 @@ renew_subscription_router = Router()
 
 async def extend_subscription(call: CallbackQuery, bot: Bot, expiration_date: date):
     date = expiration_date.ctime().split()
-    await call.message.edit_text(
-        text="🔑 <b>Subscription</b>\n\n"
+    media = InputMediaPhoto(
+        media=FSInputFile("users_core/utils/photos/subscription.png"),
+        caption="🔑 <b>Subscription</b>\n\n"
         + " ".join(
             (
                 phrases["expiration_sub_date"],
@@ -26,6 +27,9 @@ async def extend_subscription(call: CallbackQuery, bot: Bot, expiration_date: da
             )
         )
         + phrases["renew_subscription"],
+    )
+    await call.message.edit_media(
+        media=media,
         reply_markup=get_subscriptions_keyboard("renew_sub"),
     )
 

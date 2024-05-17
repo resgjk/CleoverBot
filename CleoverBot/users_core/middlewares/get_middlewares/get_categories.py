@@ -1,3 +1,5 @@
+import logging
+
 from db.models.projects_categories import ProjectCategoryModel
 from typing import Callable, Dict, Any, Awaitable
 
@@ -60,5 +62,5 @@ class CategoriesPagesMiddleware(BaseMiddleware):
                         data["is_full"] = False
                         data["page"] = ""
                     return await handler(event, data)
-        except TypeError:
-            pass
+        except TypeError as e:
+            logging.error(e)

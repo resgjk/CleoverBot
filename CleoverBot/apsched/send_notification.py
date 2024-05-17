@@ -1,13 +1,10 @@
 import asyncio
+import logging
 
 from db.models.activities import ActivityModel
+from users_core.utils.add_media_function import add_media
 
 from aiogram import Bot
-from aiogram.types import (
-    InputMediaPhoto,
-    InputMediaVideo,
-    FSInputFile,
-)
 
 from sqlalchemy.orm import sessionmaker, selectinload
 from sqlalchemy import select
@@ -43,39 +40,11 @@ async def send_notifications(
                 text.append(f"{post_details['full_description']}")
                 text = "\n\n".join(text)
 
-                media = []
-                if post_details["photos"]:
-                    for photo in post_details["photos"]:
-                        if not media:
-                            media.append(
-                                InputMediaPhoto(
-                                    type="photo",
-                                    media=FSInputFile(path=photo),
-                                    caption=text,
-                                )
-                            )
-                        else:
-                            media.append(
-                                InputMediaPhoto(
-                                    type="photo", media=FSInputFile(path=photo)
-                                )
-                            )
-                if post_details["videos"]:
-                    for video in post_details["videos"]:
-                        if not media:
-                            media.append(
-                                InputMediaVideo(
-                                    type="video",
-                                    media=FSInputFile(path=video),
-                                    caption=text,
-                                )
-                            )
-                        else:
-                            media.append(
-                                InputMediaVideo(
-                                    type="video", media=FSInputFile(path=video)
-                                )
-                            )
+                media = add_media(
+                    text=text,
+                    photos=post_details["photos"],
+                    videos=post_details["videos"],
+                )
 
                 tasks = []
                 try:
@@ -91,4 +60,4 @@ async def send_notifications(
                             tasks.append(task)
                     await asyncio.gather(*tasks, return_exceptions=True)
                 except Exception as e:
-                    print(e)
+                    logging.error(e)

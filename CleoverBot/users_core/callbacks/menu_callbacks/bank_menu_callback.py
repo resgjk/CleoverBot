@@ -5,15 +5,19 @@ from users_core.middlewares.get_middlewares.get_choise_bank import (
 )
 
 from aiogram import Bot, Router, F
-from aiogram.types import CallbackQuery
+from aiogram.types import CallbackQuery, FSInputFile, InputMediaPhoto
 
 
 bank_menu_router = Router()
 
 
 async def bank_menu(call: CallbackQuery, bot: Bot, choise_bank):
-    await call.message.edit_text(
-        text=phrases["bank_text"],
+    media = InputMediaPhoto(
+        media=FSInputFile("users_core/utils/photos/bank.png"),
+        caption=phrases["bank_text"],
+    )
+    await call.message.edit_media(
+        media=media,
         reply_markup=get_bank_keyboard(str(choise_bank)),
     )
 

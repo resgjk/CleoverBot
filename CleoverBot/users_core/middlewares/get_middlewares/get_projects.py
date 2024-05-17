@@ -1,3 +1,5 @@
+import logging
+
 from db.models.projects import ProjectModel
 from db.models.users import UserModel
 from typing import Callable, Dict, Any, Awaitable
@@ -54,8 +56,8 @@ class ProjectsPagesMiddleware(BaseMiddleware):
                                 else:
                                     current_user.projects = []
                                 await session.commit()
-                            except Exception:
-                                pass
+                            except Exception as e:
+                                logging.error(e)
             elif "_project_notification_for_user_" in event.data:
                 new_page = context_data.get("projects_page")
                 async with session_maker() as session:
@@ -84,8 +86,8 @@ class ProjectsPagesMiddleware(BaseMiddleware):
                                         current_user.projects.index(current_project)
                                     ]
                                 await session.commit()
-                            except Exception:
-                                pass
+                            except Exception as e:
+                                logging.error(e)
             else:
                 page = context_data.get("projects_page")
                 if "next_projects_page_for_user_choise_project" == event.data:
@@ -140,5 +142,5 @@ class ProjectsPagesMiddleware(BaseMiddleware):
                         data["category_id"] = 0
                         data["is_full"] = False
                     return await handler(event, data)
-        except TypeError:
-            pass
+        except TypeError as e:
+            logging.error(e)

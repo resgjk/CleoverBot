@@ -195,7 +195,7 @@ async def send_project_to_users(
 
     if result == "success":
         if users_id:
-            text, media = sender.send_project_to_users()
+            text, media = sender.send_project()
 
             tasks = []
             try:

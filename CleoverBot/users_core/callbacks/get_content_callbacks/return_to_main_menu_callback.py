@@ -6,7 +6,7 @@ from users_core.keyboards.main_menu import (
 from users_core.middlewares.register_check import RegisterCheckMiddleware
 
 from aiogram import Bot, Router, F
-from aiogram.types import CallbackQuery
+from aiogram.types import CallbackQuery, FSInputFile, InputMediaPhoto
 from aiogram.fsm.context import FSMContext
 
 main_menu_router = Router()
@@ -17,12 +17,21 @@ async def return_to_main_menu(
 ):
     await state.clear()
     if is_subscriber:
-        await call.message.edit_text(
-            text=phrases["start_message"], reply_markup=get_main_menu_keyboard_is_sub()
+        media = InputMediaPhoto(
+            media=FSInputFile("users_core/utils/photos/menu.png"),
+            caption=phrases["start_message"],
+        )
+        await call.message.edit_media(
+            media=media,
+            reply_markup=get_main_menu_keyboard_is_sub(),
         )
     else:
-        await call.message.edit_text(
-            text=phrases["start_message_user_isnt_sub"],
+        media = InputMediaPhoto(
+            media=FSInputFile("users_core/utils/photos/menu.png"),
+            caption=phrases["start_message_user_isnt_sub"],
+        )
+        await call.message.edit_media(
+            media=media,
             reply_markup=get_main_menu_keyboard_is_not_sub(),
         )
 
