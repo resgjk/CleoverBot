@@ -95,6 +95,8 @@ class ProjectsPagesMiddleware(BaseMiddleware):
                 elif "back_projects_page_for_user_choise_project" == event.data:
                     if page > 0:
                         new_page = page - 1
+                elif "return_to_category" in event.data:
+                    new_page = page
                 context_data = await state.get_data()
 
             async with session_maker() as session:

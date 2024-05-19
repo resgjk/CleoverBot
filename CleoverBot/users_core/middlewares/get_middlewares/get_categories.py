@@ -32,6 +32,8 @@ class CategoriesPagesMiddleware(BaseMiddleware):
                 elif "back_categories_page" in event.data:
                     if page > 0:
                         new_page = page - 1
+                elif "return_to_projects" in event.data:
+                    new_page = page
 
             async with session_maker() as session:
                 async with session.begin():

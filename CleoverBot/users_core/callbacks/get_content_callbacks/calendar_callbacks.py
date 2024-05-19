@@ -82,11 +82,19 @@ async def show_event(
             )
         except TelegramNetworkError as e:
             logging.error(e)
-    await bot.send_message(
-        chat_id=call.message.chat.id,
-        text=text,
-        reply_markup=return_to_calendar_keyboard(len(media)),
-    )
+        await bot.send_message(
+            chat_id=call.message.chat.id,
+            text=text,
+            reply_markup=return_to_calendar_keyboard(len(media)),
+        )
+    else:
+        event_photo = FSInputFile("users_core/utils/photos/event.png")
+        await bot.send_photo(
+            chat_id=call.message.chat.id,
+            photo=event_photo,
+            caption=text,
+            reply_markup=return_to_calendar_keyboard(0),
+        )
 
 
 calendar_router.callback_query.register(get_calendar, F.data == "calendar")

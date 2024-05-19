@@ -7,8 +7,12 @@ class ProjectSender:
     def __init__(self, project: ProjectModel) -> None:
         self.title = project.title
         self.description = project.description
-        self.photos = project.photos.split(";")[:-1]
-        self.videos = project.videos.split(";")[:-1]
+        self.photos = project.photos
+        if self.photos:
+            self.photos = project.photos.split(";")[:-1]
+        self.videos = project.videos
+        if self.videos:
+            self.videos = project.videos.split(";")[:-1]
         self.links = project.links
 
     def show_project_details(self):
@@ -17,11 +21,11 @@ class ProjectSender:
         text.append(f"{self.description}")
         if self.links:
             links_lst = []
-            for link in self.links.split(";"):
+            for link in self.links.split(";")[:-1]:
                 if link:
                     links_lst.append(f"🔗 {link}\n")
-            text.append("".join(links_lst))
-        text.append(phrases["choise_project_news"])
+            if links_lst:
+                text.append("".join(links_lst))
         text = "\n\n".join(text)
         media = add_media(text, self.photos, self.videos)
 

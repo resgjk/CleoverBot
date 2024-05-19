@@ -11,10 +11,14 @@ from aiogram.types import CallbackQuery
 create_invoice_router = Router()
 
 
-async def create_invoice(call: CallbackQuery, bot: Bot, link, create_status):
+async def create_invoice(
+    call: CallbackQuery, bot: Bot, link, create_status, amount: int
+):
     await call.answer()
     if create_status == "success":
-        await call.message.answer(f'🧾 <a href="{link}">Your subscription invoice</a>')
+        await call.message.answer(
+            f'🧾 <a href="{link}">Your subscription invoice</a>\n\n<b>PS. You must transfer {amount}$ within 30 minutes!</b>'
+        )
     else:
         await call.message.answer(phrases["error_create_payment"])
 

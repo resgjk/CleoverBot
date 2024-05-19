@@ -1,9 +1,11 @@
+import logging
+
 from users_core.utils.phrases import phrases
 from users_core.utils.category_sender import CategorySender
 from users_core.keyboards.choise_project_category_keyboard import (
     choise_category_keyboard,
-    get_back_from_categories_keyboard,
 )
+from users_core.keyboards.return_to_main_keyboard import get_keyboard
 from users_core.keyboards.choise_project_keyboard import choise_project_keyboard
 from users_core.middlewares.get_middlewares.get_categories import (
     CategoriesPagesMiddleware,
@@ -38,11 +40,25 @@ async def show_category_description(
     category_id: int,
     is_full: bool,
 ):
-    if category:
+    if "return_to_category" in call.data:
+        chat_id = call.message.chat.id
+        message_ids_for_delete = []
+        for message_number in range(int(call.data.split("_")[-2])):
+            message_ids_for_delete.append(call.message.message_id - message_number)
+        try:
+            await bot.delete_messages(
+                chat_id=chat_id, message_ids=message_ids_for_delete
+            )
+        except Exception as e:
+            logging.error(e)
+    else:
         await call.answer()
+        await bot.delete_message(
+            chat_id=call.from_user.id, message_id=call.message.message_id
+        )
+    if category:
         sender = CategorySender(category)
         text, media = sender.show_category_for_user()
-
         if media:
             try:
                 await bot.send_media_group(
@@ -52,19 +68,34 @@ async def show_category_description(
             except TelegramNetworkError:
                 await bot.send_message(chat_id=call.message.chat.id, text=text)
         else:
-            await bot.send_message(chat_id=call.message.chat.id, text=text)
-
+            category_photo = FSInputFile("users_core/utils/photos/categories.png")
+            await bot.send_photo(
+                chat_id=call.message.chat.id, photo=category_photo, caption=text
+            )
         try:
             await call.message.answer(
                 text=phrases["choise_project"],
                 reply_markup=choise_project_keyboard(
-                    projects=projects, page=page, category_id=category_id
+                    projects=projects,
+                    page=page,
+                    category_id=category_id,
+                    media_count=len(media),
                 ),
             )
+            await state.update_data(
+                category_media_count=len(media),
+                category_id=int(call.data.split("_")[-1]),
+            )
         except TelegramBadRequest:
-            await call.answer()
+            await call.message.answer(
+                text="🚫 Can't access the category, try again later!",
+                reply_markup=get_keyboard(),
+            )
     else:
-        await call.message.answer(text="🚫 Can't access the category, try again later!")
+        await call.message.answer(
+            text="🚫 Can't access the category, try again later!",
+            reply_markup=get_keyboard(),
+        )
 
 
 async def choise_project_category(
@@ -77,21 +108,40 @@ async def choise_project_category(
 ):
     await call.answer()
 
-    media = InputMediaPhoto(
-        media=FSInputFile("users_core/utils/photos/categories.png"),
-        caption=phrases["choise_project_category"],
-    )
-    if is_full:
-        await call.message.edit_media(
-            media=media,
+    categories_photo = FSInputFile("users_core/utils/photos/categories.png")
+    caption = phrases["choise_project_category"]
+
+    if "return_to_projects" in call.data:
+        chat_id = call.message.chat.id
+        message_ids_for_delete = []
+        for message_number in range(int(call.data.split("_")[-1])):
+            message_ids_for_delete.append(call.message.message_id - message_number)
+        try:
+            await bot.delete_messages(
+                chat_id=chat_id, message_ids=message_ids_for_delete
+            )
+        except Exception as e:
+            logging.error(e)
+        await bot.send_photo(
+            chat_id=call.from_user.id,
+            photo=categories_photo,
+            caption=caption,
             reply_markup=choise_category_keyboard(
                 categories=categories, page=page, type=type
             ),
         )
     else:
-        await call.message.edit_media(
-            media=media, reply_markup=get_back_from_categories_keyboard()
+        media = InputMediaPhoto(
+            media=categories_photo,
+            caption=caption,
         )
+        if is_full:
+            await call.message.edit_media(
+                media=media,
+                reply_markup=choise_category_keyboard(
+                    categories=categories, page=page, type=type
+                ),
+            )
 
 
 async def choise_project(
@@ -107,10 +157,15 @@ async def choise_project(
         await call.answer()
 
         if is_full:
+            context_data = await state.get_data()
+            media_count = context_data.get("category_media_count")
             await call.message.edit_text(
                 text=phrases["choise_project"],
                 reply_markup=choise_project_keyboard(
-                    projects=projects, page=page, category_id=category_id
+                    projects=projects,
+                    page=page,
+                    category_id=category_id,
+                    media_count=media_count,
                 ),
             )
     except TelegramBadRequest:
@@ -119,6 +174,9 @@ async def choise_project(
 
 user_choise_project_category_router.callback_query.register(
     choise_project_category, F.data == "projects"
+)
+user_choise_project_category_router.callback_query.register(
+    choise_project_category, F.data.contains("return_to_projects")
 )
 user_choise_project_category_router.callback_query.register(
     choise_project_category, F.data == f"next_categories_page_{type}"
@@ -149,6 +207,9 @@ user_choise_project_router.callback_query.middleware.register(ProjectsPagesMiddl
 
 user_view_project_category_details_router.callback_query.register(
     show_category_description, F.data.contains(f"set_project_category_{type}_")
+)
+user_view_project_category_details_router.callback_query.register(
+    show_category_description, F.data.contains("return_to_category")
 )
 user_view_project_category_details_router.callback_query.middleware.register(
     ProjectsPagesMiddleware()

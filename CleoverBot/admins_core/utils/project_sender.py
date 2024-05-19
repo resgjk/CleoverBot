@@ -8,14 +8,22 @@ class ProjectSender:
             self.category = context_data.get("category_title")
             self.description = context_data.get("description")
             self.links = context_data.get("links")
-            self.photos = context_data.get("photos").split(";")[:-1]
-            self.videos = context_data.get("videos").split(";")[:-1]
+            self.photos = context_data.get("photos")
+            if self.photos:
+                self.photos = context_data.get("photos").split(";")[:-1]
+            self.videos = context_data.get("videos")
+            if self.videos:
+                self.videos = context_data.get("videos").split(";")[:-1]
         elif project_data:
             self.title = project_data["title"]
             self.description = project_data["description"]
             self.links = project_data["links"]
-            self.photos = project_data["photos"].split(";")[:-1]
-            self.videos = project_data["videos"].split(";")[:-1]
+            self.photos = project_data["photos"]
+            if self.photos:
+                self.photos = project_data["photos"].split(";")[:-1]
+            self.videos = project_data["videos"]
+            if self.videos:
+                self.videos = project_data["videos"].split(";")[:-1]
 
     def show_project_detail_for_admin(self):
         text = []

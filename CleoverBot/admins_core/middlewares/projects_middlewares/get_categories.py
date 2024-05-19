@@ -25,7 +25,6 @@ class CategoriesPagesMiddleware(BaseMiddleware):
         try:
             if event.data in ["add_project", "choise_project"]:
                 new_page = 0
-                context_data = await state.get_data()
             else:
                 page = context_data.get("categories_page")
                 if "next_categories_page" in event.data:
@@ -33,7 +32,6 @@ class CategoriesPagesMiddleware(BaseMiddleware):
                 elif "back_categories_page" in event.data:
                     if page > 0:
                         new_page = page - 1
-                context_data = await state.get_data()
 
             async with session_maker() as session:
                 async with session.begin():

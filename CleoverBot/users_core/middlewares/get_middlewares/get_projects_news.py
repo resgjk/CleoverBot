@@ -36,6 +36,8 @@ class ProjectsNewsPagesMiddleware(BaseMiddleware):
                 elif "back_project_news_page" == event.data:
                     if page > 0:
                         new_page = page - 1
+                elif "return_to_project" in event.data:
+                    new_page = page
                 context_data = await state.get_data()
 
             async with session_maker() as session:

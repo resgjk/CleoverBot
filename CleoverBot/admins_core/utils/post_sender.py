@@ -17,8 +17,12 @@ class PostSender:
         self.end_time = context_data.get("end_time")
         self.short_description = context_data.get("short_description")
         self.full_description = context_data.get("full_description")
-        self.photos = context_data.get("photos").split(";")[:-1]
-        self.videos = context_data.get("videos").split(";")[:-1]
+        self.photos = context_data.get("photos")
+        if self.photos:
+            self.photos = context_data.get("photos").split(";")[:-1]
+        self.videos = context_data.get("videos")
+        if self.videos:
+            self.videos = context_data.get("videos").split(";")[:-1]
 
     def show_post_detail_for_admin(self):
         text = []

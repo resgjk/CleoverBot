@@ -27,7 +27,7 @@ import asyncio
 from uuid import uuid4
 
 from aiogram import Bot, Router, F
-from aiogram.types import CallbackQuery, Message, ContentType
+from aiogram.types import CallbackQuery, Message, ContentType, FSInputFile
 from aiogram.fsm.context import FSMContext
 from aiogram.exceptions import TelegramNetworkError
 
@@ -207,9 +207,19 @@ async def send_project_to_users(
                                 media=media,
                             )
                         except TelegramNetworkError:
-                            task = bot.send_message(chat_id=id, text=text)
+                            project_photo = FSInputFile(
+                                "users_core/utils/photos/project.png"
+                            )
+                            task = bot.send_photo(
+                                chat_id=id, photo=project_photo, caption=text
+                            )
                     else:
-                        task = bot.send_message(chat_id=id, text=text)
+                        project_photo = FSInputFile(
+                            "users_core/utils/photos/project.png"
+                        )
+                        task = bot.send_photo(
+                            chat_id=id, photo=project_photo, caption=text
+                        )
                     tasks.append(task)
                 await asyncio.gather(*tasks, return_exceptions=True)
                 await call.message.edit_text(

@@ -6,8 +6,12 @@ class CategorySender:
     def __init__(self, category: ProjectCategoryModel) -> None:
         self.title = category.title
         self.description = category.description
-        self.photos = category.photos.split(";")[:-1]
-        self.videos = category.videos.split(";")[:-1]
+        self.photos = category.photos
+        if self.photos:
+            self.photos = category.photos.split(";")[:-1]
+        self.videos = category.videos
+        if self.videos:
+            self.videos = category.videos.split(";")[:-1]
 
     def show_category_for_user(self):
         text = []

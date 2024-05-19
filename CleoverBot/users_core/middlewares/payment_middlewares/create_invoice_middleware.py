@@ -75,6 +75,7 @@ class CreateInvoiceMiddleware(BaseMiddleware):
                     create_status = "fail"
                 data["link"] = link
                 data["create_status"] = create_status
+                data["amount"] = invoice_data["amount"]
 
                 async with session_maker() as db_session:
                     async with db_session.begin():

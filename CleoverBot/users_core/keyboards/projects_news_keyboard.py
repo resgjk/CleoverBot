@@ -1,7 +1,10 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 
-def choise_project_news_keyboard(news: dict, page: str) -> InlineKeyboardMarkup:
+def choise_project_news_keyboard(
+    news: dict, page: str, media_count: int, category_id: int
+) -> InlineKeyboardMarkup:
     buttons = []
     for one_news in news.keys():
         buttons.append(
@@ -41,6 +44,24 @@ def choise_project_news_keyboard(news: dict, page: str) -> InlineKeyboardMarkup:
                     )
                 ]
             )
-    buttons.append([InlineKeyboardButton(text="< Back", callback_data=f"projects")])
+    buttons.append(
+        [
+            InlineKeyboardButton(
+                text="< Back",
+                callback_data=f"return_to_category_{media_count + 2}_{category_id}",
+            )
+        ]
+    )
     keyboard = InlineKeyboardMarkup(inline_keyboard=buttons)
     return keyboard
+
+
+def return_to_project_keyboard(
+    media_count: int, project_id: int
+) -> InlineKeyboardMarkup:
+    keyboard_builder = InlineKeyboardBuilder()
+    keyboard_builder.button(
+        text="< Back", callback_data=f"return_to_project_{media_count + 2}_{project_id}"
+    )
+    keyboard_builder.adjust(1, repeat=True)
+    return keyboard_builder.as_markup()

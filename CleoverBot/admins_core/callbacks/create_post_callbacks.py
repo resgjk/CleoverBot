@@ -18,7 +18,13 @@ from admins_core.keyboards.return_to_admin_panel_keyboard import (
 )
 
 from aiogram import Bot, Router, F
-from aiogram.types import CallbackQuery, Message, ReplyKeyboardRemove, ContentType
+from aiogram.types import (
+    CallbackQuery,
+    Message,
+    ReplyKeyboardRemove,
+    ContentType,
+    FSInputFile,
+)
 from aiogram.fsm.context import FSMContext
 from aiogram.exceptions import TelegramNetworkError
 
@@ -265,9 +271,13 @@ async def send_post_to_users(
                             media=media,
                         )
                     except TelegramNetworkError:
-                        task = bot.send_message(chat_id=id, text=text)
+                        event_photo = FSInputFile("users_core/utils/photos/event.png")
+                        task = bot.send_photo(
+                            chat_id=id, photo=event_photo, caption=text
+                        )
                 else:
-                    task = bot.send_message(chat_id=id, text=text)
+                    event_photo = FSInputFile("users_core/utils/photos/event.png")
+                    task = bot.send_photo(chat_id=id, photo=event_photo, caption=text)
                 tasks.append(task)
             await asyncio.gather(*tasks, return_exceptions=True)
             await state.clear()

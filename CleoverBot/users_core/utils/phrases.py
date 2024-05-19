@@ -16,6 +16,6 @@ phrases = {
     "subscription_date": "🎉 <b>Congratulations!</b> Your subscription is valid until ",
     "choise_project_category": "📚 Select the category of projects that interest you:",
     "choise_project": "💻 Select the project that interests you:",
-    "choise_project_news": "\n👀 See interesting news about this project 👇",
+    "choise_project_news": "👀 See interesting news about this project 👇",
     "sub_was_canceled": "‼ Attention! Your subscription has expired. Please extend it 👇",
 }

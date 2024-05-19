@@ -180,7 +180,7 @@ async def lifespan(app: FastAPI):
         level=logging.INFO,
         format="%(filename)s:%(lineno)d #%(levelname)-8s [%(asctime)s] - %(name)s - %(message)s",
         filename="cleover_log.log",
-        filemode="w",
+        filemode="a",
     )
     webhook_info = await bot.get_webhook_info()
     if webhook_info.url != (WEBHOOK_DOMAIN + WEBHOOK_PATH):
