@@ -1,7 +1,5 @@
 import os
 
-from bot import bot
-
 from aiogram import Bot
 
 from dotenv import load_dotenv
@@ -33,6 +31,7 @@ THREE_MONTH_PRICE = int(os.getenv("THREE_MONTH_PRICE"))
 SIX_MONTH_PRICE = int(os.getenv("SIX_MONTH_PRICE"))
 TWELVE_MONTH_PRICE = int(os.getenv("TWELVE_MONTH_PRICE"))
 
+bot = Bot(token=BOT_TOKEN)
 
 postgres_url = URL.create(
     "postgresql+asyncpg",
@@ -43,12 +42,13 @@ postgres_url = URL.create(
     password=DB_PASSWORD,
 )
 
-jobstores = {
-    "default": RedisJobStore(jobs_key="dispatched_trips_jobs",
-                             run_times_key="dispatched_trips_running",
-                             host="localhost",
-                             db=2,
-                             port=6379)
-}
-scheduler = ContextSchedulerDecorator(AsyncIOScheduler(timezone="Etc/UTC", jobstores=jobstores))
-scheduler.ctx.add_instance(bot, declared_class=Bot)
+#jobstores = {
+#    "default": RedisJobStore(jobs_key="dispatched_trips_jobs",
+#                             run_times_key="dispatched_trips_running",
+#                             host="localhost",
+#                             db=2,
+#                             port=6379)
+#}
+#scheduler = ContextSchedulerDecorator(AsyncIOScheduler(timezone="Etc/UTC", jobstores=jobstores))
+#scheduler.ctx.add_instance(bot, declared_class=Bot)
+scheduler = AsyncIOScheduler(timezone="Etc/UTC")

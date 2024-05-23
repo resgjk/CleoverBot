@@ -2,7 +2,7 @@ from datetime import datetime, timedelta, timezone
 from typing import Any
 
 from users_core.config import (
-    BOT_TOKEN,
+    bot,
     postgres_url,
     scheduler,
     WEBHOOK_DOMAIN,
@@ -131,6 +131,7 @@ from contextlib import asynccontextmanager
 
 from aiogram import Bot, Dispatcher, types
 from aiogram.exceptions import TelegramAPIError
+from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.fsm.storage.redis import RedisStorage
 
 from apsched.check_subscribs import check_subscribs
@@ -175,9 +176,9 @@ async def error_handler(update: types.Update, exception: Exception):
     return True
 
 
-bot = Bot(token=BOT_TOKEN)
-storage = RedisStorage.from_url("redis://localhost:6379/0")
-dp = Dispatcher(storage=storage)
+#storage = RedisStorage.from_url("redis://localhost:6379/0")
+#dp = Dispatcher(storage=storage)
+dp = Dispatcher(storage=MemoryStorage())
 dp.errors.register(error_handler)
 
 async_engine = create_async_engine(postgres_url)
@@ -267,7 +268,7 @@ async def lifespan(app: FastAPI):
             trigger="cron",
             hour=12,
             start_date=datetime.now(tz=timezone.utc),
-            kwargs={"session_maker": session_maker},
+            kwargs={"bot": bot, "session_maker": session_maker},
         )
         scheduler.start()
 
