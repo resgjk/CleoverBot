@@ -28,7 +28,7 @@ from aiogram.types import (
 from aiogram.fsm.context import FSMContext
 from aiogram.exceptions import TelegramNetworkError
 
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from apscheduler_di import ContextSchedulerDecorator
 
 from sqlalchemy.orm import sessionmaker
 
@@ -249,7 +249,7 @@ async def send_post_to_users(
     bot: Bot,
     state: FSMContext,
     users_id: list,
-    scheduler: AsyncIOScheduler,
+    scheduler: ContextSchedulerDecorator,
     session_maker: sessionmaker,
 ):
     await call.answer()

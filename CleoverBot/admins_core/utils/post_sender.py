@@ -79,7 +79,6 @@ class PostSender:
                 trigger="date",
                 run_date=datetime_start_date_time - timedelta(hours=time[0]),
                 kwargs={
-                    "bot": self.bot,
                     "session_maker": session_maker,
                     "post_details": post_details,
                     "notification": time[1],

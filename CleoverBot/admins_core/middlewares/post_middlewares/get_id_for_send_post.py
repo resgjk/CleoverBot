@@ -11,11 +11,11 @@ from sqlalchemy.orm import sessionmaker, selectinload
 from sqlalchemy import select
 from sqlalchemy.engine import ScalarResult
 
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from apscheduler_di import ContextSchedulerDecorator
 
 
 class SendPostMiddleware(BaseMiddleware):
-    def __init__(self, scheduler: AsyncIOScheduler) -> None:
+    def __init__(self, scheduler: ContextSchedulerDecorator) -> None:
         self.scheduler = scheduler
 
     async def __call__(
@@ -76,17 +76,12 @@ class SendPostMiddleware(BaseMiddleware):
                     session.add(new_post)
 
                 if current_activity:
-                    if current_activity.title == "news":
-                        for user in current_activity.users:
-                            if user.user_id != owner_id and user.is_subscriber:
+                    for user in current_activity.users:
+                        if user.user_id != owner_id and user.is_subscriber:
+                            if bank != "Любой бюджет" and user.bank == bank:
                                 users_id.append(user.user_id)
-                    else:
-                        for user in current_activity.users:
-                            if user.user_id != owner_id and user.is_subscriber:
-                                if bank != "Любой бюджет" and user.bank == bank:
-                                    users_id.append(user.user_id)
-                                else:
-                                    users_id.append(user.user_id)
+                            else:
+                                users_id.append(user.user_id)
                 data["users_id"] = users_id
                 await session.commit()
         return await handler(event, data)

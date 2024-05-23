@@ -130,8 +130,8 @@ import logging
 from contextlib import asynccontextmanager
 
 from aiogram import Bot, Dispatcher, types
-from aiogram.enums import ParseMode
-from aiogram.fsm.storage.memory import MemoryStorage
+from aiogram.exceptions import TelegramAPIError
+from aiogram.fsm.storage.redis import RedisStorage
 
 from apsched.check_subscribs import check_subscribs
 
@@ -167,8 +167,18 @@ def check_posts_media_folder():
             os.mkdir("media/" + direction)
 
 
-bot = Bot(BOT_TOKEN, parse_mode=ParseMode.HTML)
-dp = Dispatcher(storage=MemoryStorage())
+async def error_handler(update: types.Update, exception: Exception):
+    if isinstance(exception, TelegramAPIError):
+        logging.error(f"Ошибка API Telegram: {exception}")
+    else:
+        logging.error(f"Произошла ошибка: {exception}")
+    return True
+
+
+bot = Bot(token=BOT_TOKEN)
+storage = RedisStorage.from_url("redis://localhost:6379/0")
+dp = Dispatcher(storage=storage)
+dp.errors.register(error_handler)
 
 async_engine = create_async_engine(postgres_url)
 session_maker = get_session_maker(async_engine)
@@ -257,7 +267,7 @@ async def lifespan(app: FastAPI):
             trigger="cron",
             hour=12,
             start_date=datetime.now(tz=timezone.utc),
-            kwargs={"bot": bot, "session_maker": session_maker},
+            kwargs={"session_maker": session_maker},
         )
         scheduler.start()
 
