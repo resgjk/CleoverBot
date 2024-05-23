@@ -28,7 +28,7 @@ async def return_to_main_menu(
     else:
         media = InputMediaPhoto(
             media=FSInputFile("users_core/utils/photos/menu.png"),
-            caption=phrases["start_message_user_isnt_sub"],
+            caption=phrases["start_message"],
         )
         await call.message.edit_media(
             media=media,

@@ -1,4 +1,5 @@
 from db.models.users import UserModel
+from db.models.activities import ActivityModel
 
 from typing import Callable, Dict, Any, Awaitable
 
@@ -28,7 +29,12 @@ class RegisterCheckMiddleware(BaseMiddleware):
                 if current_user:
                     data["is_subscriber"] = current_user.is_subscriber
                 else:
+                    activity_res: ScalarResult = await session.execute(
+                        select(ActivityModel).where(ActivityModel.title == "news")
+                    )
+                    news_activity: ActivityModel = activity_res.scalars().one_or_none()
                     new_user = UserModel(user_id=event.from_user.id)
+                    new_user.activities.append(news_activity)
                     session.add(new_user)
                     await session.commit()
                     data["is_subscriber"] = False

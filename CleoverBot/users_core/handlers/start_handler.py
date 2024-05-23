@@ -27,7 +27,7 @@ async def start_handler(
     else:
         await message.answer_photo(
             photo=FSInputFile("users_core/utils/photos/menu.png"),
-            caption=phrases["start_message_user_isnt_sub"],
+            caption=phrases["start_message"],
             reply_markup=get_main_menu_keyboard_is_not_sub(),
         )
 

@@ -6,7 +6,7 @@ def get_activities_keyboard() -> ReplyKeyboardMarkup:
     keyboard_builder = ReplyKeyboardBuilder()
     keyboard_builder.button(text="DeFi 📚")
     keyboard_builder.button(text="Airdrops 💸")
-    keyboard_builder.button(text="News 🗞")
+    keyboard_builder.button(text="News about the bot 🗞")
     keyboard_builder.button(text="IDO | ICO 🤑")
     keyboard_builder.button(text="Ambassador Programs 👥")
     keyboard_builder.button(text="NFT 🖼")

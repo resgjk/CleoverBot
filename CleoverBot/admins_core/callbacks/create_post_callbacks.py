@@ -59,7 +59,7 @@ async def get_category(message: Message, bot: Bot, state: FSMContext):
             category = "defi"
         case "Airdrops 💸":
             category = "airdrops"
-        case "News 🗞":
+        case "News about the bot 🗞":
             category = "news"
         case "IDO | ICO 🤑":
             category = "ido_ico"

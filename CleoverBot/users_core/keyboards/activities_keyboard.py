@@ -8,7 +8,6 @@ def get_activities_keyboard(choise_activities) -> InlineKeyboardMarkup:
         "airdrops": (
             "✅ Airdrops 💸" if choise_activities["airdrops"] else "Airdrops 💸"
         ),
-        "news": "✅ News 🗞" if choise_activities["news"] else "News 🗞",
         "ido_ico": (
             "✅ IDO | ICO 🤑" if choise_activities["ido_ico"] else "IDO | ICO 🤑"
         ),
@@ -26,9 +25,6 @@ def get_activities_keyboard(choise_activities) -> InlineKeyboardMarkup:
     )
     keyboard_builder.button(
         text=buttons_texts["airdrops"], callback_data="set_activity_airdrops"
-    )
-    keyboard_builder.button(
-        text=buttons_texts["news"], callback_data="set_activity_news"
     )
     keyboard_builder.button(
         text=buttons_texts["ido_ico"], callback_data="set_activity_ido_ico"
