@@ -8,7 +8,6 @@ from admins_core.utils.post_form import PostForm
 from admins_core.utils.post_sender import PostSender
 from admins_core.keyboards.choise_bank_keyboard import get_banks_keyboard
 from admins_core.keyboards.choise_category_keyboard import get_activities_keyboard
-from admins_core.keyboards.finish_create_post_keyboard import get_media_keyboard
 from admins_core.keyboards.publick_post_keyboard import get_publick_keyboard
 from admins_core.middlewares.post_middlewares.get_id_for_send_post import (
     SendPostMiddleware,
@@ -48,7 +47,7 @@ async def get_title(message: Message, bot: Bot, state: FSMContext):
     await message.answer(
         text=phrases["choise_categoty"], reply_markup=get_activities_keyboard()
     )
-    await state.update_data(title=message.text, photos="", videos="")
+    await state.update_data(title=message.text)
     await state.set_state(PostForm.GET_CATEGORY)
 
 
@@ -194,7 +193,7 @@ async def get_short_description(message: Message, bot: Bot, state: FSMContext):
 
 
 async def get_full_description(message: Message, bot: Bot, state: FSMContext):
-    await message.answer(text=phrases["input_media"], reply_markup=get_media_keyboard())
+    await message.answer(text=phrases["input_media"])
     await state.update_data(full_description=message.html_text)
     await state.set_state(PostForm.GET_MEDIA_FILES)
 
@@ -202,46 +201,57 @@ async def get_full_description(message: Message, bot: Bot, state: FSMContext):
 async def get_media_files(message: Message, bot: Bot, state: FSMContext):
     context_data = await state.get_data()
     post_uuid = context_data.get("post_uuid")
-    photos = context_data.get("photos")
-    videos = context_data.get("videos")
     if message.content_type == ContentType.PHOTO:
         file = await bot.get_file(message.photo[-1].file_id)
-        photo_title = f"media/posts_media/photos/{post_uuid}_photo_{len(photos.split(';')) - 1}.jpg"
-        photos += photo_title + ";"
-        await state.update_data(photos=photos)
+        photo_title = f"media/posts_media/photos/{post_uuid}.jpg"
+        await state.update_data(media=photo_title, media_type="photo")
         await bot.download_file(file.file_path, photo_title)
+        await state.set_state(PostForm.SAVE_MEDIA_AND_SHOW_POST)
     elif message.content_type == ContentType.VIDEO:
         file = await bot.get_file(message.video.file_id)
-        video_title = f"media/posts_media/videos/{post_uuid}_video_{len(videos.split(';')) - 1}.mp4"
-        videos += video_title + ";"
-        await state.update_data(videos=videos)
+        video_title = f"media/posts_media/videos/{post_uuid}.mp4"
+        await state.update_data(media=video_title, media_type="video")
         await bot.download_file(file.file_path, video_title)
+        await state.set_state(PostForm.SAVE_MEDIA_AND_SHOW_POST)
+    elif message.content_type == ContentType.TEXT and message.text == "-":
+        await state.update_data(media=None, media_type=None)
+        await state.set_state(PostForm.SAVE_MEDIA_AND_SHOW_POST)
 
+    state_type = await state.get_state()
+    if state_type == PostForm.SAVE_MEDIA_AND_SHOW_POST:
+        context_data = await state.get_data()
+        sender = PostSender(bot=bot, context_data=context_data)
 
-async def save_media_and_show_post(call: CallbackQuery, bot: Bot, state: FSMContext):
-    await call.answer()
+        text, media = sender.show_post_detail_for_admin()
+        media_type = context_data.get("media_type")
 
-    context_data = await state.get_data()
-    sender = PostSender(bot=bot, context_data=context_data)
-
-    text, media = sender.show_post_detail_for_admin()
-
-    if media:
-        try:
-            await bot.send_media_group(
-                chat_id=call.message.chat.id,
-                media=media,
+        if media:
+            try:
+                if media_type == "photo":
+                    await bot.send_photo(
+                        chat_id=message.chat.id, photo=media, caption=text
+                    )
+                elif media_type == "video":
+                    await bot.send_video(
+                        chat_id=message.chat.id, video=media, caption=text
+                    )
+            except TelegramNetworkError:
+                event_photo = FSInputFile("users_core/utils/photos/event.png")
+                await bot.send_photo(
+                    chat_id=message.chat.id, photo=event_photo, caption=text
+                )
+        else:
+            event_photo = FSInputFile("users_core/utils/photos/event.png")
+            await bot.send_photo(
+                chat_id=message.chat.id, photo=event_photo, caption=text
             )
-        except TelegramNetworkError:
-            await call.message.answer(text=text)
-    else:
-        await call.message.answer(text=text)
-    await bot.send_message(
-        text=phrases["finish_message"],
-        chat_id=call.message.chat.id,
-        reply_markup=get_publick_keyboard(),
-    )
-    await state.set_state(PostForm.SEND_POST_TO_USERS)
+
+        await bot.send_message(
+            text=phrases["finish_message"],
+            chat_id=message.chat.id,
+            reply_markup=get_publick_keyboard(),
+        )
+        await state.set_state(PostForm.SEND_POST_TO_USERS)
 
 
 async def send_post_to_users(
@@ -260,16 +270,17 @@ async def send_post_to_users(
         text, media = sender.send_post_to_users(
             session_maker=session_maker, scheduler=scheduler
         )
+        media_type = context_data.get("media_type")
 
         tasks = []
         try:
             for id in users_id:
                 if media:
                     try:
-                        task = bot.send_media_group(
-                            chat_id=id,
-                            media=media,
-                        )
+                        if media_type == "photo":
+                            task = bot.send_photo(chat_id=id, photo=media, caption=text)
+                        elif media_type == "video":
+                            task = bot.send_video(chat_id=id, video=media, caption=text)
                     except TelegramNetworkError:
                         event_photo = FSInputFile("users_core/utils/photos/event.png")
                         task = bot.send_photo(
@@ -310,10 +321,6 @@ create_post_router.message.register(
 )
 create_post_router.message.register(get_full_description, PostForm.GET_FULL_DESCRIPTION)
 create_post_router.message.register(get_media_files, PostForm.GET_MEDIA_FILES)
-create_post_router.callback_query.register(
-    save_media_and_show_post, F.data == "save_media", PostForm.GET_MEDIA_FILES
-)
-
 send_post_router.callback_query.register(
     send_post_to_users, F.data == "publick_post", PostForm.SEND_POST_TO_USERS
 )

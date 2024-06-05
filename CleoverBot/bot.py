@@ -176,8 +176,8 @@ async def error_handler(update: types.Update, exception: Exception):
     return True
 
 
-#storage = RedisStorage.from_url("redis://localhost:6379/0")
-#dp = Dispatcher(storage=storage)
+# storage = RedisStorage.from_url("redis://localhost:6379/0")
+# dp = Dispatcher(storage=storage)
 dp = Dispatcher(storage=MemoryStorage())
 dp.errors.register(error_handler)
 

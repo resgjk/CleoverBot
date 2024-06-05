@@ -2,7 +2,7 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 
 def choise_project_keyboard(
-    projects: dict, page: str, category_id: int, media_count: int
+    projects: dict, page: str, category_id: int, type: str
 ) -> InlineKeyboardMarkup:
     buttons = []
     if projects:
@@ -33,7 +33,7 @@ def choise_project_keyboard(
                 [
                     InlineKeyboardButton(
                         text="➡️",
-                        callback_data=f"next_projects_page_for_user_choise_project",
+                        callback_data=f"next_projects_page_{type}",
                     )
                 ]
             )
@@ -42,11 +42,11 @@ def choise_project_keyboard(
                 [
                     InlineKeyboardButton(
                         text="⬅️",
-                        callback_data=f"back_projects_page_for_user_choise_project",
+                        callback_data=f"back_projects_page_{type}",
                     ),
                     InlineKeyboardButton(
                         text="➡️",
-                        callback_data=f"next_projects_page_for_user_choise_project",
+                        callback_data=f"next_projects_page_{type}",
                     ),
                 ]
             )
@@ -55,7 +55,7 @@ def choise_project_keyboard(
                 [
                     InlineKeyboardButton(
                         text="⬅️",
-                        callback_data=f"back_projects_page_for_user_choise_project",
+                        callback_data=f"back_projects_page_{type}",
                     )
                 ]
             )
@@ -75,7 +75,8 @@ def choise_project_keyboard(
     buttons.append(
         [
             InlineKeyboardButton(
-                text="< Back", callback_data=f"return_to_projects_{media_count + 2}"
+                text="< Back",
+                callback_data="projects",
             )
         ]
     )

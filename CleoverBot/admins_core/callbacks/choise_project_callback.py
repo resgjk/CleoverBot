@@ -16,7 +16,7 @@ from admins_core.middlewares.projects_middlewares.get_project_data import (
 )
 
 from aiogram import Bot, Router, F
-from aiogram.types import CallbackQuery
+from aiogram.types import CallbackQuery, FSInputFile
 from aiogram.fsm.context import FSMContext
 from aiogram.exceptions import TelegramNetworkError
 
@@ -70,26 +70,40 @@ async def view_project(
     if result == "success":
         sender = ProjectSender(project_data=project_data)
         text, media = sender.send_project()
+        media_type = project_data["media_type"]
 
         if media:
             try:
-                await bot.send_media_group(
-                    chat_id=call.message.chat.id,
-                    media=media,
-                )
+                if media_type == "photo":
+                    await bot.send_photo(
+                        chat_id=call.from_user.id,
+                        photo=media,
+                        caption=text,
+                        reply_markup=get_project_route_keyboard(project_data["id"]),
+                    )
+                elif media_type == "video":
+                    await bot.send_video(
+                        chat_id=call.from_user.id,
+                        video=media,
+                        caption=text,
+                        reply_markup=get_project_route_keyboard(project_data["id"]),
+                    )
             except TelegramNetworkError:
-                await call.message.answer(
-                    text=text,
+                project_photo = FSInputFile("users_core/utils/photos/project.png")
+                await bot.send_photo(
+                    chat_id=call.from_user.id,
+                    photo=project_photo,
+                    caption=text,
+                    reply_markup=get_project_route_keyboard(project_data["id"]),
                 )
         else:
-            await call.message.answer(
-                text=text,
+            project_photo = FSInputFile("users_core/utils/photos/project.png")
+            await bot.send_photo(
+                chat_id=call.from_user.id,
+                photo=project_photo,
+                caption=text,
+                reply_markup=get_project_route_keyboard(project_data["id"]),
             )
-        await bot.send_message(
-            text="👇 Выберите действие:",
-            chat_id=call.message.chat.id,
-            reply_markup=get_project_route_keyboard(project_data["id"]),
-        )
     else:
         await call.message.answer(
             text="Не удалось выбрать данный проект, попробуйте еще раз!"
@@ -108,7 +122,6 @@ choise_project_category_router.callback_query.register(
 choise_project_category_router.callback_query.middleware.register(
     CategoriesPagesMiddleware()
 )
-
 choise_project_router.callback_query.register(
     choise_project, F.data.contains(f"set_project_category_{type}_")
 )
@@ -119,7 +132,6 @@ choise_project_router.callback_query.register(
     choise_project, F.data == "back_projects_page"
 )
 choise_project_router.callback_query.middleware.register(ProjectsPagesMiddleware())
-
 view_project_router.callback_query.register(
     view_project, F.data.contains("choise_project_for_view")
 )

@@ -1,5 +1,4 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 
 def choise_category_keyboard(
@@ -45,7 +44,7 @@ def choise_category_keyboard(
                 ]
             )
     buttons.append(
-        [InlineKeyboardButton(text="< Back", callback_data=f"return_to_main_menu")]
+        [InlineKeyboardButton(text="< Back", callback_data="return_to_main_menu")]
     )
     keyboard = InlineKeyboardMarkup(inline_keyboard=buttons)
     return keyboard

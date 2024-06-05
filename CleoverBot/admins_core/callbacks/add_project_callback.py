@@ -7,7 +7,6 @@ from admins_core.keyboards.choise_project_category_keyboard import (
 from admins_core.keyboards.return_to_projects_route_menu import (
     return_to_projects_route_keyboard,
 )
-from admins_core.keyboards.save_new_project_media_keyboard import get_media_keyboard
 from admins_core.keyboards.save_new_project_links_keyboard import get_links_keyboard
 from admins_core.keyboards.save_new_project_keyboard import get_save_keyboard
 from admins_core.middlewares.projects_middlewares.get_categories import (
@@ -93,7 +92,7 @@ async def choise_category(
 async def get_project_title(message: Message, bot: Bot, state: FSMContext, result: str):
     if result == "not_in_db":
         await message.answer(text=phrases["get_project_description"])
-        await state.update_data(title=message.text, photos="", videos="")
+        await state.update_data(title=message.text)
         await state.set_state(ProjectForm.GET_DESCRIPTION)
     elif result == "in_db":
         await message.answer(
@@ -135,7 +134,6 @@ async def start_get_media(
     await call.answer()
     await call.message.answer(
         text=phrases["get_project_media"],
-        reply_markup=get_media_keyboard(),
     )
     await state.set_state(ProjectForm.GET_MEDIA)
 
@@ -143,47 +141,54 @@ async def start_get_media(
 async def get_media_files(message: Message, bot: Bot, state: FSMContext):
     context_data = await state.get_data()
     project_uuid = context_data.get("project_uuid")
-    title = context_data.get("title")
-    photos = context_data.get("photos")
-    videos = context_data.get("videos")
     if message.content_type == ContentType.PHOTO:
         file = await bot.get_file(message.photo[-1].file_id)
-        photo_title = f"media/projects_media/projects/photos/{project_uuid}_photo_{len(photos.split(';')) - 1}.jpg"
-        photos += photo_title + ";"
-        await state.update_data(photos=photos)
+        photo_title = f"media/projects_media/projects/photos/{project_uuid}.jpg"
+        await state.update_data(media=photo_title, media_type="photo")
         await bot.download_file(file.file_path, photo_title)
+        await state.set_state(ProjectForm.SAVE_MEDIA_AND_SHOW_PROJECT)
     elif message.content_type == ContentType.VIDEO:
         file = await bot.get_file(message.video.file_id)
-        video_title = f"media/projects_media/projects/videos/{project_uuid}_video_{len(videos.split(';')) - 1}.mp4"
-        videos += video_title + ";"
-        await state.update_data(videos=videos)
+        video_title = f"media/projects_media/projects/videos/{project_uuid}.mp4"
+        await state.update_data(media=video_title, media_type="video")
         await bot.download_file(file.file_path, video_title)
+        await state.set_state(ProjectForm.SAVE_MEDIA_AND_SHOW_PROJECT)
+    elif message.content_type == ContentType.TEXT and message.text == "-":
+        await state.update_data(media=None, media_type=None)
+        await state.set_state(ProjectForm.SAVE_MEDIA_AND_SHOW_PROJECT)
 
+    state_type = await state.get_state()
+    if state_type == ProjectForm.SAVE_MEDIA_AND_SHOW_PROJECT:
+        context_data = await state.get_data()
+        sender = ProjectSender(context_data=context_data)
 
-async def save_media_and_show_project(call: CallbackQuery, bot: Bot, state: FSMContext):
-    await call.answer()
+        text, media = sender.show_project_detail_for_admin()
+        media_type = context_data.get("media_type")
 
-    context_data = await state.get_data()
-    sender = ProjectSender(context_data=context_data)
-
-    text, media = sender.show_project_detail_for_admin()
-
-    if media:
-        try:
-            await bot.send_media_group(
-                chat_id=call.message.chat.id,
-                media=media,
+        if media:
+            try:
+                if media_type == "photo":
+                    await bot.send_photo(
+                        chat_id=message.chat.id, photo=media, caption=text
+                    )
+                elif media_type == "video":
+                    await bot.send_video(
+                        chat_id=message.chat.id, video=media, caption=text
+                    )
+            except TelegramNetworkError:
+                await message.answer(text=text)
+        else:
+            event_photo = FSInputFile("users_core/utils/photos/project.png")
+            await bot.send_photo(
+                chat_id=message.chat.id, photo=event_photo, caption=text
             )
-        except TelegramNetworkError:
-            await call.message.answer(text=text)
-    else:
-        await call.message.answer(text=text)
-    await bot.send_message(
-        text=phrases["finish_project_message"],
-        chat_id=call.message.chat.id,
-        reply_markup=get_save_keyboard(),
-    )
-    await state.set_state(ProjectForm.SAVE_AND_SEND_NOTIF)
+
+        await bot.send_message(
+            text=phrases["finish_project_message"],
+            chat_id=message.chat.id,
+            reply_markup=get_save_keyboard(),
+        )
+        await state.set_state(ProjectForm.SAVE_AND_SEND_NOTIF)
 
 
 async def send_project_to_users(
@@ -196,31 +201,34 @@ async def send_project_to_users(
     if result == "success":
         if users_id:
             text, media = sender.send_project()
+            media_type = context_data.get("media_type")
 
             tasks = []
             try:
                 for id in users_id:
                     if media:
                         try:
-                            task = bot.send_media_group(
-                                chat_id=id,
-                                media=media,
-                            )
+                            if media_type == "photo":
+                                task = bot.send_photo(
+                                    chat_id=id, photo=media, caption=text
+                                )
+                            elif media_type == "video":
+                                task = bot.send_video(
+                                    chat_id=id, video=media, caption=text
+                                )
                         except TelegramNetworkError:
-                            project_photo = FSInputFile(
+                            event_photo = FSInputFile(
                                 "users_core/utils/photos/project.png"
                             )
                             task = bot.send_photo(
-                                chat_id=id, photo=project_photo, caption=text
+                                chat_id=id, photo=event_photo, caption=text
                             )
                     else:
-                        project_photo = FSInputFile(
-                            "users_core/utils/photos/project.png"
-                        )
+                        event_photo = FSInputFile("users_core/utils/photos/project.png")
                         task = bot.send_photo(
-                            chat_id=id, photo=project_photo, caption=text
+                            chat_id=id, photo=event_photo, caption=text
                         )
-                    tasks.append(task)
+                tasks.append(task)
                 await asyncio.gather(*tasks, return_exceptions=True)
                 await call.message.edit_text(
                     text="✅ Проект успешно опубликован!",
@@ -261,10 +269,6 @@ save_media_and_links_router.callback_query.register(
     start_get_media, F.data == "save_project_links", ProjectForm.GET_LINKS
 )
 save_media_and_links_router.message.register(get_media_files, ProjectForm.GET_MEDIA)
-save_media_and_links_router.callback_query.register(
-    save_media_and_show_project, F.data == "save_project_media", ProjectForm.GET_MEDIA
-)
-
 choise_category_for_add_project_router.callback_query.register(
     choise_category,
     F.data.contains(f"set_project_category_{type}_"),
@@ -273,12 +277,10 @@ choise_category_for_add_project_router.callback_query.register(
 choise_category_for_add_project_router.callback_query.middleware.register(
     ChoiseCategoryMiddleware()
 )
-
 get_title_for_add_project_router.message.register(
     get_project_title, ProjectForm.GET_TITLE
 )
 get_title_for_add_project_router.message.middleware.register(CheckProjectMiddleware())
-
 save_project_and_save_router.callback_query.register(
     send_project_to_users,
     F.data == "save_project",

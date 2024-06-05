@@ -1,13 +1,13 @@
+from datetime import datetime, timezone
 import logging
+from typing import Callable, Dict, Any, Awaitable
 
 from db.models.projects_news import ProjectNewsModel
-from typing import Callable, Dict, Any, Awaitable
 
 from aiogram import BaseMiddleware
 from aiogram.types import CallbackQuery
 from aiogram.fsm.context import FSMContext
 
-from datetime import datetime, timezone
 
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import select

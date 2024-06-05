@@ -1,8 +1,7 @@
+from typing import Callable, Dict, Any, Awaitable
+
 from db.models.users import UserModel
 from db.models.activities import ActivityModel
-
-
-from typing import Callable, Dict, Any, Awaitable
 
 from aiogram import BaseMiddleware
 from aiogram.types import CallbackQuery

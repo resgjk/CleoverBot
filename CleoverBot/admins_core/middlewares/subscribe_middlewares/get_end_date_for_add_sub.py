@@ -1,8 +1,7 @@
 from datetime import datetime, timezone
+from typing import Callable, Dict, Any, Awaitable
 
 from db.models.users import UserModel
-
-from typing import Callable, Dict, Any, Awaitable
 
 from aiogram import BaseMiddleware
 from aiogram.types import Message

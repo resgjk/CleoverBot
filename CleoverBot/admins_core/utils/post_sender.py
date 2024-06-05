@@ -1,7 +1,9 @@
 from apsched.send_notification import send_notifications
 
-from admins_core.utils.add_media_function import add_media
+import os
 from datetime import datetime, timedelta, timezone
+
+from aiogram.types import FSInputFile
 
 
 class PostSender:
@@ -17,12 +19,8 @@ class PostSender:
         self.end_time = context_data.get("end_time")
         self.short_description = context_data.get("short_description")
         self.full_description = context_data.get("full_description")
-        self.photos = context_data.get("photos")
-        if self.photos:
-            self.photos = context_data.get("photos").split(";")[:-1]
-        self.videos = context_data.get("videos")
-        if self.videos:
-            self.videos = context_data.get("videos").split(";")[:-1]
+        self.media = context_data.get("media")
+        self.media_type = context_data.get("media_type")
 
     def show_post_detail_for_admin(self):
         text = []
@@ -48,7 +46,11 @@ class PostSender:
         text.append(f"<b>Краткое описание</b>: {self.short_description}")
         text.append(f"<b>Подробное описание</b>: {self.full_description}")
         text = "\n\n".join(text)
-        media = add_media(text, self.photos, self.videos)
+
+        if self.media and os.path.exists(self.media):
+            media = FSInputFile(self.media)
+        else:
+            media = None
 
         return text, media
 
@@ -62,9 +64,8 @@ class PostSender:
             "end_date": self.end_date,
             "end_time": self.end_time,
             "full_description": self.full_description,
-            "photos": self.photos,
-            "videos": self.videos,
-            "title": self.title,
+            "media": self.media,
+            "media_type": self.media_type,
         }
 
         times = [
@@ -101,6 +102,10 @@ class PostSender:
         text.append(f"<b>{self.title}</b>")
         text.append(f"{self.full_description}")
         text = "\n\n".join(text)
-        media = add_media(text, self.photos, self.videos)
+
+        if self.media and os.path.exists(self.media):
+            media = FSInputFile(self.media)
+        else:
+            media = None
 
         return text, media

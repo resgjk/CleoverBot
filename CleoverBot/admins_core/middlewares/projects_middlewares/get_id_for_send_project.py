@@ -1,7 +1,7 @@
+from typing import Callable, Dict, Any, Awaitable
+
 from db.models.users import UserModel
 from db.models.projects import ProjectModel
-
-from typing import Callable, Dict, Any, Awaitable
 
 from aiogram import BaseMiddleware
 from aiogram.types import CallbackQuery
@@ -26,8 +26,8 @@ class SendProjectMiddleware(BaseMiddleware):
         category = context_data.get("category_id")
         description = context_data.get("description")
         links = context_data.get("links")
-        photos = context_data.get("photos")
-        videos = context_data.get("videos")
+        media = context_data.get("media")
+        media_type = context_data.get("media_type")
         owner_id = event.from_user.id
         users_id = []
         async with session_maker() as session:
@@ -37,9 +37,9 @@ class SendProjectMiddleware(BaseMiddleware):
                         title=title,
                         project_category_id=category,
                         description=description,
-                        photos=photos,
-                        videos=videos,
-                        links=links,
+                        media=media,
+                        media_type=media_type,
+                        links=links if links else None,
                     )
                     session.add(new_project)
 

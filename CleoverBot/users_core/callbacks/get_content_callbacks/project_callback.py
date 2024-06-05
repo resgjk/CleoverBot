@@ -1,5 +1,3 @@
-import logging
-
 from users_core.utils.phrases import phrases
 from users_core.utils.category_sender import CategorySender
 from users_core.keyboards.choise_project_category_keyboard import (
@@ -18,7 +16,7 @@ from users_core.middlewares.get_middlewares.get_category_details import (
 from db.models.projects_categories import ProjectCategoryModel
 
 from aiogram import Bot, Router, F
-from aiogram.types import CallbackQuery, FSInputFile, InputMediaPhoto
+from aiogram.types import CallbackQuery, FSInputFile, InputMediaPhoto, InputMediaVideo
 from aiogram.fsm.context import FSMContext
 from aiogram.exceptions import TelegramBadRequest, TelegramNetworkError
 
@@ -38,62 +36,75 @@ async def show_category_description(
     projects: dict,
     page: str,
     category_id: int,
-    is_full: bool,
 ):
-    if "return_to_category" in call.data:
-        chat_id = call.message.chat.id
-        message_ids_for_delete = []
-        for message_number in range(int(call.data.split("_")[-2])):
-            message_ids_for_delete.append(call.message.message_id - message_number)
-        try:
-            await bot.delete_messages(
-                chat_id=chat_id, message_ids=message_ids_for_delete
-            )
-        except Exception as e:
-            logging.error(e)
-    else:
-        await call.answer()
-        await bot.delete_message(
-            chat_id=call.from_user.id, message_id=call.message.message_id
-        )
     if category:
         sender = CategorySender(category)
         text, media = sender.show_category_for_user()
-        if media:
-            try:
-                await bot.send_media_group(
-                    chat_id=call.message.chat.id,
-                    media=media,
-                )
-            except TelegramNetworkError:
-                await bot.send_message(chat_id=call.message.chat.id, text=text)
-        else:
-            category_photo = FSInputFile("users_core/utils/photos/categories.png")
-            await bot.send_photo(
-                chat_id=call.message.chat.id, photo=category_photo, caption=text
-            )
+        media_type = category.media_type
+
         try:
-            await call.message.answer(
-                text=phrases["choise_project"],
-                reply_markup=choise_project_keyboard(
-                    projects=projects,
-                    page=page,
-                    category_id=category_id,
-                    media_count=len(media),
-                ),
-            )
+            if media:
+                try:
+                    if media_type == "photo":
+                        message_media = InputMediaPhoto(media=media, caption=text)
+                        await call.message.edit_media(
+                            media=message_media,
+                            reply_markup=choise_project_keyboard(
+                                projects=projects,
+                                page=page,
+                                category_id=category_id,
+                                type=type,
+                            ),
+                        )
+                    elif media_type == "video":
+                        message_media = InputMediaVideo(media=media, caption=text)
+                        await call.message.edit_media(
+                            media=message_media,
+                            reply_markup=choise_project_keyboard(
+                                projects=projects,
+                                page=page,
+                                category_id=category_id,
+                                type=type,
+                            ),
+                        )
+                except TelegramNetworkError:
+                    category_photo = FSInputFile(
+                        "users_core/utils/photos/categories.png"
+                    )
+                    category_message_media = InputMediaPhoto(
+                        media=category_photo, caption=text
+                    )
+                    await call.message.edit_media(
+                        media=category_message_media,
+                        reply_markup=choise_project_keyboard(
+                            projects=projects,
+                            page=page,
+                            category_id=category_id,
+                            type=type,
+                        ),
+                    )
+            else:
+                category_photo = FSInputFile("users_core/utils/photos/categories.png")
+                category_message_media = InputMediaPhoto(
+                    media=category_photo, caption=text
+                )
+                await call.message.edit_media(
+                    media=category_message_media,
+                    reply_markup=choise_project_keyboard(
+                        projects=projects, page=page, category_id=category_id, type=type
+                    ),
+                )
             await state.update_data(
-                category_media_count=len(media),
                 category_id=int(call.data.split("_")[-1]),
             )
         except TelegramBadRequest:
-            await call.message.answer(
-                text="🚫 Can't access the category, try again later!",
+            await call.message.edit_caption(
+                caption="🚫 Can't access the category, try again later!",
                 reply_markup=get_keyboard(),
             )
     else:
-        await call.message.answer(
-            text="🚫 Can't access the category, try again later!",
+        await call.message.edit_caption(
+            caption="🚫 Can't access the category, try again later!",
             reply_markup=get_keyboard(),
         )
 
@@ -111,37 +122,17 @@ async def choise_project_category(
     categories_photo = FSInputFile("users_core/utils/photos/categories.png")
     caption = phrases["choise_project_category"]
 
-    if "return_to_projects" in call.data:
-        chat_id = call.message.chat.id
-        message_ids_for_delete = []
-        for message_number in range(int(call.data.split("_")[-1])):
-            message_ids_for_delete.append(call.message.message_id - message_number)
-        try:
-            await bot.delete_messages(
-                chat_id=chat_id, message_ids=message_ids_for_delete
-            )
-        except Exception as e:
-            logging.error(e)
-        await bot.send_photo(
-            chat_id=call.from_user.id,
-            photo=categories_photo,
-            caption=caption,
+    media = InputMediaPhoto(
+        media=categories_photo,
+        caption=caption,
+    )
+    if is_full:
+        await call.message.edit_media(
+            media=media,
             reply_markup=choise_category_keyboard(
                 categories=categories, page=page, type=type
             ),
         )
-    else:
-        media = InputMediaPhoto(
-            media=categories_photo,
-            caption=caption,
-        )
-        if is_full:
-            await call.message.edit_media(
-                media=media,
-                reply_markup=choise_category_keyboard(
-                    categories=categories, page=page, type=type
-                ),
-            )
 
 
 async def choise_project(
@@ -157,15 +148,9 @@ async def choise_project(
         await call.answer()
 
         if is_full:
-            context_data = await state.get_data()
-            media_count = context_data.get("category_media_count")
-            await call.message.edit_text(
-                text=phrases["choise_project"],
+            await call.message.edit_reply_markup(
                 reply_markup=choise_project_keyboard(
-                    projects=projects,
-                    page=page,
-                    category_id=category_id,
-                    media_count=media_count,
+                    projects=projects, page=page, category_id=category_id, type=type
                 ),
             )
     except TelegramBadRequest:
@@ -176,9 +161,6 @@ user_choise_project_category_router.callback_query.register(
     choise_project_category, F.data == "projects"
 )
 user_choise_project_category_router.callback_query.register(
-    choise_project_category, F.data.contains("return_to_projects")
-)
-user_choise_project_category_router.callback_query.register(
     choise_project_category, F.data == f"next_categories_page_{type}"
 )
 user_choise_project_category_router.callback_query.register(
@@ -187,15 +169,14 @@ user_choise_project_category_router.callback_query.register(
 user_choise_project_category_router.callback_query.middleware.register(
     CategoriesPagesMiddleware()
 )
-
 user_choise_project_router.callback_query.register(
     choise_project, F.data.contains("_project_notification_for_user_")
 )
 user_choise_project_router.callback_query.register(
-    choise_project, F.data.contains("next_projects_page_for_user_choise_project")
+    choise_project, F.data.contains(f"next_projects_page_{type}")
 )
 user_choise_project_router.callback_query.register(
-    choise_project, F.data.contains("back_projects_page_for_user_choise_project")
+    choise_project, F.data.contains(f"back_projects_page_{type}")
 )
 user_choise_project_router.callback_query.register(
     choise_project, F.data.contains("enable_notifications_category_")
@@ -207,9 +188,6 @@ user_choise_project_router.callback_query.middleware.register(ProjectsPagesMiddl
 
 user_view_project_category_details_router.callback_query.register(
     show_category_description, F.data.contains(f"set_project_category_{type}_")
-)
-user_view_project_category_details_router.callback_query.register(
-    show_category_description, F.data.contains("return_to_category")
 )
 user_view_project_category_details_router.callback_query.middleware.register(
     ProjectsPagesMiddleware()

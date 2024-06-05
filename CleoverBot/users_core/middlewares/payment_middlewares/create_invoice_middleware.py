@@ -1,3 +1,6 @@
+import aiohttp
+from typing import Callable, Dict, Any, Awaitable
+
 from users_core.config import (
     API_KEY,
     SHOP_ID,
@@ -9,9 +12,6 @@ from users_core.config import (
 from users_core.utils.phrases import phrases
 from db.models.users import UserModel
 from db.models.transactions import TransactionModel
-
-import aiohttp
-from typing import Callable, Dict, Any, Awaitable
 
 from aiogram import BaseMiddleware
 from aiogram.types import CallbackQuery

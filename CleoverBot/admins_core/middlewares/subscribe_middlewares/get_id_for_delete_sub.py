@@ -1,7 +1,6 @@
-from db.models.users import UserModel
-
-
 from typing import Callable, Dict, Any, Awaitable
+
+from db.models.users import UserModel
 
 from aiogram import BaseMiddleware
 from aiogram.types import Message

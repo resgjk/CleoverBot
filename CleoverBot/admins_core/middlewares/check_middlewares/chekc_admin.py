@@ -1,7 +1,6 @@
-from db.models.admins import AdminModel
-
-
 from typing import Callable, Dict, Any, Awaitable
+
+from db.models.admins import AdminModel
 
 from aiogram import BaseMiddleware
 from aiogram.types import Message

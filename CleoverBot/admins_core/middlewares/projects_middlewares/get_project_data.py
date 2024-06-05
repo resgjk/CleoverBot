@@ -1,5 +1,6 @@
-from db.models.projects import ProjectModel
 from typing import Callable, Dict, Any, Awaitable
+
+from db.models.projects import ProjectModel
 
 from aiogram import BaseMiddleware
 from aiogram.types import CallbackQuery
@@ -30,8 +31,8 @@ class ProjectDetailsMiddleware(BaseMiddleware):
                         "title": project.title,
                         "description": project.description,
                         "links": project.links,
-                        "photos": project.photos,
-                        "videos": project.videos,
+                        "media": project.media,
+                        "media_type": project.media_type,
                     }
                     data["project_data"] = project_data
                     data["result"] = "success"

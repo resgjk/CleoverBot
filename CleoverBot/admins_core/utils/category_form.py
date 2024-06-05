@@ -5,6 +5,7 @@ class CategoryForm(StatesGroup):
     GET_TITLE = State()
     GET_DESCRIPTION = State()
     GET_MEDIA = State()
+    SAVE_MEDIA_AND_SHOW_CATEGORY = State()
     SAVE_IN_DB = State()
 
 

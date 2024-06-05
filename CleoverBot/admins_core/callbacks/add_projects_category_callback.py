@@ -1,9 +1,6 @@
 from admins_core.utils.phrases import phrases
 from admins_core.utils.category_form import CategoryForm
 from admins_core.utils.category_sender import CategorySender
-from admins_core.keyboards.save_new_projects_category_media_keyboard import (
-    get_media_keyboard,
-)
 from admins_core.keyboards.return_to_categories_route_menu import (
     return_to_categories_route_keyboard,
 )
@@ -18,7 +15,7 @@ from admins_core.middlewares.projects_middlewares.save_projects_category_in_db i
 from uuid import uuid4
 
 from aiogram import Bot, Router, F
-from aiogram.types import CallbackQuery, Message, ContentType
+from aiogram.types import CallbackQuery, Message, ContentType, FSInputFile
 from aiogram.fsm.context import FSMContext
 from aiogram.exceptions import TelegramNetworkError
 
@@ -39,7 +36,7 @@ async def get_category_title(
 ):
     if result == "not_in_db":
         await message.answer(text=phrases["get_projects_category_description"])
-        await state.update_data(title=message.text, photos="", videos="")
+        await state.update_data(title=message.text)
         await state.set_state(CategoryForm.GET_DESCRIPTION)
     elif result == "in_db":
         await message.answer(
@@ -53,10 +50,7 @@ async def get_category_title(
 
 async def get_category_description(message: Message, bot: Bot, state: FSMContext):
     if message.content_type == ContentType.TEXT:
-        await message.answer(
-            text=phrases["get_projects_category_media"],
-            reply_markup=get_media_keyboard(),
-        )
+        await message.answer(text=phrases["get_projects_category_media"])
         await state.update_data(
             description=message.html_text, project_category_uuid=str(uuid4())
         )
@@ -68,49 +62,61 @@ async def get_category_description(message: Message, bot: Bot, state: FSMContext
 async def get_media_files(message: Message, bot: Bot, state: FSMContext):
     context_data = await state.get_data()
     project_category_uuid = context_data.get("project_category_uuid")
-    title = context_data.get("title")
-    photos = context_data.get("photos")
-    videos = context_data.get("videos")
     if message.content_type == ContentType.PHOTO:
         file = await bot.get_file(message.photo[-1].file_id)
-        photo_title = f"media/projects_media/categories/photos/{project_category_uuid}_photo_{len(photos.split(';')) - 1}.jpg"
-        photos += photo_title + ";"
-        await state.update_data(photos=photos)
+        photo_title = (
+            f"media/projects_media/categories/photos/{project_category_uuid}.jpg"
+        )
+        await state.update_data(media=photo_title, media_type="photo")
         await bot.download_file(file.file_path, photo_title)
+        await state.set_state(CategoryForm.SAVE_MEDIA_AND_SHOW_CATEGORY)
     elif message.content_type == ContentType.VIDEO:
         file = await bot.get_file(message.video.file_id)
-        video_title = f"media/projects_media/categories/videos/{project_category_uuid}_video_{len(videos.split(';')) - 1}.mp4"
-        videos += video_title + ";"
-        await state.update_data(videos=videos)
+        video_title = (
+            f"media/projects_media/categories/videos/{project_category_uuid}.mp4"
+        )
+        await state.update_data(media=video_title, media_type="video")
         await bot.download_file(file.file_path, video_title)
+        await state.set_state(CategoryForm.SAVE_MEDIA_AND_SHOW_CATEGORY)
+    elif message.content_type == ContentType.TEXT and message.text == "-":
+        await state.update_data(media=None, media_type=None)
+        await state.set_state(CategoryForm.SAVE_MEDIA_AND_SHOW_CATEGORY)
 
+    state_type = await state.get_state()
+    if state_type == CategoryForm.SAVE_MEDIA_AND_SHOW_CATEGORY:
+        context_data = await state.get_data()
+        sender = CategorySender(context_data=context_data)
 
-async def save_media_and_show_category(
-    call: CallbackQuery, bot: Bot, state: FSMContext
-):
-    await call.answer()
+        text, media = sender.show_category_detail_for_admin()
+        media_type = context_data.get("media_type")
 
-    context_data = await state.get_data()
-    sender = CategorySender(context_data=context_data)
-
-    text, media = sender.show_category_detail_for_admin()
-
-    if media:
-        try:
-            await bot.send_media_group(
-                chat_id=call.message.chat.id,
-                media=media,
+        if media:
+            try:
+                if media_type == "photo":
+                    await bot.send_photo(
+                        chat_id=message.chat.id, photo=media, caption=text
+                    )
+                elif media_type == "video":
+                    await bot.send_video(
+                        chat_id=message.chat.id, video=media, caption=text
+                    )
+            except TelegramNetworkError:
+                catgory_photo = FSInputFile("users_core/utils/photos/categories.png")
+                await bot.send_photo(
+                    chat_id=message.chat.id, photo=catgory_photo, caption=text
+                )
+        else:
+            catgory_photo = FSInputFile("users_core/utils/photos/categories.png")
+            await bot.send_photo(
+                chat_id=message.chat.id, photo=catgory_photo, caption=text
             )
-        except TelegramNetworkError:
-            await call.message.answer(text=text)
-    else:
-        await call.message.answer(text=text)
-    await bot.send_message(
-        text=phrases["finish_category_message"],
-        chat_id=call.message.chat.id,
-        reply_markup=get_save_keyboard(),
-    )
-    await state.set_state(CategoryForm.SAVE_IN_DB)
+
+        await bot.send_message(
+            text=phrases["finish_category_message"],
+            chat_id=message.chat.id,
+            reply_markup=get_save_keyboard(),
+        )
+        await state.set_state(CategoryForm.SAVE_IN_DB)
 
 
 async def save_category_id_db(
@@ -144,12 +150,6 @@ add_projects_category_router.message.register(
     get_category_description, CategoryForm.GET_DESCRIPTION
 )
 add_projects_category_router.message.register(get_media_files, CategoryForm.GET_MEDIA)
-add_projects_category_router.callback_query.register(
-    save_media_and_show_category,
-    F.data == "save_projects_category_media",
-    CategoryForm.GET_MEDIA,
-)
-
 save_projects_category_in_db_router.callback_query.register(
     save_category_id_db, F.data == "save_category", CategoryForm.SAVE_IN_DB
 )

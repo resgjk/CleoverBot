@@ -1,7 +1,7 @@
+from typing import Callable, Dict, Any, Awaitable
+
 from db.models.projects import ProjectModel
 from db.models.projects_news import ProjectNewsModel
-
-from typing import Callable, Dict, Any, Awaitable
 
 from aiogram import BaseMiddleware
 from aiogram.types import CallbackQuery
@@ -26,20 +26,20 @@ class SendNewsMiddleware(BaseMiddleware):
         project_news_id = context_data.get("project_news_id")
         title = context_data.get("title")
         description = context_data.get("description")
-        photos = context_data.get("photos")
-        videos = context_data.get("videos")
+        media = context_data.get("media")
+        media_type = context_data.get("media_type")
         users_id = []
         async with session_maker() as session:
             async with session.begin():
-                if title:
-                    new_news = ProjectNewsModel(
-                        project_id=project_news_id, title=title, description=description
-                    )
-                    if photos:
-                        new_news.photos = photos
-                    if videos:
-                        new_news.videos = videos
-                    session.add(new_news)
+                new_news = ProjectNewsModel(
+                    project_id=project_news_id,
+                    title=title,
+                    description=description,
+                    media=media,
+                    media_type=media_type,
+                )
+
+                session.add(new_news)
 
                 project_res: ScalarResult = await session.execute(
                     select(ProjectModel)

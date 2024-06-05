@@ -1,23 +1,26 @@
-from users_core.utils.add_media_function import add_media
+import os
+
 from db.models.projects_news import ProjectNewsModel
+
+from aiogram.types import FSInputFile
 
 
 class NewsSender:
     def __init__(self, news: ProjectNewsModel) -> None:
         self.title = news.title
         self.description = news.description
-        self.photos = news.photos
-        if self.photos:
-            self.photos = news.photos.split(";")[:-1]
-        self.videos = news.videos
-        if self.videos:
-            self.videos = news.videos.split(";")[:-1]
+        self.media = news.media
+        self.media_type = news.media_type
 
     def show_news_to_user(self):
         text = []
         text.append(f"<b>{self.title}</b>")
         text.append(f"{self.description}")
         text = "\n\n".join(text)
-        media = add_media(photos=self.photos, videos=self.videos)
+
+        if self.media and os.path.exists(self.media):
+            media = FSInputFile(self.media)
+        else:
+            media = None
 
         return text, media

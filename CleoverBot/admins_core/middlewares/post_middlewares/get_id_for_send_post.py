@@ -1,7 +1,7 @@
+from typing import Callable, Dict, Any, Awaitable
+
 from db.models.activities import ActivityModel
 from db.models.posts import PostModel
-
-from typing import Callable, Dict, Any, Awaitable
 
 from aiogram import BaseMiddleware
 from aiogram.types import CallbackQuery
@@ -38,8 +38,8 @@ class SendPostMiddleware(BaseMiddleware):
         end_time = context_data.get("end_time")
         short_description = context_data.get("short_description")
         full_description = context_data.get("full_description")
-        photos = context_data.get("photos")
-        videos = context_data.get("videos")
+        media = context_data.get("media")
+        media_type = context_data.get("media_type")
         users_id = []
         async with session_maker() as session:
             async with session.begin():
@@ -69,10 +69,10 @@ class SendPostMiddleware(BaseMiddleware):
                         if end_time:
                             new_post.end_time = end_time
                         new_post.end_date = end_date
-                    if photos:
-                        new_post.photos = photos
-                    if videos:
-                        new_post.videos = videos
+                    if media:
+                        new_post.media = media
+                    if media_type:
+                        new_post.media_type = media_type
                     session.add(new_post)
 
                 if current_activity:

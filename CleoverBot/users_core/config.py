@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 import os
 
 from aiogram import Bot
@@ -42,13 +43,13 @@ postgres_url = URL.create(
     password=DB_PASSWORD,
 )
 
-#jobstores = {
+# jobstores = {
 #    "default": RedisJobStore(jobs_key="dispatched_trips_jobs",
 #                             run_times_key="dispatched_trips_running",
 #                             host="localhost",
 #                             db=2,
 #                             port=6379)
-#}
-#scheduler = ContextSchedulerDecorator(AsyncIOScheduler(timezone="Etc/UTC", jobstores=jobstores))
-#scheduler.ctx.add_instance(bot, declared_class=Bot)
+# }
+# scheduler = ContextSchedulerDecorator(AsyncIOScheduler(timezone="Etc/UTC", jobstores=jobstores))
+# scheduler.ctx.add_instance(bot, declared_class=Bot)
 scheduler = AsyncIOScheduler(timezone="Etc/UTC")

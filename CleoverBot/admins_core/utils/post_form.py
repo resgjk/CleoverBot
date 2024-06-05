@@ -12,4 +12,5 @@ class PostForm(StatesGroup):
     GET_SHORT_DESCRIPTION = State()
     GET_FULL_DESCRIPTION = State()
     GET_MEDIA_FILES = State()
+    SAVE_MEDIA_AND_SHOW_POST = State()
     SEND_POST_TO_USERS = State()

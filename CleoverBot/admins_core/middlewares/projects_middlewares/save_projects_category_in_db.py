@@ -1,6 +1,6 @@
-from db.models.projects_categories import ProjectCategoryModel
-
 from typing import Callable, Dict, Any, Awaitable
+
+from db.models.projects_categories import ProjectCategoryModel
 
 from aiogram import BaseMiddleware
 from aiogram.types import CallbackQuery
@@ -21,8 +21,8 @@ class SaveProjectsCategoryMiddleware(BaseMiddleware):
         context_data = await state.get_data()
         title = context_data.get("title")
         description = context_data.get("description")
-        photos = context_data.get("photos")
-        videos = context_data.get("videos")
+        media = context_data.get("media")
+        media_type = context_data.get("media_type")
 
         async with session_maker() as session:
             async with session.begin():
@@ -30,8 +30,8 @@ class SaveProjectsCategoryMiddleware(BaseMiddleware):
                     new_projects_category = ProjectCategoryModel(
                         title=title,
                         description=description,
-                        photos=photos,
-                        videos=videos,
+                        media=media,
+                        media_type=media_type,
                     )
                     session.add(new_projects_category)
                     await session.commit()

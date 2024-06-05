@@ -31,8 +31,8 @@ class PostModel(Base):
     end_time: Mapped[time] = mapped_column(nullable=True)
     short_description: Mapped[str] = mapped_column(nullable=False)
     full_description: Mapped[str] = mapped_column(nullable=False)
-    photos: Mapped[str] = mapped_column(nullable=True)
-    videos: Mapped[str] = mapped_column(nullable=True)
+    media: Mapped[str] = mapped_column(nullable=True)
+    media_type: Mapped[Literal["photo", "video"]] = mapped_column(nullable=True)
 
     def __repr__(self) -> str:
         return f"{self.title} {self.owner_id}"

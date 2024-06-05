@@ -1,9 +1,8 @@
 from datetime import datetime, timedelta, timezone
+from typing import Callable, Dict, Any, Awaitable
 import logging
 
 from db.models.posts import PostModel
-
-from typing import Callable, Dict, Any, Awaitable
 
 from aiogram import BaseMiddleware
 from aiogram.types import CallbackQuery
@@ -25,7 +24,7 @@ class CalendarMiddleware(BaseMiddleware):
         state: FSMContext = data["state"]
         context_data = await state.get_data()
         try:
-            if event.data == "calendar":
+            if event.data == "calendar" and not (context_data.get("curr_date")):
                 await state.update_data(curr_date=datetime.now(tz=timezone.utc).date())
                 context_data = await state.get_data()
             else:
@@ -46,7 +45,13 @@ class CalendarMiddleware(BaseMiddleware):
                     posts = res.unique().scalars().all()
                     events = []
                     for event_news in posts:
-                        events.append([event_news.title, event_news.short_description])
+                        events.append(
+                            [
+                                event_news.title,
+                                event_news.short_description,
+                                event_news.id,
+                            ]
+                        )
                     data["events_news"] = events
             return await handler(event, data)
         except Exception as e:
@@ -65,7 +70,7 @@ class GetEventDetails(BaseMiddleware):
             async with session.begin():
                 res: ScalarResult = await session.execute(
                     select(PostModel).where(
-                        PostModel.title == event.data.split("_")[-1]
+                        PostModel.id == int(event.data.split("_")[-1])
                     )
                 )
                 post: PostModel = res.scalars().one_or_none()
@@ -76,8 +81,8 @@ class GetEventDetails(BaseMiddleware):
                     "end_date": post.end_date,
                     "end_time": post.end_time,
                     "full_description": post.full_description,
-                    "photos": post.photos,
-                    "videos": post.videos,
+                    "media": post.media,
+                    "media_type": post.media_type,
                 }
                 data["event_datails"] = event_datails
         return await handler(event, data)

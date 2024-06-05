@@ -1,3 +1,5 @@
+from typing import Literal
+
 from db.base import Base
 
 from sqlalchemy import ForeignKey
@@ -16,8 +18,8 @@ class ProjectModel(Base):
     )
     project_category: Mapped["ProjectCategoryModel"] = relationship("ProjectCategoryModel", back_populates="projects")  # type: ignore
     description: Mapped[str] = mapped_column(unique=False, nullable=True)
-    photos: Mapped[str] = mapped_column(nullable=True)
-    videos: Mapped[str] = mapped_column(nullable=True)
+    media: Mapped[str] = mapped_column(nullable=True)
+    media_type: Mapped[Literal["photo", "video"]] = mapped_column(nullable=True)
     links: Mapped[str] = mapped_column(nullable=True)
     news: Mapped[list["ProjectNewsModel"]] = relationship(
         "ProjectNewsModel",

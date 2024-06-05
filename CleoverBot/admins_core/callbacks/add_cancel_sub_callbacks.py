@@ -83,18 +83,15 @@ async def get_id_for_delete_sub(
 
 add_cancel_sub_router.callback_query.register(add_sub, F.data == "give_subscribe")
 add_cancel_sub_router.callback_query.register(cancel_sub, F.data == "cancel_subscribe")
-
 get_id_for_add_sub_router.message.register(
     get_id_for_add_sub, UserSubscribeRoute.GET_ID_FOR_ADD_SUB
 )
-
 get_end_date_for_add_sub_router.message.register(
     get_end_date_for_add_sub, UserSubscribeRoute.GET_END_DATE_FOR_SUB
 )
 get_end_date_for_add_sub_router.message.middleware.register(
     GetEndDateForAddSubMiddleware()
 )
-
 delete_sub_router.message.register(
     get_id_for_delete_sub, UserSubscribeRoute.GET_ID_FOR_DELETE_SUB
 )

@@ -1,10 +1,11 @@
 import asyncio
 import logging
+import os
 
 from db.models.activities import ActivityModel
-from users_core.utils.add_media_function import add_media
 
 from aiogram import Bot
+from aiogram.types import FSInputFile
 
 from sqlalchemy.orm import sessionmaker, selectinload
 from sqlalchemy import select
@@ -40,23 +41,31 @@ async def send_notifications(
                 text.append(f"{post_details['full_description']}")
                 text = "\n\n".join(text)
 
-                media = add_media(
-                    text=text,
-                    photos=post_details["photos"],
-                    videos=post_details["videos"],
-                )
+                if post_details["media"] and os.path.exists(post_details["media"]):
+                    media = FSInputFile(post_details["media"])
+                else:
+                    media = None
 
                 tasks = []
                 try:
                     for id in users_id:
                         if media:
-                            task = bot.send_media_group(
-                                chat_id=id,
-                                media=media,
-                            )
+                            if post_details["media_type"] == "photo":
+                                task = bot.send_photo(
+                                    chat_id=id, photo=media, caption=text
+                                )
+                            elif post_details["media_type"] == "video":
+                                task = bot.send_video(
+                                    chat_id=id, video=media, caption=text
+                                )
                             tasks.append(task)
                         else:
-                            task = bot.send_message(chat_id=id, text=text)
+                            event_photo = FSInputFile(
+                                "users_core/utils/photos/event.png"
+                            )
+                            task = bot.send_photo(
+                                chat_id=id, photo=event_photo, caption=text
+                            )
                             tasks.append(task)
                     await asyncio.gather(*tasks, return_exceptions=True)
                 except Exception as e:

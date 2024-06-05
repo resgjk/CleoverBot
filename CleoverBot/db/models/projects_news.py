@@ -1,4 +1,5 @@
 from datetime import datetime, timezone, date
+from typing import Literal
 
 from db.base import Base
 
@@ -19,8 +20,8 @@ class ProjectNewsModel(Base):
         nullable=False, default=datetime.now(tz=timezone.utc).date()
     )
     description: Mapped[str] = mapped_column(nullable=False)
-    photos: Mapped[str] = mapped_column(nullable=True)
-    videos: Mapped[str] = mapped_column(nullable=True)
+    media: Mapped[str] = mapped_column(nullable=True)
+    media_type: Mapped[Literal["photo", "video"]] = mapped_column(nullable=True)
 
     def __repr__(self) -> str:
         return f"{self.title} {self.project}"

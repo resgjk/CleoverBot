@@ -8,7 +8,7 @@ def get_calendar_keyboard(events) -> InlineKeyboardMarkup:
         buttons.append(
             [
                 InlineKeyboardButton(
-                    text=event[0], callback_data=f"show_event_{event[0]}"
+                    text=event[0], callback_data=f"show_event_{event[-1]}"
                 )
             ]
         )
@@ -29,10 +29,10 @@ def get_calendar_keyboard(events) -> InlineKeyboardMarkup:
     return keyboard
 
 
-def return_to_calendar_keyboard(media_count: int) -> InlineKeyboardMarkup:
+def return_to_calendar_keyboard() -> InlineKeyboardMarkup:
     keyboard_builder = InlineKeyboardBuilder()
     keyboard_builder.button(
         text="⬅️ Return to calendar",
-        callback_data=f"return_to_calendar_{media_count + 1}",
+        callback_data="calendar",
     )
     return keyboard_builder.as_markup()

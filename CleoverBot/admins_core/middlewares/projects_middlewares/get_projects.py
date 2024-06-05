@@ -1,7 +1,7 @@
 import logging
+from typing import Callable, Dict, Any, Awaitable
 
 from db.models.projects import ProjectModel
-from typing import Callable, Dict, Any, Awaitable
 
 from aiogram import BaseMiddleware
 from aiogram.types import CallbackQuery
