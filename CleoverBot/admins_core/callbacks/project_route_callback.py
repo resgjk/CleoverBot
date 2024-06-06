@@ -1,3 +1,5 @@
+import logging
+
 from admins_core.utils.phrases import phrases
 from admins_core.utils.news_form import NewsForm
 from admins_core.utils.news_sender import NewsSender
@@ -182,6 +184,7 @@ async def send_post_to_users(
                 ),
             )
         except Exception as e:
+            logging.error(e)
             await call.message.answer(
                 text=f"Не удалось опубликовать новость, попробуйте еще раз!\nОшибка: {str(e)}"
             )

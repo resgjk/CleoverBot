@@ -1,6 +1,7 @@
 import asyncio
 from uuid import uuid4
 from datetime import date, time, timezone
+import logging
 
 from users_core.config import scheduler
 from admins_core.utils.phrases import phrases
@@ -297,6 +298,7 @@ async def send_post_to_users(
                 reply_markup=return_to_admin_panel_keyboard(),
             )
         except Exception as e:
+            logging.error(e)
             await call.message.answer(
                 text=f"Не удалось опубликовать пост, попробуйте еще раз!\nОшибка: {str(e)}"
             )

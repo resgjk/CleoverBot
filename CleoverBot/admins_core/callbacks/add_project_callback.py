@@ -1,3 +1,5 @@
+import logging
+
 from admins_core.utils.phrases import phrases
 from admins_core.utils.project_form import ProjectForm
 from admins_core.utils.project_sender import ProjectSender
@@ -235,6 +237,7 @@ async def send_project_to_users(
                     reply_markup=return_to_projects_route_keyboard(),
                 )
             except Exception as e:
+                logging.error(e)
                 await call.message.answer(
                     text=f"Не удалось опубликовать проект, попробуйте еще раз!\nОшибка: {str(e)}",
                     reply_markup=return_to_projects_route_keyboard(),
