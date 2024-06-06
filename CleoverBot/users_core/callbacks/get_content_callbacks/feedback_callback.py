@@ -23,26 +23,31 @@ async def get_feedback(call: CallbackQuery, bot: Bot, state: FSMContext):
     await state.set_state(FeedbackForm.GET_FEEDBACK)
 
 
-async def post_feedback(message: Message, bot: Bot, state: FSMContext, admin_ids: list):
-    feedback_photo = FSInputFile("users_core/utils/photos/feedback.png")
-    await message.answer_photo(
-        photo=feedback_photo,
-        caption=phrases["user_post_feedback"],
-        reply_markup=get_keyboard(),
-    )
-    await state.clear()
+async def post_feedback(
+    message: Message, bot: Bot, state: FSMContext, admin_ids: list, result: str
+):
+    if result == "success":
+        feedback_photo = FSInputFile("users_core/utils/photos/feedback.png")
+        await message.answer_photo(
+            photo=feedback_photo,
+            caption=phrases["user_post_feedback"],
+            reply_markup=get_keyboard(),
+        )
+        await state.clear()
 
-    if admin_ids:
-        try:
-            tasks = []
-            for id in admin_ids:
-                task = bot.send_message(
-                    chat_id=id, text=phrases["admin_show_feedback"] + message.text
-                )
-                tasks.append(task)
-            await asyncio.gather(*tasks, return_exceptions=True)
-        except Exception as e:
-            logging.error(e)
+        if admin_ids:
+            try:
+                tasks = []
+                for id in admin_ids:
+                    task = bot.send_message(
+                        chat_id=id, text=phrases["admin_show_feedback"] + message.text
+                    )
+                    tasks.append(task)
+                await asyncio.gather(*tasks, return_exceptions=True)
+            except Exception as e:
+                logging.error(e)
+    elif result == "invalid":
+        await message.answer(text="🚫 Sorry, but you can only send text!")
 
 
 feedback_router.callback_query.register(get_feedback, F.data == "feedback")
