@@ -168,7 +168,7 @@ def check_posts_media_folder():
             os.mkdir("media/" + direction)
 
 
-async def error_handler(update: types.Update, exception: Exception):
+async def error_handler(exception: Exception):
     if isinstance(exception, TelegramAPIError):
         logging.error(f"Ошибка API Telegram: {exception}")
     else:

@@ -11,6 +11,8 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.jobstores.redis import RedisJobStore
 from apscheduler_di import ContextSchedulerDecorator
 
+from aiogram.client.default import DefaultBotProperties
+
 
 load_dotenv()
 
@@ -32,7 +34,7 @@ THREE_MONTH_PRICE = int(os.getenv("THREE_MONTH_PRICE"))
 SIX_MONTH_PRICE = int(os.getenv("SIX_MONTH_PRICE"))
 TWELVE_MONTH_PRICE = int(os.getenv("TWELVE_MONTH_PRICE"))
 
-bot = Bot(token=BOT_TOKEN)
+bot = Bot(token=BOT_TOKEN, default=DefaultBotProperties(parse_mode="HTML"))
 
 postgres_url = URL.create(
     "postgresql+asyncpg",
