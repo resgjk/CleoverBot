@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta, timezone
+import datetime
 from typing import Callable, Dict, Any, Awaitable
 import logging
 
@@ -25,20 +25,26 @@ class CalendarMiddleware(BaseMiddleware):
         context_data = await state.get_data()
         try:
             if event.data == "calendar" and not (context_data.get("curr_date")):
-                await state.update_data(curr_date=datetime.now(tz=timezone.utc).date())
+                await state.update_data(
+                    curr_date=datetime.datetime.now(tz=datetime.timezone.utc)
+                    .date()
+                    .isoformat()
+                )
                 context_data = await state.get_data()
             else:
-                loc_date = context_data.get("curr_date")
+                loc_date = datetime.date.fromisoformat(context_data.get("curr_date"))
                 if event.data == "next_date":
-                    new_date = loc_date + timedelta(days=1)
-                    await state.update_data(curr_date=new_date)
+                    new_date = loc_date + datetime.timedelta(days=1)
+                    await state.update_data(curr_date=new_date.isoformat())
                 elif event.data == "back_date":
-                    new_date = loc_date - timedelta(days=1)
-                    await state.update_data(curr_date=new_date)
+                    new_date = loc_date - datetime.timedelta(days=1)
+                    await state.update_data(curr_date=new_date.isoformat())
                 context_data = await state.get_data()
             async with session_maker() as session:
                 async with session.begin():
-                    curr_date = context_data.get("curr_date")
+                    curr_date = datetime.date.fromisoformat(
+                        context_data.get("curr_date")
+                    )
                     res: ScalarResult = await session.execute(
                         select(PostModel).where(PostModel.start_date == curr_date)
                     )

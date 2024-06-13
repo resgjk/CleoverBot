@@ -1,4 +1,5 @@
 from typing import Callable, Dict, Any, Awaitable
+from datetime import date, time
 
 from db.models.activities import ActivityModel
 from db.models.posts import PostModel
@@ -63,12 +64,12 @@ class SendPostMiddleware(BaseMiddleware):
                     )
                     if start_date:
                         if start_time:
-                            new_post.start_time = start_time
-                        new_post.start_date = start_date
+                            new_post.start_time = time.fromisoformat(start_time)
+                        new_post.start_date = date.fromisoformat(start_date)
                     if end_date:
                         if end_time:
-                            new_post.end_time = end_time
-                        new_post.end_date = end_date
+                            new_post.end_time = time.fromisoformat(end_time)
+                        new_post.end_date = date.fromisoformat(end_date)
                     if media:
                         new_post.media = media
                     if media_type:

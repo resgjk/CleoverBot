@@ -8,6 +8,8 @@ from users_core.middlewares.get_middlewares.calendar import (
 )
 from users_core.utils.calendar_event_sender import CalendarEventSender
 
+import datetime
+
 from aiogram import Bot, Router, F
 from aiogram.types import CallbackQuery, FSInputFile, InputMediaPhoto, InputMediaVideo
 from aiogram.fsm.context import FSMContext
@@ -24,7 +26,9 @@ async def get_calendar(
     await call.answer()
     context_data = await state.get_data()
     calendar_photo = FSInputFile("users_core/utils/photos/calendar.png")
-    date = ".".join(str(context_data.get("curr_date")).split("-")[::-1])
+    date = ".".join(
+        str(datetime.date.fromisoformat(context_data.get("curr_date"))).split("-")[::-1]
+    )
     text_header = f"🗓️ {date}\n<b>Current events ✍</b>\n\n"
     text = []
 

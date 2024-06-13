@@ -1,15 +1,13 @@
 from apsched.send_notification import send_notifications
 
 import os
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta, timezone, date, time
 
 from aiogram.types import FSInputFile
 
 
 class PostSender:
-    def __init__(self, bot, context_data) -> None:
-        self.bot = bot
-
+    def __init__(self, context_data) -> None:
         self.title = context_data.get("title")
         self.category = context_data.get("category")
         self.bank = context_data.get("bank")
@@ -54,7 +52,7 @@ class PostSender:
 
         return text, media
 
-    def notification_sender(self, datetime_start_date_time, session_maker, scheduler):
+    def notification_sender(self, datetime_start_date_time, scheduler):
         post_details = {
             "title": self.title,
             "category": self.category,
@@ -80,21 +78,20 @@ class PostSender:
                 trigger="date",
                 run_date=datetime_start_date_time - timedelta(hours=time[0]),
                 kwargs={
-                    "bot": self.bot,
-                    "session_maker": session_maker,
                     "post_details": post_details,
                     "notification": time[1],
                 },
             )
 
-    def send_post_to_users(self, session_maker, scheduler):
+    def send_post_to_users(self, scheduler):
         if self.start_date and self.start_time:
             datetime_start_date_time = datetime.combine(
-                self.start_date, self.start_time, tzinfo=timezone.utc
+                date.fromisoformat(self.start_date),
+                time.fromisoformat(self.start_time),
+                tzinfo=timezone.utc,
             )
             self.notification_sender(
                 datetime_start_date_time=datetime_start_date_time,
-                session_maker=session_maker,
                 scheduler=scheduler,
             )
 

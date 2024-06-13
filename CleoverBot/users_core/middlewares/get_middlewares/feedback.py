@@ -24,7 +24,11 @@ class PostFeedbackMiddleware(BaseMiddleware):
                     res: ScalarResult = await session.execute(select(AdminModel))
                     current_admins: list[AdminModel] = res.scalars().all()
 
-                    admin_ids = [admin.user_id for admin in current_admins]
+                    admin_ids = [
+                        admin.user_id
+                        for admin in current_admins
+                        if admin.user_id != event.from_user.id
+                    ]
                     data["admin_ids"] = admin_ids
                     data["result"] = "success"
         else:

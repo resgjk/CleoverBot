@@ -1,11 +1,14 @@
 from datetime import datetime, timezone
 import os
 
+from db.engine import create_async_engine, get_session_maker
+
 from aiogram import Bot
 
 from dotenv import load_dotenv
 
 from sqlalchemy.engine import URL
+from sqlalchemy.orm import sessionmaker
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.jobstores.redis import RedisJobStore
@@ -45,13 +48,20 @@ postgres_url = URL.create(
     password=DB_PASSWORD,
 )
 
-# jobstores = {
-#    "default": RedisJobStore(jobs_key="dispatched_trips_jobs",
-#                             run_times_key="dispatched_trips_running",
-#                             host="localhost",
-#                             db=2,
-#                             port=6379)
-# }
-# scheduler = ContextSchedulerDecorator(AsyncIOScheduler(timezone="Etc/UTC", jobstores=jobstores))
-# scheduler.ctx.add_instance(bot, declared_class=Bot)
-scheduler = AsyncIOScheduler(timezone="Etc/UTC")
+async_engine = create_async_engine(postgres_url)
+session_maker = get_session_maker(async_engine)
+
+jobstores = {
+    "default": RedisJobStore(
+        jobs_key="dispatched_trips_jobs",
+        run_times_key="dispatched_trips_running",
+        host="localhost",
+        db=2,
+        port=6379,
+    )
+}
+scheduler = ContextSchedulerDecorator(
+    AsyncIOScheduler(timezone="Etc/UTC", jobstores=jobstores)
+)
+scheduler.ctx.add_instance(bot, declared_class=Bot)
+scheduler.ctx.add_instance(session_maker, declared_class=sessionmaker)

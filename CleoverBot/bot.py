@@ -3,8 +3,9 @@ from typing import Any
 
 from users_core.config import (
     bot,
-    postgres_url,
     scheduler,
+    async_engine,
+    session_maker,
     WEBHOOK_DOMAIN,
     WEBHOOK_PATH,
     CALLBACK_PATH,
@@ -13,7 +14,7 @@ from db.models.users import UserModel
 from db.models.transactions import TransactionModel
 from users_core.utils.phrases import phrases
 
-from db.engine import create_async_engine, get_session_maker, proceed_models
+from db.engine import proceed_models
 from users_core.handlers.start_handler import start_router
 from users_core.callbacks.get_content_callbacks.feedback_callback import feedback_router
 from users_core.callbacks.get_content_callbacks.return_to_main_menu_callback import (
@@ -131,7 +132,6 @@ from contextlib import asynccontextmanager
 
 from aiogram import Bot, Dispatcher, types
 from aiogram.exceptions import TelegramAPIError
-from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.fsm.storage.redis import RedisStorage
 
 from apsched.check_subscribs import check_subscribs
@@ -176,13 +176,9 @@ async def error_handler(exception: Exception):
     return True
 
 
-# storage = RedisStorage.from_url("redis://localhost:6379/0")
-# dp = Dispatcher(storage=storage)
-dp = Dispatcher(storage=MemoryStorage())
+storage = RedisStorage.from_url("redis://localhost:6379/0")
+dp = Dispatcher(storage=storage)
 dp.errors.register(error_handler)
-
-async_engine = create_async_engine(postgres_url)
-session_maker = get_session_maker(async_engine)
 
 
 @asynccontextmanager
@@ -268,7 +264,6 @@ async def lifespan(app: FastAPI):
             trigger="cron",
             hour=12,
             start_date=datetime.now(tz=timezone.utc),
-            kwargs={"bot": bot, "session_maker": session_maker},
         )
         scheduler.start()
 
@@ -279,6 +274,11 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(docs_url=None, redoc_url=None, lifespan=lifespan)
+
+
+@app.get("/{path:path}")
+async def handle_nonexistent_html(request: Request, path: str):
+    return {"error": "Requested HTML file not found"}
 
 
 @app.post(CALLBACK_PATH)

@@ -7,7 +7,7 @@ phrases = {
     "expiration_sub_date": "Your subscription will end:",
     "renew_subscription": "\n\nHere you can renew your bot subscription:",
     "support_text": "❓ <b>Support</b>\n\nIf you have any problems with the bot you can write to our manager: @l1qrty",
-    "instruction_text": "📜 <b>Instruction</b>\n\nOur team has written a detailed guide for using Cleover Bot. If you are experiencing any difficulties we advise you to read it.",
+    "instruction_text": "📜 <b>Instruction</b>\n\nOur team has written <a href='https://telegra.ph/CLEOVER-BOT--INSTRUCTION-06-11-2'>a detailed guide for using Cleover Bot</a>. If you are experiencing any difficulties we advise you to read it.",
     "notification_text": "🔔 <b>Notification</b>\n\nTime of the first activity reminder",
     "bank_text": "💸 <b>Your bank</b>\n\nPick your bank for better news selection",
     "wait_payment_text": "⌛ Please wait, an invoice is being created...",

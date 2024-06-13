@@ -97,7 +97,7 @@ async def get_start_date(message: Message, bot: Bot, state: FSMContext):
                 valid_date = date(
                     year=int(str_date[2]), month=int(str_date[1]), day=int(str_date[0])
                 )
-                await state.update_data(start_date=valid_date)
+                await state.update_data(start_date=valid_date.isoformat())
                 await state.set_state(PostForm.GET_START_TIME)
             else:
                 await message.answer(
@@ -121,7 +121,7 @@ async def get_start_time(message: Message, bot: Bot, state: FSMContext):
                 valid_time = time(
                     hour=int(str_time[0]), minute=int(str_time[1]), tzinfo=timezone.utc
                 )
-                await state.update_data(start_time=valid_time)
+                await state.update_data(start_time=valid_time.isoformat())
                 await state.set_state(PostForm.GET_END_DATE)
             else:
                 await message.answer(
@@ -151,7 +151,7 @@ async def get_end_date(message: Message, bot: Bot, state: FSMContext):
                 valid_date = date(
                     year=int(str_date[2]), month=int(str_date[1]), day=int(str_date[0])
                 )
-                await state.update_data(end_date=valid_date)
+                await state.update_data(end_date=valid_date.isoformat())
                 await state.set_state(PostForm.GET_END_TIME)
             else:
                 await message.answer(
@@ -175,7 +175,7 @@ async def get_end_time(message: Message, bot: Bot, state: FSMContext):
                 valid_time = time(
                     hour=int(str_time[0]), minute=int(str_time[1]), tzinfo=timezone.utc
                 )
-                await state.update_data(end_time=valid_time)
+                await state.update_data(end_time=valid_time.isoformat())
                 await state.set_state(PostForm.GET_SHORT_DESCRIPTION)
             else:
                 await message.answer(
@@ -221,7 +221,7 @@ async def get_media_files(message: Message, bot: Bot, state: FSMContext):
     state_type = await state.get_state()
     if state_type == PostForm.SAVE_MEDIA_AND_SHOW_POST:
         context_data = await state.get_data()
-        sender = PostSender(bot=bot, context_data=context_data)
+        sender = PostSender(context_data=context_data)
 
         text, media = sender.show_post_detail_for_admin()
         media_type = context_data.get("media_type")
@@ -265,12 +265,10 @@ async def send_post_to_users(
 ):
     await call.answer()
     context_data = await state.get_data()
-    sender = PostSender(bot=bot, context_data=context_data)
+    sender = PostSender(context_data=context_data)
 
     if users_id:
-        text, media = sender.send_post_to_users(
-            session_maker=session_maker, scheduler=scheduler
-        )
+        text, media = sender.send_post_to_users(scheduler=scheduler)
         media_type = context_data.get("media_type")
 
         tasks = []
