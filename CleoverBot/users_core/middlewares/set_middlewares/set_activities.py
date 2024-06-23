@@ -1,4 +1,5 @@
 from typing import Callable, Dict, Any, Awaitable
+import logging
 
 from db.models.users import UserModel
 from db.models.activities import ActivityModel
@@ -31,39 +32,39 @@ class SetActivitiesMiddleware(BaseMiddleware):
         session_maker: sessionmaker = data["session_maker"]
         async with session_maker() as session:
             async with session.begin():
-                choise_activities = {
-                    "defi": False,
-                    "airdrops": False,
-                    "news": False,
-                    "ido_ico": False,
-                    "ambassador_programs": False,
-                    "nft": False,
-                }
-                res: ScalarResult = await session.execute(
+                user_res: ScalarResult = await session.execute(
                     select(UserModel)
                     .options(selectinload(UserModel.activities))
                     .where(UserModel.user_id == event.from_user.id)
                 )
-                current_user: UserModel = res.scalars().one_or_none()
-                if len(event.data.split("_")) == 4:
-                    choisen_activity = (
-                        f"{event.data.split('_')[-2]}_{event.data.split('_')[-1]}"
+                current_user: UserModel = user_res.scalars().one_or_none()
+
+                activity_res: ScalarResult = await session.execute(
+                    select(ActivityModel).where(
+                        ActivityModel.id == int(event.data.split("_")[-1])
                     )
-                else:
-                    choisen_activity = event.data.split("_")[-1]
-                res_activity: ScalarResult = await session.execute(
-                    select(ActivityModel)
-                    .options(selectinload(ActivityModel.users))
-                    .where(ActivityModel.title == choisen_activity)
                 )
-                current_activity: ActivityModel = res_activity.scalars().one_or_none()
+                current_activity = activity_res.scalars().one_or_none()
+
+                all_activities_res: ScalarResult = await session.execute(
+                    select(ActivityModel).where(ActivityModel.for_all == False)
+                )
+                all_activities: list[ActivityModel] = all_activities_res.scalars().all()
+
                 if current_activity in current_user.activities:
-                    current_user.activities.remove(current_activity)
+                    try:
+                        current_user.activities.remove(current_activity)
+                    except ValueError as e:
+                        logging.error(e)
                 else:
                     current_user.activities.append(current_activity)
-                for activity in current_user.activities:
-                    if activity.title in choise_activities:
-                        choise_activities[activity.title] = True
-                data["choise_activities"] = choise_activities
+
+                choice_activities = {}
+                for activity in all_activities:
+                    if activity in current_user.activities:
+                        choice_activities[f"✅ {activity.title}"] = activity.id
+                    else:
+                        choice_activities[activity.title] = activity.id
+                data["choice_activities"] = choice_activities
                 await session.commit()
         return await handler(event, data)

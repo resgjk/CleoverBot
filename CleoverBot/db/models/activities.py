@@ -10,6 +10,7 @@ class ActivityModel(Base):
         primary_key=True, unique=True, nullable=False, autoincrement=True
     )
     title: Mapped[str] = mapped_column(unique=True, nullable=False)
+    for_all: Mapped[bool] = mapped_column(nullable=False, default=False)
     users: Mapped[list["UserModel"]] = relationship(  # type: ignore
         back_populates="activities", secondary="users_to_activities"
     )

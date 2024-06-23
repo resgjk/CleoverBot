@@ -48,7 +48,7 @@ class SendPostMiddleware(BaseMiddleware):
                     activity_res: ScalarResult = await session.execute(
                         select(ActivityModel)
                         .options(selectinload(ActivityModel.users))
-                        .where(ActivityModel.title == category)
+                        .where(ActivityModel.id == category)
                     )
                     current_activity: ActivityModel = (
                         activity_res.scalars().one_or_none()

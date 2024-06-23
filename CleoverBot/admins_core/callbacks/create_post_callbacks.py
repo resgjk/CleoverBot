@@ -2,6 +2,7 @@ import asyncio
 from uuid import uuid4
 from datetime import date, time, timezone
 import logging
+import re
 
 from users_core.config import scheduler
 from admins_core.utils.phrases import phrases
@@ -10,6 +11,9 @@ from admins_core.utils.post_sender import PostSender
 from admins_core.keyboards.choise_bank_keyboard import get_banks_keyboard
 from admins_core.keyboards.choise_category_keyboard import get_activities_keyboard
 from admins_core.keyboards.publick_post_keyboard import get_publick_keyboard
+from admins_core.middlewares.post_middlewares.get_activities_list import (
+    GetActivitiesListMiddleware,
+)
 from admins_core.middlewares.post_middlewares.get_id_for_send_post import (
     SendPostMiddleware,
 )
@@ -34,7 +38,11 @@ from sqlalchemy.orm import sessionmaker
 
 
 create_post_router = Router()
+select_category_router = Router()
 send_post_router = Router()
+
+time_pattern = r"^(?:[01]?\d|2[0-3]):[0-5]\d$"
+date_pattern = r"^(0[1-9]|[12][0-9]|3[01])\.(0[1-9]|1[0-2])\.\d{4}$"
 
 
 async def create_post(call: CallbackQuery, bot: Bot, state: FSMContext):
@@ -44,9 +52,10 @@ async def create_post(call: CallbackQuery, bot: Bot, state: FSMContext):
     await state.update_data(owner_id=call.from_user.id)
 
 
-async def get_title(message: Message, bot: Bot, state: FSMContext):
+async def get_title(message: Message, bot: Bot, state: FSMContext, activities: dict):
     await message.answer(
-        text=phrases["choise_categoty"], reply_markup=get_activities_keyboard()
+        text=phrases["choise_categoty"],
+        reply_markup=get_activities_keyboard(activities),
     )
     await state.update_data(title=message.text)
     await state.set_state(PostForm.GET_CATEGORY)
@@ -54,20 +63,7 @@ async def get_title(message: Message, bot: Bot, state: FSMContext):
 
 async def get_category(message: Message, bot: Bot, state: FSMContext):
     await message.answer(text=phrases["choise_bank"], reply_markup=get_banks_keyboard())
-    match message.text:
-        case "DeFi 📚":
-            category = "defi"
-        case "Airdrops 💸":
-            category = "airdrops"
-        case "News about the bot 🗞":
-            category = "news"
-        case "IDO | ICO 🤑":
-            category = "ido_ico"
-        case "Ambassador Programs 👥":
-            category = "ambassador_programs"
-        case "NFT 🖼":
-            category = "nft"
-    await state.update_data(category=category)
+    await state.update_data(category=int(message.text.split(" | ")[0]))
     await state.set_state(PostForm.GET_BANK)
 
 
@@ -86,24 +82,15 @@ async def get_start_date(message: Message, bot: Bot, state: FSMContext):
         await state.update_data(start_time=None)
         await state.set_state(PostForm.GET_END_DATE)
     else:
-        str_date = message.text.split(".")
-        try:
-            if (
-                int(str_date[0]) <= 31
-                and int(str_date[1]) <= 12
-                and int(str_date[2]) >= 1000
-            ):
-                await message.answer(phrases["input_start_time"])
-                valid_date = date(
-                    year=int(str_date[2]), month=int(str_date[1]), day=int(str_date[0])
-                )
-                await state.update_data(start_date=valid_date.isoformat())
-                await state.set_state(PostForm.GET_START_TIME)
-            else:
-                await message.answer(
-                    text="Неверный формат даты. Введите дату еще раз в формате дд.мм.гггг UTC"
-                )
-        except Exception as e:
+        if re.match(date_pattern, message.text):
+            str_date = message.text.split(".")
+            await message.answer(phrases["input_start_time"])
+            valid_date = date(
+                year=int(str_date[2]), month=int(str_date[1]), day=int(str_date[0])
+            )
+            await state.update_data(start_date=valid_date.isoformat())
+            await state.set_state(PostForm.GET_START_TIME)
+        else:
             await message.answer(
                 text="Неверный формат даты. Введите дату еще раз в формате дд.мм.гггг UTC"
             )
@@ -114,20 +101,15 @@ async def get_start_time(message: Message, bot: Bot, state: FSMContext):
         await message.answer(phrases["input_end_date"])
         await state.set_state(PostForm.GET_END_DATE)
     else:
-        str_time = message.text.split(":")
-        try:
-            if int(str_time[0]) <= 23 and int(str_time[1]) <= 59:
-                await message.answer(phrases["input_end_date"])
-                valid_time = time(
-                    hour=int(str_time[0]), minute=int(str_time[1]), tzinfo=timezone.utc
-                )
-                await state.update_data(start_time=valid_time.isoformat())
-                await state.set_state(PostForm.GET_END_DATE)
-            else:
-                await message.answer(
-                    text="Неверный формат времени. Введите время еще раз в формате чч.мм UTC"
-                )
-        except Exception:
+        if re.match(time_pattern, message.text):
+            str_time = message.text.split(":")
+            await message.answer(phrases["input_end_date"])
+            valid_time = time(
+                hour=int(str_time[0]), minute=int(str_time[1]), tzinfo=timezone.utc
+            )
+            await state.update_data(start_time=valid_time.isoformat())
+            await state.set_state(PostForm.GET_END_DATE)
+        else:
             await message.answer(
                 text="Неверный формат времени. Введите время еще раз в формате чч.мм UTC"
             )
@@ -140,24 +122,15 @@ async def get_end_date(message: Message, bot: Bot, state: FSMContext):
         await state.update_data(end_time=None)
         await state.set_state(PostForm.GET_SHORT_DESCRIPTION)
     else:
-        str_date = message.text.split(".")
-        try:
-            if (
-                int(str_date[0]) <= 31
-                and int(str_date[1]) <= 12
-                and int(str_date[2]) >= 1000
-            ):
-                await message.answer(phrases["input_end_time"])
-                valid_date = date(
-                    year=int(str_date[2]), month=int(str_date[1]), day=int(str_date[0])
-                )
-                await state.update_data(end_date=valid_date.isoformat())
-                await state.set_state(PostForm.GET_END_TIME)
-            else:
-                await message.answer(
-                    text="Неверный формат даты. Введите дату еще раз в формате дд.мм.гггг UTC"
-                )
-        except Exception:
+        if re.match(date_pattern, message.text):
+            str_date = message.text.split(".")
+            await message.answer(phrases["input_end_time"])
+            valid_date = date(
+                year=int(str_date[2]), month=int(str_date[1]), day=int(str_date[0])
+            )
+            await state.update_data(end_date=valid_date.isoformat())
+            await state.set_state(PostForm.GET_END_TIME)
+        else:
             await message.answer(
                 text="Неверный формат даты. Введите дату еще раз в формате дд.мм.гггг UTC"
             )
@@ -168,20 +141,15 @@ async def get_end_time(message: Message, bot: Bot, state: FSMContext):
         await message.answer(phrases["input_short_description"])
         await state.set_state(PostForm.GET_SHORT_DESCRIPTION)
     else:
-        str_time = message.text.split(":")
-        try:
-            if int(str_time[0]) <= 23 and int(str_time[1]) <= 59:
-                await message.answer(phrases["input_short_description"])
-                valid_time = time(
-                    hour=int(str_time[0]), minute=int(str_time[1]), tzinfo=timezone.utc
-                )
-                await state.update_data(end_time=valid_time.isoformat())
-                await state.set_state(PostForm.GET_SHORT_DESCRIPTION)
-            else:
-                await message.answer(
-                    text="Неверный формат времени. Введите время еще раз в формате чч.мм UTC"
-                )
-        except Exception:
+        if re.match(time_pattern, message.text):
+            str_time = message.text.split(":")
+            await message.answer(phrases["input_short_description"])
+            valid_time = time(
+                hour=int(str_time[0]), minute=int(str_time[1]), tzinfo=timezone.utc
+            )
+            await state.update_data(end_time=valid_time.isoformat())
+            await state.set_state(PostForm.GET_SHORT_DESCRIPTION)
+        else:
             await message.answer(
                 text="Неверный формат времени. Введите время еще раз в формате чч.мм UTC"
             )
@@ -309,7 +277,8 @@ async def send_post_to_users(
 
 
 create_post_router.callback_query.register(create_post, F.data == "create_post")
-create_post_router.message.register(get_title, PostForm.GET_TITLE)
+select_category_router.message.register(get_title, PostForm.GET_TITLE)
+select_category_router.message.middleware.register(GetActivitiesListMiddleware())
 create_post_router.message.register(get_category, PostForm.GET_CATEGORY)
 create_post_router.message.register(get_bank, PostForm.GET_BANK)
 create_post_router.message.register(get_start_date, PostForm.GET_START_DATE)

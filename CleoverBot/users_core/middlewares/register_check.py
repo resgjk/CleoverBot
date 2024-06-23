@@ -31,16 +31,16 @@ class RegisterCheckMiddleware(BaseMiddleware):
                     data["is_subscriber"] = current_user.is_subscriber
                 else:
                     activity_res: ScalarResult = await session.execute(
-                        select(ActivityModel).where(ActivityModel.title == "news")
+                        select(ActivityModel).where(ActivityModel.for_all)
                     )
-                    news_activity: ActivityModel = activity_res.scalars().one_or_none()
+                    activities: list[ActivityModel] = activity_res.scalars().all()
                     new_user = UserModel(
                         user_id=event.from_user.id,
                         is_subscriber=True,
                         subscriber_until=datetime(year=2024, month=12, day=30).date(),
                     )
                     # new_user = UserModel(user_id=event.from_user.id)
-                    new_user.activities.append(news_activity)
+                    new_user.activities += activities
                     session.add(new_user)
                     await session.commit()
                     data["is_subscriber"] = True

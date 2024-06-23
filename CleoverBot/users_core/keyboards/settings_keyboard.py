@@ -5,6 +5,7 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 def get_settings_keyboard() -> InlineKeyboardMarkup:
     keyboard_builder = InlineKeyboardBuilder()
     keyboard_builder.button(text="🔑 Subscription", callback_data="subscription")
+    keyboard_builder.button(text="💡 Tracked activities", callback_data="activities")
     keyboard_builder.button(text="🔔 Notification", callback_data="notification")
     keyboard_builder.button(text="💸 Your bank", callback_data="your_bank")
     keyboard_builder.button(

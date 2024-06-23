@@ -19,4 +19,5 @@ phrases = {
     "sub_was_canceled": "‼ Attention! Your subscription has expired. Please extend it 👇",
     "user_post_feedback": "<b>Thank you for your feedback! 💌</b>\n\nOur team will definitely consider your proposal and will do everything to make Cleover better! 🧠☘️",
     "admin_show_feedback": "🆕 <b>Обратная связь!</b>\n\n",
+    "activities_list": "💡 <b>Select the activity you want to learn about.</b>",
 }

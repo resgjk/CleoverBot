@@ -51,17 +51,18 @@ postgres_url = URL.create(
 async_engine = create_async_engine(postgres_url)
 session_maker = get_session_maker(async_engine)
 
-jobstores = {
-    "default": RedisJobStore(
-        jobs_key="dispatched_trips_jobs",
-        run_times_key="dispatched_trips_running",
-        host="localhost",
-        db=2,
-        port=6379,
-    )
-}
-scheduler = ContextSchedulerDecorator(
-    AsyncIOScheduler(timezone="Etc/UTC", jobstores=jobstores)
-)
+# jobstores = {
+#     "default": RedisJobStore(
+#         jobs_key="dispatched_trips_jobs",
+#         run_times_key="dispatched_trips_running",
+#         host="localhost",
+#         db=2,
+#         port=6379,
+#     )
+# }
+# scheduler = ContextSchedulerDecorator(
+#     AsyncIOScheduler(timezone="Etc/UTC", jobstores=jobstores)
+# )
+scheduler = ContextSchedulerDecorator(AsyncIOScheduler(timezone="Etc/UTC"))
 scheduler.ctx.add_instance(bot, declared_class=Bot)
 scheduler.ctx.add_instance(session_maker, declared_class=sessionmaker)

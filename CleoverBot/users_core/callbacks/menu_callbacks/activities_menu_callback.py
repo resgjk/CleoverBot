@@ -11,14 +11,14 @@ from aiogram.types import CallbackQuery, FSInputFile, InputMediaPhoto
 activities_menu_router = Router()
 
 
-async def activities_menu(call: CallbackQuery, bot: Bot, choise_activities: dict):
+async def activities_menu(call: CallbackQuery, bot: Bot, choice_activities: dict):
     media = InputMediaPhoto(
         media=FSInputFile("users_core/utils/photos/activities.png"),
         caption=phrases["activities_text"],
     )
     await call.message.edit_media(
         media=media,
-        reply_markup=get_activities_keyboard(choise_activities),
+        reply_markup=get_activities_keyboard(choice_activities),
     )
 
 

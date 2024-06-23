@@ -2,14 +2,10 @@ from aiogram.types import ReplyKeyboardMarkup
 from aiogram.utils.keyboard import ReplyKeyboardBuilder
 
 
-def get_activities_keyboard() -> ReplyKeyboardMarkup:
+def get_activities_keyboard(activities: dict) -> ReplyKeyboardMarkup:
     keyboard_builder = ReplyKeyboardBuilder()
-    keyboard_builder.button(text="DeFi 📚")
-    keyboard_builder.button(text="Airdrops 💸")
-    keyboard_builder.button(text="News about the bot 🗞")
-    keyboard_builder.button(text="IDO | ICO 🤑")
-    keyboard_builder.button(text="Ambassador Programs 👥")
-    keyboard_builder.button(text="NFT 🖼")
+    for activity in activities.keys():
+        keyboard_builder.button(text=f"{activities[activity]} | {activity}")
     keyboard_builder.adjust(1, repeat=True)
     return keyboard_builder.as_markup(
         resize_keyboard=True,

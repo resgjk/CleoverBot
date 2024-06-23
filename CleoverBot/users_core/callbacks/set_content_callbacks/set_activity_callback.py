@@ -12,7 +12,7 @@ from aiogram.exceptions import TelegramBadRequest
 set_activity_router = Router()
 
 
-async def set_activity(call: CallbackQuery, bot: Bot, choise_activities: dict):
+async def set_activity(call: CallbackQuery, bot: Bot, choice_activities: dict):
     try:
         media = InputMediaPhoto(
             media=FSInputFile("users_core/utils/photos/activities.png"),
@@ -20,7 +20,7 @@ async def set_activity(call: CallbackQuery, bot: Bot, choise_activities: dict):
         )
         await call.message.edit_media(
             media=media,
-            reply_markup=get_activities_keyboard(choise_activities),
+            reply_markup=get_activities_keyboard(choice_activities),
         )
     except TelegramBadRequest:
         await call.answer()
