@@ -27,4 +27,4 @@ class CategoryDetailsMiddleware(BaseMiddleware):
                 )
                 category = res.scalars().one_or_none()
                 data["category"] = category
-                return await handler(event, data)
+        return await handler(event, data)

@@ -1,5 +1,5 @@
 from typing import Callable, Dict, Any, Awaitable
-from datetime import date, time
+from datetime import date, time, datetime, timezone
 
 from db.models.activities import ActivityModel
 from db.models.posts import PostModel
@@ -56,6 +56,7 @@ class SendPostMiddleware(BaseMiddleware):
 
                     new_post = PostModel(
                         owner_id=owner_id,
+                        create_date=datetime.now(tz=timezone.utc),
                         title=title,
                         category_id=current_activity.id,
                         bank=bank,

@@ -1,9 +1,9 @@
-from datetime import datetime, timezone, date, time
+from datetime import datetime, date, time
 from typing import Literal
 
 from db.base import Base
 
-from sqlalchemy import BIGINT, ForeignKey
+from sqlalchemy import BIGINT, ForeignKey, DateTime
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 
@@ -22,8 +22,8 @@ class PostModel(Base):
     bank: Mapped[
         Literal["Zero bank", "$100 - 1000", "$1000 - 10000", "$10k+", "Любой бюджет"]
     ]
-    create_date: Mapped[date] = mapped_column(
-        nullable=False, default=datetime.now(tz=timezone.utc).date()
+    create_date: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False
     )
     start_date: Mapped[date] = mapped_column(nullable=True)
     start_time: Mapped[time] = mapped_column(nullable=True)

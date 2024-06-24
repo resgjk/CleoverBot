@@ -26,4 +26,4 @@ class NewsDetailsMiddleware(BaseMiddleware):
                 )
                 news = res.scalars().one_or_none()
                 data["news"] = news
-                return await handler(event, data)
+        return await handler(event, data)

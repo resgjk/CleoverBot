@@ -1,4 +1,4 @@
-from aiogram.types import InlineKeyboardMarkup
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 
@@ -13,3 +13,38 @@ def get_activities_list_keyboard(activities: dict) -> InlineKeyboardMarkup:
     )
     keyboard_builder.adjust(1, repeat=True)
     return keyboard_builder.as_markup()
+
+
+def get_event_list_keyboard(events: dict, page: str) -> InlineKeyboardMarkup:
+    buttons = []
+    for event in events.keys():
+        buttons.append(
+            [
+                InlineKeyboardButton(
+                    text=event,
+                    callback_data=f"show_activity_event_{events[event]}",
+                )
+            ]
+        )
+
+    match page:
+        case "first":
+            buttons.append(
+                [InlineKeyboardButton(text="➡️", callback_data=f"next_events_page")]
+            )
+        case "middle":
+            buttons.append(
+                [
+                    InlineKeyboardButton(text="⬅️", callback_data=f"back_events_page"),
+                    InlineKeyboardButton(text="➡️", callback_data=f"next_events_page"),
+                ]
+            )
+        case "last":
+            buttons.append(
+                [InlineKeyboardButton(text="⬅️", callback_data=f"back_events_page")]
+            )
+    buttons.append(
+        [InlineKeyboardButton(text="< Back", callback_data="activity_events")]
+    )
+    keyboard = InlineKeyboardMarkup(inline_keyboard=buttons)
+    return keyboard

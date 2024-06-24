@@ -63,6 +63,6 @@ class CategoriesPagesMiddleware(BaseMiddleware):
                         data["categories"] = {}
                         data["is_full"] = False
                         data["page"] = ""
-                    return await handler(event, data)
+            return await handler(event, data)
         except TypeError as e:
             logging.error(e)

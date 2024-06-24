@@ -63,7 +63,8 @@ from users_core.callbacks.get_content_callbacks.project_news_callback import (
     user_view_project_news_details_router,
 )
 from users_core.callbacks.get_content_callbacks.activity_events_callback import (
-    activity_events_router,
+    activity_events_list_router,
+    current_activity_events_router,
 )
 from users_core.utils.commands import set_commands
 
@@ -261,8 +262,9 @@ async def lifespan(app: FastAPI):
             user_view_project_description_router,
             user_view_project_news_details_router,
             user_view_project_category_details_router,
-            activity_events_router,
+            activity_events_list_router,
             select_category_router,
+            current_activity_events_router,
         )
 
         scheduler.add_job(

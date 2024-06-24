@@ -26,4 +26,4 @@ class ProjectDetailsMiddleware(BaseMiddleware):
                 )
                 project = res.scalars().one_or_none()
                 data["project"] = project
-                return await handler(event, data)
+        return await handler(event, data)

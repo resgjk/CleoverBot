@@ -143,6 +143,6 @@ class ProjectsPagesMiddleware(BaseMiddleware):
                         data["page"] = ""
                         data["category_id"] = 0
                         data["is_full"] = False
-                    return await handler(event, data)
+            return await handler(event, data)
         except TypeError as e:
             logging.error(e)
