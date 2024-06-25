@@ -21,7 +21,7 @@ async def send_notifications(
             activity_res: ScalarResult = await session.execute(
                 select(ActivityModel)
                 .options(selectinload(ActivityModel.users))
-                .where(ActivityModel.title == post_details["category"])
+                .where(ActivityModel.id == post_details["category"])
             )
             current_activity: ActivityModel = activity_res.scalars().one_or_none()
             users_id = []

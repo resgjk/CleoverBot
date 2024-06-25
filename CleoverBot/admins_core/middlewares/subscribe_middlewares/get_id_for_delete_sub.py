@@ -3,7 +3,7 @@ from typing import Callable, Dict, Any, Awaitable
 from db.models.users import UserModel
 
 from aiogram import BaseMiddleware
-from aiogram.types import Message
+from aiogram.types import Message, ContentType
 
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import select
@@ -20,7 +20,7 @@ class GetIdForDeleteSubMiddleware(BaseMiddleware):
         session_maker: sessionmaker = data["session_maker"]
         async with session_maker() as session:
             async with session.begin():
-                if event.text.isdigit():
+                if event.content_type == ContentType.TEXT and event.text.isdigit():
                     res: ScalarResult = await session.execute(
                         select(UserModel).where(UserModel.user_id == int(event.text))
                     )

@@ -3,7 +3,7 @@ from typing import Callable, Dict, Any, Awaitable
 from db.models.admins import AdminModel
 
 from aiogram import BaseMiddleware
-from aiogram.types import Message
+from aiogram.types import Message, ContentType
 
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import select
@@ -21,6 +21,8 @@ class AddSimpleAdminMiddleware(BaseMiddleware):
         async with session_maker() as session:
             async with session.begin():
                 try:
+                    if event.content_type != ContentType.TEXT:
+                        raise ValueError
                     res: ScalarResult = await session.execute(
                         select(AdminModel).where(AdminModel.user_id == int(event.text))
                     )
@@ -48,6 +50,8 @@ class DeleteSimpleAdminMiddleware(BaseMiddleware):
         async with session_maker() as session:
             async with session.begin():
                 try:
+                    if event.content_type != ContentType.TEXT:
+                        raise ValueError
                     res: ScalarResult = await session.execute(
                         select(AdminModel).where(AdminModel.user_id == int(event.text))
                     )

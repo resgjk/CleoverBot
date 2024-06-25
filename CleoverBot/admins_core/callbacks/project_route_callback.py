@@ -76,15 +76,25 @@ async def add_project_news(
 
 
 async def get_news_title(message: Message, bot: Bot, state: FSMContext):
-    await message.answer(text=phrases["input_news_description"])
-    await state.set_state(NewsForm.GET_DESCRIPTION)
-    await state.update_data(title=message.text)
+    if message.content_type == ContentType.TEXT:
+        await message.answer(text=phrases["input_news_description"])
+        await state.set_state(NewsForm.GET_DESCRIPTION)
+        await state.update_data(title=message.text)
+    else:
+        await message.answer(
+            text="Введите название в верном формате:",
+        )
 
 
 async def get_news_description(message: Message, bot: Bot, state: FSMContext):
-    await message.answer(text=phrases["input_news_media"])
-    await state.update_data(description=message.html_text, news_uuid=str(uuid4()))
-    await state.set_state(NewsForm.GET_MEDIA_FILES)
+    if message.content_type == ContentType.TEXT:
+        await message.answer(text=phrases["input_news_media"])
+        await state.update_data(description=message.html_text, news_uuid=str(uuid4()))
+        await state.set_state(NewsForm.GET_MEDIA_FILES)
+    else:
+        await message.answer(
+            text="Введите описание в верном формате:",
+        )
 
 
 async def get_media_files(message: Message, bot: Bot, state: FSMContext):

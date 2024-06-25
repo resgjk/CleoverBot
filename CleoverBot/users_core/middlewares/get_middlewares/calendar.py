@@ -80,7 +80,7 @@ class GetEventDetails(BaseMiddleware):
                     )
                 )
                 post: PostModel = res.scalars().one_or_none()
-                event_datails = {
+                event_details = {
                     "title": post.title,
                     "start_date": post.start_date,
                     "start_time": post.start_time,
@@ -90,5 +90,5 @@ class GetEventDetails(BaseMiddleware):
                     "media": post.media,
                     "media_type": post.media_type,
                 }
-                data["event_datails"] = event_datails
+                data["event_details"] = event_details
         return await handler(event, data)

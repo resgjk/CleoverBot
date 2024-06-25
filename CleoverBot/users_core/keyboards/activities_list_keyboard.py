@@ -48,3 +48,12 @@ def get_event_list_keyboard(events: dict, page: str) -> InlineKeyboardMarkup:
     )
     keyboard = InlineKeyboardMarkup(inline_keyboard=buttons)
     return keyboard
+
+
+def return_to_activity_events_keyboard(activity_id: int) -> InlineKeyboardMarkup:
+    keyboard_builder = InlineKeyboardBuilder()
+    keyboard_builder.button(
+        text="⬅️ Back to events", callback_data=f"show_activity_events_{activity_id}"
+    )
+    keyboard_builder.adjust(1, repeat=True)
+    return keyboard_builder.as_markup()

@@ -4,9 +4,9 @@ from aiogram.types import FSInputFile
 
 
 class ActivitySender:
-    def __init__(self, activity_datails) -> None:
-        self.title = activity_datails["title"]
-        self.description = activity_datails["description"]
+    def __init__(self, activity_details) -> None:
+        self.title = activity_details["title"]
+        self.description = activity_details["description"]
 
     def send_activity(self):
         text = []

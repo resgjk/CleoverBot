@@ -4,11 +4,11 @@ from aiogram.types import FSInputFile
 
 
 class CalendarEventSender:
-    def __init__(self, event_datails) -> None:
-        self.title = event_datails["title"]
-        self.full_description = event_datails["full_description"]
-        self.media = event_datails["media"]
-        self.media_type = event_datails["media_type"]
+    def __init__(self, event_details) -> None:
+        self.title = event_details["title"]
+        self.full_description = event_details["full_description"]
+        self.media = event_details["media"]
+        self.media_type = event_details["media_type"]
 
     def send_event(self):
         text = []

@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 import logging
 from typing import Callable, Dict, Any, Awaitable
 
@@ -10,7 +10,7 @@ from aiogram.fsm.context import FSMContext
 
 
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy import select
+from sqlalchemy import select, desc
 from sqlalchemy.engine import ScalarResult
 
 
@@ -26,7 +26,10 @@ class ProjectsNewsPagesMiddleware(BaseMiddleware):
         context_data = await state.get_data()
         try:
             if "choise_project_for_user_view_" in event.data:
-                new_page = 0
+                if context_data.get("news_page"):
+                    new_page = context_data.get("news_page")
+                else:
+                    new_page = 0
                 await state.update_data(project_id=int(event.data.split("_")[-1]))
                 context_data = await state.get_data()
             else:
@@ -49,11 +52,12 @@ class ProjectsNewsPagesMiddleware(BaseMiddleware):
                         .where(
                             ProjectNewsModel.project_id == project_id,
                             (
-                                datetime.now(tz=timezone.utc).date()
+                                datetime.now(tz=timezone.utc)
                                 - ProjectNewsModel.create_date
                             )
-                            <= 30,
+                            <= timedelta(days=30),
                         )
+                        .order_by(desc(ProjectNewsModel.create_date))
                         .offset(new_page * 5)
                         .limit(5)
                     )

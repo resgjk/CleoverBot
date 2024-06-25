@@ -1,9 +1,9 @@
-from datetime import datetime, timezone, date
+from datetime import datetime
 from typing import Literal
 
 from db.base import Base
 
-from sqlalchemy import ForeignKey
+from sqlalchemy import ForeignKey, DateTime
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 
@@ -16,8 +16,8 @@ class ProjectNewsModel(Base):
     project_id: Mapped[int] = mapped_column(ForeignKey("projects.id"), nullable=False)
     project: Mapped["ProjectModel"] = relationship("ProjectModel", back_populates="news")  # type: ignore
     title: Mapped[str] = mapped_column(nullable=False)
-    create_date: Mapped[date] = mapped_column(
-        nullable=False, default=datetime.now(tz=timezone.utc).date()
+    create_date: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False
     )
     description: Mapped[str] = mapped_column(nullable=False)
     media: Mapped[str] = mapped_column(nullable=True)

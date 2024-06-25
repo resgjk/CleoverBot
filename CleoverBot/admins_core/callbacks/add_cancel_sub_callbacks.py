@@ -11,7 +11,7 @@ from admins_core.middlewares.subscribe_middlewares.get_id_for_delete_sub import 
 )
 
 from aiogram import Bot, Router, F
-from aiogram.types import CallbackQuery, Message
+from aiogram.types import CallbackQuery, Message, ContentType
 from aiogram.fsm.context import FSMContext
 
 
@@ -28,7 +28,7 @@ async def add_sub(call: CallbackQuery, bot: Bot, state: FSMContext):
 
 
 async def get_id_for_add_sub(message: Message, bot: Bot, state: FSMContext):
-    if message.text.isdigit():
+    if message.content_type == ContentType.TEXT and message.text.isdigit():
         await state.update_data(user_id=int(message.text))
         await message.answer(text=phrases["add_sub_end_date"])
         await state.set_state(UserSubscribeRoute.GET_END_DATE_FOR_SUB)

@@ -53,12 +53,17 @@ async def create_post(call: CallbackQuery, bot: Bot, state: FSMContext):
 
 
 async def get_title(message: Message, bot: Bot, state: FSMContext, activities: dict):
-    await message.answer(
-        text=phrases["choise_categoty"],
-        reply_markup=get_activities_keyboard(activities),
-    )
-    await state.update_data(title=message.text)
-    await state.set_state(PostForm.GET_CATEGORY)
+    if message.content_type == ContentType.TEXT:
+        await message.answer(
+            text=phrases["choise_categoty"],
+            reply_markup=get_activities_keyboard(activities),
+        )
+        await state.update_data(title=message.text)
+        await state.set_state(PostForm.GET_CATEGORY)
+    else:
+        await message.answer(
+            text="Введите название в верном формате:",
+        )
 
 
 async def get_category(message: Message, bot: Bot, state: FSMContext):
@@ -156,15 +161,25 @@ async def get_end_time(message: Message, bot: Bot, state: FSMContext):
 
 
 async def get_short_description(message: Message, bot: Bot, state: FSMContext):
-    await message.answer(text=phrases["input_full_description"])
-    await state.update_data(short_description=message.text, post_uuid=str(uuid4()))
-    await state.set_state(PostForm.GET_FULL_DESCRIPTION)
+    if message.content_type == ContentType.TEXT:
+        await message.answer(text=phrases["input_full_description"])
+        await state.update_data(short_description=message.text, post_uuid=str(uuid4()))
+        await state.set_state(PostForm.GET_FULL_DESCRIPTION)
+    else:
+        await message.answer(
+            text="Введите краткое описание в верном формате:",
+        )
 
 
 async def get_full_description(message: Message, bot: Bot, state: FSMContext):
-    await message.answer(text=phrases["input_media"])
-    await state.update_data(full_description=message.html_text)
-    await state.set_state(PostForm.GET_MEDIA_FILES)
+    if message.content_type == ContentType.TEXT:
+        await message.answer(text=phrases["input_media"])
+        await state.update_data(full_description=message.html_text)
+        await state.set_state(PostForm.GET_MEDIA_FILES)
+    else:
+        await message.answer(
+            text="Введите полное описание в верном формате:",
+        )
 
 
 async def get_media_files(message: Message, bot: Bot, state: FSMContext):

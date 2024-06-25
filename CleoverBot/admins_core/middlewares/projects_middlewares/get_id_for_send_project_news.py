@@ -1,4 +1,5 @@
 from typing import Callable, Dict, Any, Awaitable
+from datetime import datetime, timezone
 
 from db.models.projects import ProjectModel
 from db.models.projects_news import ProjectNewsModel
@@ -34,6 +35,7 @@ class SendNewsMiddleware(BaseMiddleware):
                 new_news = ProjectNewsModel(
                     project_id=project_news_id,
                     title=title,
+                    create_date=datetime.now(tz=timezone.utc),
                     description=description,
                     media=media,
                     media_type=media_type,

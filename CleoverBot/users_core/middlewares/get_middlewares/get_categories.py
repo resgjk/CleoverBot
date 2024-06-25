@@ -24,7 +24,10 @@ class CategoriesPagesMiddleware(BaseMiddleware):
         context_data = await state.get_data()
         try:
             if event.data == "projects":
-                new_page = 0
+                if context_data.get("user_categories_page"):
+                    new_page = context_data.get("user_categories_page")
+                else:
+                    new_page = 0
             else:
                 page = context_data.get("user_categories_page")
                 if "next_categories_page" in event.data:

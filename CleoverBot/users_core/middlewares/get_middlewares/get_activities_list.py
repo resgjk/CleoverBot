@@ -47,7 +47,10 @@ class GetCurrentActivityEventsMiddleware(BaseMiddleware):
         context_data = await state.get_data()
         try:
             if "show_activity_events" in event.data:
-                new_page = 0
+                if context_data.get("user_events_page"):
+                    new_page = context_data.get("user_events_page")
+                else:
+                    new_page = 0
                 await state.update_data(
                     current_activity_id=int(event.data.split("_")[-1])
                 )
@@ -111,3 +114,34 @@ class GetCurrentActivityEventsMiddleware(BaseMiddleware):
             return await handler(event, data)
         except TypeError as e:
             logging.error(e)
+
+
+class GetActivityEventDetails(BaseMiddleware):
+    async def __call__(
+        self,
+        handler: Callable[[CallbackQuery, Dict[str, Any]], Awaitable[Any]],
+        event: CallbackQuery,
+        data: Dict[str, Any],
+    ) -> Any:
+        session_maker: sessionmaker = data["session_maker"]
+        async with session_maker() as session:
+            async with session.begin():
+                res: ScalarResult = await session.execute(
+                    select(PostModel).where(
+                        PostModel.id == int(event.data.split("_")[-1])
+                    )
+                )
+                post: PostModel = res.scalars().one_or_none()
+                event_details = {
+                    "activity_id": post.category_id,
+                    "title": post.title,
+                    "start_date": post.start_date,
+                    "start_time": post.start_time,
+                    "end_date": post.end_date,
+                    "end_time": post.end_time,
+                    "full_description": post.full_description,
+                    "media": post.media,
+                    "media_type": post.media_type,
+                }
+                data["event_details"] = event_details
+        return await handler(event, data)

@@ -47,13 +47,13 @@ async def get_calendar(
 
 
 async def show_event(
-    call: CallbackQuery, bot: Bot, event_datails: dict, state: FSMContext
+    call: CallbackQuery, bot: Bot, event_details: dict, state: FSMContext
 ):
     await call.answer()
 
-    sender = CalendarEventSender(event_datails)
+    sender = CalendarEventSender(event_details)
     text, media = sender.send_event()
-    media_type = event_datails["media_type"]
+    media_type = event_details["media_type"]
 
     if media:
         try:

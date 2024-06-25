@@ -25,7 +25,10 @@ class ProjectsPagesMiddleware(BaseMiddleware):
         context_data = await state.get_data()
         try:
             if "set_project_category_for_user_choise_project" in event.data:
-                new_page = 0
+                if context_data.get("projects_page"):
+                    new_page = context_data.get("projects_page")
+                else:
+                    new_page = 0
                 await state.update_data(category_id=int(event.data.split("_")[-1]))
                 context_data = await state.get_data()
             elif "_notifications_category_" in event.data:
