@@ -1,5 +1,7 @@
 from typing import Callable, Dict, Any, Awaitable
 from datetime import datetime
+import logging
+import base64
 
 from db.models.users import UserModel
 from db.models.activities import ActivityModel
@@ -39,6 +41,25 @@ class RegisterCheckMiddleware(BaseMiddleware):
                         is_subscriber=True,
                         subscriber_until=datetime(year=2024, month=12, day=30).date(),
                     )
+                    start_command = event.text.split(" ")
+                    if len(start_command) == 2:
+                        try:
+                            referral_user_id = int(
+                                base64.b64decode(start_command[1]).decode("utf-8")
+                            )
+                            referral_res: ScalarResult = await session.execute(
+                                select(UserModel).where(
+                                    UserModel.user_id == referral_user_id
+                                )
+                            )
+                            current_referral: UserModel = (
+                                referral_res.scalars().one_or_none()
+                            )
+                            if current_referral:
+                                new_user.referral_link = start_command[1]
+                                current_referral.referral_count += 1
+                        except Exception as e:
+                            logging(e)
                     # new_user = UserModel(user_id=event.from_user.id)
                     new_user.activities += activities
                     session.add(new_user)

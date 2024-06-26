@@ -32,6 +32,14 @@ class UserModel(Base):
     transactions: Mapped[list["TransactionModel"]] = relationship(  # type: ignore
         "TransactionModel", back_populates="user", lazy=True
     )
+    referral_link: Mapped[str] = mapped_column(nullable=True, unique=False)
+    referral_status: Mapped[Literal["INFLUENCER", "RABOTYAGA", "AGENCY"]] = (
+        mapped_column(nullable=False, unique=False, default="RABOTYAGA")
+    )
+    referral_count: Mapped[int] = mapped_column(nullable=False, unique=False, default=0)
+    referral_balance: Mapped[int] = mapped_column(
+        nullable=False, unique=False, default=0
+    )
 
     def __repr__(self) -> str:
         return f"{self.id} {self.user_id} {self.is_subscriber} {self.subscriber_until} {self.bank} {self.notification}"

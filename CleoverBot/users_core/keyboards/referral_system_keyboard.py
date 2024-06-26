@@ -2,12 +2,9 @@ from aiogram.types import InlineKeyboardMarkup
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 
-def get_activities_keyboard(choice_activities: dict) -> InlineKeyboardMarkup:
+def get_referral_system_keyboard() -> InlineKeyboardMarkup:
     keyboard_builder = InlineKeyboardBuilder()
-    for activity in choice_activities.keys():
-        keyboard_builder.button(
-            text=activity, callback_data=f"set_activity_{choice_activities[activity]}"
-        )
+    keyboard_builder.button(text="💰 Withdraw money", callback_data="withdraw_money")
     keyboard_builder.button(text="⬅️ Return to settings", callback_data="settings")
     keyboard_builder.adjust(1, repeat=True)
     return keyboard_builder.as_markup()

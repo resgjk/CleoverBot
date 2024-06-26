@@ -67,6 +67,9 @@ from users_core.callbacks.get_content_callbacks.activity_events_callback import 
     current_activity_events_router,
     activity_event_details_router,
 )
+from users_core.callbacks.get_content_callbacks.referral_system_callback import (
+    referral_system_router,
+)
 from users_core.utils.commands import set_commands
 
 
@@ -267,6 +270,7 @@ async def lifespan(app: FastAPI):
             select_category_router,
             current_activity_events_router,
             activity_event_details_router,
+            referral_system_router,
         )
 
         scheduler.add_job(
