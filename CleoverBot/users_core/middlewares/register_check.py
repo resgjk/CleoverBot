@@ -59,7 +59,7 @@ class RegisterCheckMiddleware(BaseMiddleware):
                                 new_user.referral_link = start_command[1]
                                 current_referral.referral_count += 1
                         except Exception as e:
-                            logging(e)
+                            logging.error(e)
                     # new_user = UserModel(user_id=event.from_user.id)
                     new_user.activities += activities
                     session.add(new_user)
