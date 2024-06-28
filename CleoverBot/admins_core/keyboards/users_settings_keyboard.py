@@ -4,7 +4,9 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 def get_users_settings_keyboard() -> InlineKeyboardMarkup:
     keyboard_builder = InlineKeyboardBuilder()
-    keyboard_builder.button(text="👥 Добавить инфлюенсера", callback_data="add_influencer")
+    keyboard_builder.button(
+        text="👥 Добавить инфлюенсера", callback_data="add_influencer"
+    )
     keyboard_builder.button(text="➕ Выдать подписку", callback_data="give_subscribe")
     keyboard_builder.button(
         text="🚫 Отменить подписку", callback_data="cancel_subscribe"

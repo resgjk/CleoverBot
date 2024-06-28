@@ -5,6 +5,7 @@ import base64
 
 from db.models.users import UserModel
 from db.models.activities import ActivityModel
+from users_core.utils.referral_system_utils import send_notification_about_new_referral
 
 from aiogram import BaseMiddleware
 from aiogram.types import Message
@@ -58,6 +59,9 @@ class RegisterCheckMiddleware(BaseMiddleware):
                             if current_referral:
                                 new_user.referral_link = start_command[1]
                                 current_referral.referral_count += 1
+                                await send_notification_about_new_referral(
+                                    current_referral.user_id, data["bot"]
+                                )
                         except Exception as e:
                             logging.error(e)
                     # new_user = UserModel(user_id=event.from_user.id)

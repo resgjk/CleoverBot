@@ -134,6 +134,11 @@ from admins_core.callbacks.project_route_callback import (
     send_project_news_router,
     check_project_router,
 )
+from admins_core.callbacks.add_referral_callback import (
+    add_influencer_router,
+    get_influencer_id_router,
+    choice_influencer_type_router,
+)
 
 import os
 import logging
@@ -271,6 +276,9 @@ async def lifespan(app: FastAPI):
             current_activity_events_router,
             activity_event_details_router,
             referral_system_router,
+            add_influencer_router,
+            get_influencer_id_router,
+            choice_influencer_type_router,
         )
 
         scheduler.add_job(

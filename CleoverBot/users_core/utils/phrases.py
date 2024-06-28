@@ -21,4 +21,5 @@ phrases = {
     "admin_show_feedback": "🆕 <b>Обратная связь!</b>\n\n",
     "activities_list": "💡 <b>Select the activity you want to learn about.</b>",
     "referral_system": "Our <b>referral system allows each user to refer friends and receive bonuses</b> for each new subscriber who signs up through your link! 💸🗣\n\n",
+    "new_referral_notification": "🎉 Congratulations! You have <b>a new referral</b>!",
 }

@@ -21,7 +21,7 @@ async def get_referral_menu(call: CallbackQuery, bot: Bot, referral_details: dic
     text.append(f"💵 Your balance: <b>{referral_details["balance"]}$</b>")
 
     media = InputMediaPhoto(
-        media=FSInputFile("users_core/utils/photos/subscription.png"),
+        media=FSInputFile("users_core/utils/photos/referral.png"),
         caption=phrases["referral_system"] + "\n\n".join(text),
     )
     await call.message.edit_media(
