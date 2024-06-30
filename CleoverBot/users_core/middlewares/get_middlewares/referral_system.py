@@ -2,6 +2,7 @@ from typing import Callable, Dict, Any, Awaitable
 import base64
 
 from db.models.users import UserModel
+from users_core.utils.referral_system_utils import int_to_base64
 
 from aiogram import BaseMiddleware
 from aiogram.types import Message, ContentType
@@ -25,9 +26,7 @@ class ReferralSystemMiddleware(BaseMiddleware):
                     select(UserModel).where(UserModel.user_id == event.from_user.id)
                 )
                 current_user: UserModel = user_res.scalars().one_or_none()
-                referral_link = base64.b64encode(
-                    str(current_user.user_id).encode("utf-8")
-                ).decode("utf-8")
+                referral_link = int_to_base64(current_user.user_id)
                 data["referral_details"] = {
                     "link": referral_link,
                     "referral_count": current_user.referral_count,

@@ -5,7 +5,10 @@ import base64
 
 from db.models.users import UserModel
 from db.models.activities import ActivityModel
-from users_core.utils.referral_system_utils import send_notification_about_new_referral
+from users_core.utils.referral_system_utils import (
+    send_notification_about_new_referral,
+    base64_to_int,
+)
 
 from aiogram import BaseMiddleware
 from aiogram.types import Message
@@ -45,9 +48,7 @@ class RegisterCheckMiddleware(BaseMiddleware):
                     start_command = event.text.split(" ")
                     if len(start_command) == 2:
                         try:
-                            referral_user_id = int(
-                                base64.b64decode(start_command[1]).decode("utf-8")
-                            )
+                            referral_user_id = base64_to_int(start_command[1])
                             referral_res: ScalarResult = await session.execute(
                                 select(UserModel).where(
                                     UserModel.user_id == referral_user_id

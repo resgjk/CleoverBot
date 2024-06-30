@@ -9,11 +9,12 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.engine import ScalarResult
 
 
-def base64_to_big_int(base64_str):
-    byte_data = base64.b64decode(base64_str)
-    big_int = int.from_bytes(byte_data, byteorder="big", signed=False)
+def base64_to_int(base64_str: str):
+    return int(base64.b64decode(base64_str).decode("utf-8"))
 
-    return big_int
+
+def int_to_base64(num: int):
+    return base64.b64encode(str(num).encode("utf-8")).decode("utf-8")
 
 
 async def send_notification_about_new_referral(user_id: int, bot: Bot):
@@ -31,15 +32,15 @@ async def replenish_referral_account(
         async with session.begin():
             referral_res: ScalarResult = await session.execute(
                 select(UserModel).where(
-                    UserModel.user_id == base64_to_big_int(referral_link)
+                    UserModel.user_id == base64_to_int(referral_link)
                 )
             )
             current_referral: UserModel = referral_res.scalars().one_or_none()
             if current_referral:
                 if current_referral.referral_status == "RABOTYAGA":
                     current_referral.referral_balance += amount * 0.1
-                elif current_referral.referral_status == "INFLUENCER":
+                else:
                     current_referral.referral_balance += amount * 0.25
-                elif current_referral.referral_status == "AGENCY":
-                    current_referral.referral_balance += amount * 0.25
-                    await replenish_agency()
+                    if current_referral.referral_status == "AGENCY":
+                        await replenish_agency()
+                await session.commit()

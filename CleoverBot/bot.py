@@ -350,7 +350,9 @@ async def payment_callback(request: Request):
                     + f"<b>{new_date[2]} {new_date[1]} {new_date[-1]}</b>",
                 )
             if current_user.referral_link:
-                replenish_referral_account(session_maker, current_user.referral_link, float(data["amount_usd"]))
+                replenish_referral_account(
+                    session_maker, current_user.referral_link, float(data["amount_usd"])
+                )
             await session.commit()
 
 
