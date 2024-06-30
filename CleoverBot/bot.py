@@ -13,6 +13,7 @@ from users_core.config import (
 from db.models.users import UserModel
 from db.models.transactions import TransactionModel
 from users_core.utils.phrases import phrases
+from users_core.utils.referral_system_utils import replenish_referral_account
 
 from db.engine import proceed_models
 from users_core.handlers.start_handler import start_router
@@ -348,6 +349,8 @@ async def payment_callback(request: Request):
                     text=phrases["subscription_date"]
                     + f"<b>{new_date[2]} {new_date[1]} {new_date[-1]}</b>",
                 )
+            if current_user.referral_link:
+                replenish_referral_account(session_maker, current_user.referral_link, float(data["amount_usd"]))
             await session.commit()
 
 

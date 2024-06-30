@@ -37,7 +37,7 @@ class UserModel(Base):
         mapped_column(nullable=False, unique=False, default="RABOTYAGA")
     )
     referral_count: Mapped[int] = mapped_column(nullable=False, unique=False, default=0)
-    referral_balance: Mapped[int] = mapped_column(
+    referral_balance: Mapped[float] = mapped_column(
         nullable=False, unique=False, default=0
     )
 
