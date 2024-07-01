@@ -7,6 +7,7 @@ from aiogram import Bot
 
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.engine import ScalarResult
+from sqlalchemy import select
 
 
 def base64_to_int(base64_str: str):
@@ -26,8 +27,9 @@ async def replenish_agency():
 
 
 async def replenish_referral_account(
-    session_maker: sessionmaker, referral_link: str, amount: int
+    session_maker: sessionmaker, referral_link: str, amount: float
 ):
+    print(base64_to_int(referral_link))
     async with session_maker() as session:
         async with session.begin():
             referral_res: ScalarResult = await session.execute(

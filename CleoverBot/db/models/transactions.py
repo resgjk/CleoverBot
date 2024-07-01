@@ -19,6 +19,7 @@ class TransactionModel(Base):
     )
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
     user = relationship("UserModel", back_populates="transactions")
+    amount: Mapped[float] = mapped_column(nullable=False, unique=False)
     is_success: Mapped[bool] = mapped_column(
         nullable=False, default=False, unique=False
     )

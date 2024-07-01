@@ -199,7 +199,7 @@ dp.errors.register(error_handler)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     logging.basicConfig(
-        level=logging.INFO,
+        level=logging.ERROR,
         format="%(filename)s:%(lineno)d #%(levelname)-8s [%(asctime)s] - %(name)s - %(message)s",
         filename="cleover_log.log",
         filemode="a",
@@ -319,40 +319,43 @@ async def payment_callback(request: Request):
                 .where(TransactionModel.uuid.contains(data["invoice_id"]))
             )
             current_transaction: TransactionModel = res.scalars().one_or_none()
-            current_transaction.is_success = True
-            current_user: UserModel = current_transaction.user
-            match current_transaction.type:
-                case "one_month":
-                    days = 31
-                case "three_month":
-                    days = 92
-                case "six_month":
-                    days = 183
-                case "twelve_month":
-                    days = 365
-            if current_user.is_subscriber:
-                new_date = current_user.subscriber_until + timedelta(days=days)
-                current_user.subscriber_until = new_date.date()
-                new_date = new_date.date().ctime().split()
-                await bot.send_message(
-                    chat_id=current_user.user_id,
-                    text=phrases["subscription_date"]
-                    + f"<b>{new_date[2]} {new_date[1]} {new_date[-1]}</b>",
-                )
-            else:
-                new_date = datetime.now(tz=timezone.utc) + timedelta(days=days)
-                current_user.subscriber_until = new_date.date()
-                current_user.is_subscriber = True
-                new_date = new_date.date().ctime().split()
-                await bot.send_message(
-                    chat_id=current_user.user_id,
-                    text=phrases["subscription_date"]
-                    + f"<b>{new_date[2]} {new_date[1]} {new_date[-1]}</b>",
-                )
-            if current_user.referral_link:
-                replenish_referral_account(
-                    session_maker, current_user.referral_link, float(data["amount_usd"])
-                )
+            if current_transaction:
+                current_transaction.is_success = True
+                current_user: UserModel = current_transaction.user
+                match current_transaction.type:
+                    case "one_month":
+                        days = 31
+                    case "three_month":
+                        days = 92
+                    case "six_month":
+                        days = 183
+                    case "twelve_month":
+                        days = 365
+                if current_user.is_subscriber:
+                    new_date = current_user.subscriber_until + timedelta(days=days)
+                    current_user.subscriber_until = new_date
+                    new_date = new_date.ctime().split()
+                    await bot.send_message(
+                        chat_id=current_user.user_id,
+                        text=phrases["subscription_date"]
+                        + f"<b>{new_date[2]} {new_date[1]} {new_date[-1]}</b>",
+                    )
+                else:
+                    new_date = datetime.now(tz=timezone.utc) + timedelta(days=days)
+                    current_user.subscriber_until = new_date.date()
+                    current_user.is_subscriber = True
+                    new_date = new_date.date().ctime().split()
+                    await bot.send_message(
+                        chat_id=current_user.user_id,
+                        text=phrases["subscription_date"]
+                        + f"<b>{new_date[2]} {new_date[1]} {new_date[-1]}</b>",
+                    )
+                if current_user.referral_link:
+                    await replenish_referral_account(
+                        session_maker,
+                        current_user.referral_link,
+                        current_transaction.amount,
+                    )
             await session.commit()
 
 

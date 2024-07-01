@@ -40,7 +40,17 @@ class CreateInvoiceMiddleware(BaseMiddleware):
                 "shop_id": SHOP_ID,
                 "currency": "USD",
                 "time_to_pay": {"hours": 0, "minutes": 30},
-                "available_currencies": ["USDT_TRC20", "ETH", "BTC"],
+                "available_currencies": [
+                    "USDT_TRC20",
+                    "USDC_TRC20",
+                    "TUSD_TRC20",
+                    "USDT_ERC20",
+                    "USDC_ERC20",
+                    "TUSD_ERC20",
+                    "BTC",
+                    "LTC",
+                    "ETH",
+                ],
             }
 
             params = {
@@ -88,6 +98,7 @@ class CreateInvoiceMiddleware(BaseMiddleware):
                         transaction: TransactionModel = TransactionModel(
                             uuid=response_body["result"]["uuid"],
                             type=transaction_type,
+                            amount=invoice_data["amount"],
                             user_id=current_user.id,
                             is_success=False,
                         )

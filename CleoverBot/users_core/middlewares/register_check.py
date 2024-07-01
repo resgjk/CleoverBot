@@ -42,6 +42,7 @@ class RegisterCheckMiddleware(BaseMiddleware):
                     activities: list[ActivityModel] = activity_res.scalars().all()
                     new_user = UserModel(
                         user_id=event.from_user.id,
+                        username=event.from_user.username,
                         is_subscriber=True,
                         subscriber_until=datetime(year=2024, month=12, day=30).date(),
                     )
