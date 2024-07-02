@@ -1,7 +1,10 @@
 import base64
+from datetime import datetime
 
 from users_core.utils.phrases import phrases
 from db.models.users import UserModel
+from db.models.transactions import TransactionModel
+from db.models.agency_stats import AgencyStatModel
 
 from aiogram import Bot
 
@@ -22,12 +25,22 @@ async def send_notification_about_new_referral(user_id: int, bot: Bot):
     await bot.send_message(chat_id=user_id, text=phrases["new_referral_notification"])
 
 
-async def replenish_agency():
-    pass
+async def add_agency_statistics(
+    session_maker: sessionmaker, user_id: int, transaction_id: int
+):
+    async with session_maker() as session:
+        async with session.begin():
+            new_stat = AgencyStatModel(
+                user_id=user_id,
+                transaction_id=transaction_id,
+                payment_datetime=datetime.now(),
+            )
+            session.add(new_stat)
+            await session.commit()
 
 
 async def replenish_referral_account(
-    session_maker: sessionmaker, referral_link: str, amount: float
+    session_maker: sessionmaker, referral_link: str, transaction: TransactionModel
 ):
     print(base64_to_int(referral_link))
     async with session_maker() as session:
@@ -40,9 +53,11 @@ async def replenish_referral_account(
             current_referral: UserModel = referral_res.scalars().one_or_none()
             if current_referral:
                 if current_referral.referral_status == "RABOTYAGA":
-                    current_referral.referral_balance += amount * 0.1
+                    current_referral.referral_balance += transaction.amount * 0.1
                 else:
-                    current_referral.referral_balance += amount * 0.25
+                    current_referral.referral_balance += transaction.amount * 0.25
                     if current_referral.referral_status == "AGENCY":
-                        await replenish_agency()
+                        await add_agency_statistics(
+                            session_maker, current_referral.id, transaction.id
+                        )
                 await session.commit()

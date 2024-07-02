@@ -10,6 +10,7 @@ __all__ = (
     "ProjectModel",
     "ProjectNewsModel",
     "UserToProjectModel",
+    "AgencyStatModel",
 )
 
 
@@ -24,3 +25,4 @@ from db.models.projects_categories import ProjectCategoryModel
 from db.models.projects import ProjectModel
 from db.models.projects_news import ProjectNewsModel
 from db.models.users_to_projects import UserToProjectModel
+from db.models.agency_stats import AgencyStatModel

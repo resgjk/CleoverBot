@@ -140,6 +140,7 @@ from admins_core.callbacks.add_referral_callback import (
     get_influencer_id_router,
     choice_influencer_type_router,
 )
+from admins_core.callbacks.agency_statistic_callback import agency_statistic_router
 
 import os
 import logging
@@ -163,6 +164,7 @@ def check_posts_media_folder():
         os.mkdir("media")
 
     dirs = [
+        "stat_files",
         "posts_media",
         "posts_media/photos",
         "posts_media/videos",
@@ -280,6 +282,7 @@ async def lifespan(app: FastAPI):
             add_influencer_router,
             get_influencer_id_router,
             choice_influencer_type_router,
+            agency_statistic_router,
         )
 
         scheduler.add_job(
@@ -319,7 +322,7 @@ async def payment_callback(request: Request):
                 .where(TransactionModel.uuid.contains(data["invoice_id"]))
             )
             current_transaction: TransactionModel = res.scalars().one_or_none()
-            if current_transaction:
+            if current_transaction and not (current_transaction.is_success):
                 current_transaction.is_success = True
                 current_user: UserModel = current_transaction.user
                 match current_transaction.type:
@@ -354,7 +357,7 @@ async def payment_callback(request: Request):
                     await replenish_referral_account(
                         session_maker,
                         current_user.referral_link,
-                        current_transaction.amount,
+                        current_transaction,
                     )
             await session.commit()
 
