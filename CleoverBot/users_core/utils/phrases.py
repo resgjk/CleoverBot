@@ -22,4 +22,7 @@ phrases = {
     "activities_list": "💡 <b>Select the activity you want to learn about.</b>",
     "referral_system": "Our <b>referral system allows each user to refer friends and receive bonuses</b> for each new subscriber who signs up through your link! 💸🗣\n\n",
     "new_referral_notification": "🎉 Congratulations! You have <b>a new referral</b>!",
+    "withdrawal_in_process": "🔄 Your withdrawal request <b>is being processed</b>, please wait!\n\n<b>P.S.</b> If you have any questions, write to support.",
+    "insufficient_funds": "❗ You don't have enough funds on your balance sheet! Minimum withdrawal amount - <b>100$</b>\n\n<b>P.S.</b> If you have any questions, write to support.",
+    "wallet_enter": "💸 Enter your <b>USDT BEP-20</b> wallet.\n\n‼ Make sure that the <b>entered wallet is correct</b>! Administration <b>is not responsible</b> for sending funds to an incorrect wallet! ‼",
 }

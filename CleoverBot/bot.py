@@ -70,6 +70,8 @@ from users_core.callbacks.get_content_callbacks.activity_events_callback import 
 )
 from users_core.callbacks.get_content_callbacks.referral_system_callback import (
     referral_system_router,
+    request_a_withdrawal_router,
+    withdrawal_wallet_router,
 )
 from users_core.utils.commands import set_commands
 
@@ -141,6 +143,9 @@ from admins_core.callbacks.add_referral_callback import (
     choice_influencer_type_router,
 )
 from admins_core.callbacks.agency_statistic_callback import agency_statistic_router
+from admins_core.callbacks.withdraw_requests_callback import (
+    accept_withdraw_request_router,
+)
 
 import os
 import logging
@@ -283,6 +288,9 @@ async def lifespan(app: FastAPI):
             get_influencer_id_router,
             choice_influencer_type_router,
             agency_statistic_router,
+            request_a_withdrawal_router,
+            withdrawal_wallet_router,
+            accept_withdraw_request_router,
         )
 
         scheduler.add_job(

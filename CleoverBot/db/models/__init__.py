@@ -11,6 +11,7 @@ __all__ = (
     "ProjectNewsModel",
     "UserToProjectModel",
     "AgencyStatModel",
+    "WithdrawRequestModel",
 )
 
 
@@ -26,3 +27,4 @@ from db.models.projects import ProjectModel
 from db.models.projects_news import ProjectNewsModel
 from db.models.users_to_projects import UserToProjectModel
 from db.models.agency_stats import AgencyStatModel
+from db.models.withdrawal_requests import WithdrawRequestModel
