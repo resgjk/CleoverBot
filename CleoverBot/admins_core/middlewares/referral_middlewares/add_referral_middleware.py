@@ -12,7 +12,7 @@ from sqlalchemy import select
 from sqlalchemy.engine import ScalarResult
 
 
-class GetInfluencerIdMidleware(BaseMiddleware):
+class GetInfluencerIdMiddleware(BaseMiddleware):
     async def __call__(
         self,
         handler: Callable[[Message, Dict[str, Any]], Awaitable[Any]],
@@ -37,7 +37,7 @@ class GetInfluencerIdMidleware(BaseMiddleware):
         return await handler(event, data)
 
 
-class GetInfluencerTypeMidleware(BaseMiddleware):
+class GetInfluencerTypeMiddleware(BaseMiddleware):
     async def __call__(
         self,
         handler: Callable[[CallbackQuery, Dict[str, Any]], Awaitable[Any]],

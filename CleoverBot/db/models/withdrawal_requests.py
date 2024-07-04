@@ -20,7 +20,7 @@ class WithdrawRequestModel(Base):
         DateTime(timezone=True), nullable=False
     )
     wallet_address: Mapped[str] = mapped_column(nullable=False, unique=False)
-    amount: Mapped[int] = mapped_column(nullable=False, unique=False)
+    amount: Mapped[float] = mapped_column(nullable=False, unique=False)
     is_paid: Mapped[bool] = mapped_column(nullable=False, unique=False, default=False)
 
     def __repr__(self) -> str:

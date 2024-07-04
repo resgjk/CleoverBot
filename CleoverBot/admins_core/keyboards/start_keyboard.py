@@ -18,5 +18,8 @@ def get_start_keyboard(is_super_admin: bool) -> InlineKeyboardMarkup:
         keyboard_builder.button(
             text="📝 Статистика по агенству", callback_data="agency_statistic"
         )
+        keyboard_builder.button(
+            text="📤 Заявки на вывод", callback_data="withdraw_request"
+        )
     keyboard_builder.adjust(1, repeat=True)
     return keyboard_builder.as_markup()

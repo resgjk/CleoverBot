@@ -146,6 +146,10 @@ from admins_core.callbacks.agency_statistic_callback import agency_statistic_rou
 from admins_core.callbacks.withdraw_requests_callback import (
     accept_withdraw_request_router,
 )
+from admins_core.callbacks.choice_withdraw_request_callback import (
+    choice_withdraw_request_router,
+    get_request_details_router,
+)
 
 import os
 import logging
@@ -291,6 +295,8 @@ async def lifespan(app: FastAPI):
             request_a_withdrawal_router,
             withdrawal_wallet_router,
             accept_withdraw_request_router,
+            choice_withdraw_request_router,
+            get_request_details_router,
         )
 
         scheduler.add_job(

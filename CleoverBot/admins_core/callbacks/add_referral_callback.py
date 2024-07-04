@@ -4,9 +4,9 @@ from admins_core.keyboards.influencers_categories_keyboard import get_infl_type_
 from admins_core.keyboards.return_to_user_settings_keyboard import (
     return_to_user_settings_keyboard,
 )
-from admins_core.middlewares.referral_midlewares.add_referral_midleware import (
-    GetInfluencerIdMidleware,
-    GetInfluencerTypeMidleware,
+from admins_core.middlewares.referral_middlewares.add_referral_middleware import (
+    GetInfluencerIdMiddleware,
+    GetInfluencerTypeMiddleware,
 )
 
 from aiogram import Bot, Router, F
@@ -66,7 +66,7 @@ add_influencer_router.callback_query.register(
 get_influencer_id_router.message.register(
     get_id_for_add_influencer, InfluencerRouter.GET_ID_FOR_ADD_INFL
 )
-get_influencer_id_router.message.middleware.register(GetInfluencerIdMidleware())
+get_influencer_id_router.message.middleware.register(GetInfluencerIdMiddleware())
 choice_influencer_type_router.callback_query.register(
     get_type_for_add_influencer,
     F.data == "average_infl",
@@ -76,5 +76,5 @@ choice_influencer_type_router.callback_query.register(
     get_type_for_add_influencer, F.data == "agency_infl", InfluencerRouter.GET_INFL_TYPE
 )
 choice_influencer_type_router.callback_query.middleware.register(
-    GetInfluencerTypeMidleware()
+    GetInfluencerTypeMiddleware()
 )
