@@ -1,4 +1,3 @@
-from admins_core.utils.phrases import phrases
 from admins_core.middlewares.referral_middlewares.accept_withdraw_request_middleware import (
     AcceptWithdrawRequestMiddleware,
 )

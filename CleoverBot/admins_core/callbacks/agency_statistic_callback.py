@@ -7,8 +7,6 @@ from admins_core.utils.create_statistic_files import (
     get_users_document,
 )
 
-import openpyxl
-
 from sqlalchemy.orm import sessionmaker
 
 from aiogram.types import CallbackQuery, FSInputFile

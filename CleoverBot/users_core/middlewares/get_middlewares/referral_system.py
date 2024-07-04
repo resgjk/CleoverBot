@@ -10,7 +10,7 @@ from db.models.admins import AdminModel
 from users_core.utils.referral_system_utils import int_to_base64
 
 from aiogram import BaseMiddleware
-from aiogram.types import Message, ContentType, CallbackQuery
+from aiogram.types import Message, CallbackQuery
 
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import select

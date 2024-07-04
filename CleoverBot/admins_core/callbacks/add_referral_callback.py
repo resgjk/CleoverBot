@@ -10,7 +10,7 @@ from admins_core.middlewares.referral_middlewares.add_referral_middleware import
 )
 
 from aiogram import Bot, Router, F
-from aiogram.types import CallbackQuery, Message, ContentType
+from aiogram.types import CallbackQuery, Message
 from aiogram.fsm.context import FSMContext
 
 

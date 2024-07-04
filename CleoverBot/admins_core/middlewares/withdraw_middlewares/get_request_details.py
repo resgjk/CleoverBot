@@ -5,7 +5,6 @@ from db.models.withdrawal_requests import WithdrawRequestModel
 
 from aiogram import BaseMiddleware
 from aiogram.types import CallbackQuery
-from aiogram.fsm.context import FSMContext
 
 from sqlalchemy.orm import sessionmaker, joinedload
 from sqlalchemy import select
