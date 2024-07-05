@@ -23,7 +23,7 @@ withdrawal_wallet_router = Router()
 
 async def get_referral_menu(call: CallbackQuery, bot: Bot, referral_details: dict):
     text = []
-    link = f"https://t.me/cleover_test_bot?start={referral_details["link"]}"
+    link = f"https://t.me/cleoverbot?start={referral_details["link"]}"
     text.append(f'🔗 Your referral link: <b><a href="{link}">{link}</a></b>')
     text.append(
         f"🚶 You've attracted <b>{referral_details["referral_count"]}</b> referrals"

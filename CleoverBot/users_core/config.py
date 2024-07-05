@@ -63,6 +63,6 @@ jobstores = {
 scheduler = ContextSchedulerDecorator(
     AsyncIOScheduler(timezone="Etc/UTC", jobstores=jobstores)
 )
+scheduler.ctx.add_instance(bot, declared_class=Bot)
+scheduler.ctx.add_instance(session_maker, declared_class=sessionmaker)
 # scheduler = ContextSchedulerDecorator(AsyncIOScheduler(timezone="Etc/UTC"))
-# scheduler.ctx.add_instance(bot, declared_class=Bot)
-# scheduler.ctx.add_instance(session_maker, declared_class=sessionmaker)
