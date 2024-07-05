@@ -12,16 +12,6 @@ from sqlalchemy import select
 from sqlalchemy.engine import ScalarResult
 
 
-callbacks_data = {
-    "set_activity_defi": "defi",
-    "set_activity_airdrops": "airdrops",
-    "set_activity_news": "news",
-    "set_activity_ido_ico": "ido_ico",
-    "set_activity_ambassador_programs": "ambassador_programs",
-    "set_activity_nft": "nft",
-}
-
-
 class SetActivitiesMiddleware(BaseMiddleware):
     async def __call__(
         self,
