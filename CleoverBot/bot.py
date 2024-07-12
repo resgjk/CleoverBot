@@ -208,11 +208,11 @@ async def error_handler(exception: Exception):
 
 
 storage = RedisStorage.from_url("redis://localhost:6379/0")
-storage_throttling = RedisStorage.from_url("redis://localhost:6379/5")
+# storage_throttling = RedisStorage.from_url("redis://localhost:6379/5")
 dp = Dispatcher(storage=storage)
 dp.errors.register(error_handler)
-dp.message.middleware.register(ThrottlingMiddleware(storage=storage_throttling))
-dp.callback_query.middleware.register(ThrottlingMiddleware(storage=storage_throttling))
+# dp.message.middleware.register(ThrottlingMiddleware(storage=storage_throttling))
+# dp.callback_query.middleware.register(ThrottlingMiddleware(storage=storage_throttling))
 
 
 @asynccontextmanager
