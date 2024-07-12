@@ -34,4 +34,6 @@ async def check_subscribs(bot: Bot, session_maker: sessionmaker):
             await session.commit()
 
             if tasks:
-                await asyncio.gather(*tasks, return_exceptions=True)
+                for success_task in tasks:
+                    await success_task
+                    await asyncio.sleep(0.04)

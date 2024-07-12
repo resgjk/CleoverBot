@@ -73,6 +73,7 @@ from users_core.callbacks.get_content_callbacks.referral_system_callback import 
     request_a_withdrawal_router,
     withdrawal_wallet_router,
 )
+from users_core.middlewares.throttling_middleware import ThrottlingMiddleware
 from users_core.utils.commands import set_commands
 
 
@@ -154,9 +155,10 @@ from admins_core.callbacks.choice_withdraw_request_callback import (
 import os
 import logging
 from contextlib import asynccontextmanager
+import asyncio
 
 from aiogram import Bot, Dispatcher, types
-from aiogram.exceptions import TelegramAPIError
+from aiogram.exceptions import TelegramAPIError, TelegramRetryAfter
 from aiogram.fsm.storage.redis import RedisStorage
 
 from apsched.check_subscribs import check_subscribs
@@ -195,7 +197,10 @@ def check_posts_media_folder():
 
 
 async def error_handler(exception: Exception):
-    if isinstance(exception, TelegramAPIError):
+    if isinstance(exception, TelegramRetryAfter):
+        logging.error(f"Ошибка количества отправок: {exception}")
+        await asyncio.sleep(exception.retry_after)
+    elif isinstance(exception, TelegramAPIError):
         logging.error(f"Ошибка API Telegram: {exception}")
     else:
         logging.error(f"Произошла ошибка: {exception}")
@@ -203,8 +208,11 @@ async def error_handler(exception: Exception):
 
 
 storage = RedisStorage.from_url("redis://localhost:6379/0")
+storage_throttling = RedisStorage.from_url("redis://localhost:6379/5")
 dp = Dispatcher(storage=storage)
 dp.errors.register(error_handler)
+dp.message.middleware.register(ThrottlingMiddleware(storage=storage_throttling))
+dp.callback_query.middleware.register(ThrottlingMiddleware(storage=storage_throttling))
 
 
 @asynccontextmanager

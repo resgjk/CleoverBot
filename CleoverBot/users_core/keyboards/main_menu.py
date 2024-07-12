@@ -24,3 +24,10 @@ def get_main_menu_keyboard_is_not_sub() -> InlineKeyboardMarkup:
     keyboard_builder.button(text="❓ Support", callback_data="support")
     keyboard_builder.adjust(2, repeat=True)
     return keyboard_builder.as_markup()
+
+
+def get_check_channels() -> InlineKeyboardMarkup:
+    keyboard_builder = InlineKeyboardBuilder()
+    keyboard_builder.button(text="Check 👀", callback_data="check_channels")
+    keyboard_builder.adjust(1, repeat=True)
+    return keyboard_builder.as_markup()

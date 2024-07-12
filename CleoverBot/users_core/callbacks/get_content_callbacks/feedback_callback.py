@@ -43,7 +43,9 @@ async def post_feedback(
                         chat_id=id, text=phrases["admin_show_feedback"] + message.text
                     )
                     tasks.append(task)
-                await asyncio.gather(*tasks, return_exceptions=True)
+                for success_task in tasks:
+                    await success_task
+                    await asyncio.sleep(0.04)
             except Exception as e:
                 logging.error(e)
     elif result == "invalid":
