@@ -25,4 +25,6 @@ phrases = {
     "withdrawal_in_process": "🔄 Your withdrawal request <b>is being processed</b>, please wait!\n\n<b>P.S.</b> If you have any questions, write to support.",
     "insufficient_funds": "❗ You don't have enough funds on your balance sheet! Minimum withdrawal amount - <b>100$</b>\n\n<b>P.S.</b> If you have any questions, write to support.",
     "wallet_enter": "💸 Enter your <b>USDT BEP-20</b> wallet.\n\n‼ Make sure that the <b>entered wallet is correct</b>! Administration <b>is not responsible</b> for sending funds to an incorrect wallet! ‼",
+    "channels_text": "Hey! We're happy to see you here.\n\nTo access the best crypto aggregator, please subscribe to:\n\n<b>• @cleovernews\n• @cleoverchat</b>",
+    "not_in_channel_text": "You're trying to trick me 😢\n\nYou're not subscribed!",
 }

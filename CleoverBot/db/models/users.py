@@ -41,6 +41,9 @@ class UserModel(Base):
     referral_balance: Mapped[float] = mapped_column(
         nullable=False, unique=False, default=0
     )
+    is_in_channel: Mapped[bool] = mapped_column(
+        nullable=False, unique=False, default=False
+    )
 
     def __repr__(self) -> str:
         return f"{self.id} {self.user_id} {self.is_subscriber} {self.subscriber_until} {self.bank} {self.notification}"

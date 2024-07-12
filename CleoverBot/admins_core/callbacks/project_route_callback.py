@@ -185,7 +185,9 @@ async def send_post_to_users(
                     news_photo = FSInputFile("users_core/utils/photos/news.png")
                     task = bot.send_photo(chat_id=id, photo=news_photo, caption=text)
                 tasks.append(task)
-            await asyncio.gather(*tasks, return_exceptions=True)
+            for success_task in tasks:
+                await success_task
+                await asyncio.sleep(0.04)
             await state.clear()
             await call.message.edit_text(
                 text="✅ Новость успешно опубликована!",

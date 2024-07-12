@@ -1,4 +1,3 @@
-from datetime import datetime, timezone
 import os
 
 from db.engine import create_async_engine, get_session_maker
@@ -37,6 +36,8 @@ THREE_MONTH_PRICE = int(os.getenv("THREE_MONTH_PRICE"))
 SIX_MONTH_PRICE = int(os.getenv("SIX_MONTH_PRICE"))
 TWELVE_MONTH_PRICE = int(os.getenv("TWELVE_MONTH_PRICE"))
 
+TG_CHANNEL_ID = int(os.getenv("TG_CHANNEL_ID"))
+
 bot = Bot(token=BOT_TOKEN, default=DefaultBotProperties(parse_mode="HTML"))
 
 postgres_url = URL.create(
@@ -63,6 +64,6 @@ jobstores = {
 scheduler = ContextSchedulerDecorator(
     AsyncIOScheduler(timezone="Etc/UTC", jobstores=jobstores)
 )
+# scheduler = ContextSchedulerDecorator(AsyncIOScheduler(timezone="Etc/UTC"))
 scheduler.ctx.add_instance(bot, declared_class=Bot)
 scheduler.ctx.add_instance(session_maker, declared_class=sessionmaker)
-# scheduler = ContextSchedulerDecorator(AsyncIOScheduler(timezone="Etc/UTC"))

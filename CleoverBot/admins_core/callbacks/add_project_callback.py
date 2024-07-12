@@ -230,8 +230,10 @@ async def send_project_to_users(
                         task = bot.send_photo(
                             chat_id=id, photo=event_photo, caption=text
                         )
-                tasks.append(task)
-                await asyncio.gather(*tasks, return_exceptions=True)
+                    tasks.append(task)
+                for success_task in tasks:
+                    await success_task
+                    await asyncio.sleep(0.04)
                 await call.message.edit_text(
                     text="✅ Проект успешно опубликован!",
                     reply_markup=return_to_projects_route_keyboard(),

@@ -77,7 +77,9 @@ async def get_withdrawal_wallet(
                 reply_markup=get_accept_request_keyboard(request_details.uuid),
             )
             tasks.append(task)
-        await asyncio.gather(*tasks, return_exceptions=True)
+        for success_task in tasks:
+            await success_task
+            await asyncio.sleep(0.04)
     else:
         await message.answer(
             "🚫 It was not possible to process your request. Try again later!"
