@@ -17,14 +17,15 @@ class ThrottlingMiddleware(BaseMiddleware):
         event: Message,
         data: Dict[str, Any],
     ) -> Any:
-        user_id = event.from_user.id
-        key = f"user:{user_id}"
-        await self.storage.redis.incr(key)
-        await self.storage.redis.expire(key, self.time_frame)
-        curr_lim = await self.storage.redis.get(key)
-        if int(curr_lim) > self.limit:
-            await event.answer(
-                f"⌛ You're turning too often, please wait <b>{self.time_frame} seconds!</b>"
-            )
-            return
+        if event.text[0] == "/":
+            user_id = event.from_user.id
+            key = f"user:{user_id}"
+            await self.storage.redis.incr(key)
+            await self.storage.redis.expire(key, self.time_frame)
+            curr_lim = await self.storage.redis.get(key)
+            if int(curr_lim) > self.limit:
+                await event.answer(
+                    f"⌛ You're turning too often, please wait <b>{self.time_frame} seconds!</b>"
+                )
+                return
         return await handler(event, data)
