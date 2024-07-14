@@ -1,7 +1,7 @@
 from typing import Callable, Dict, Any, Awaitable
 
 from aiogram import BaseMiddleware
-from aiogram.types import Message
+from aiogram.types import Message, ContentType
 from aiogram.fsm.storage.redis import RedisStorage
 
 
@@ -17,7 +17,7 @@ class ThrottlingMiddleware(BaseMiddleware):
         event: Message,
         data: Dict[str, Any],
     ) -> Any:
-        if event.text[0] == "/":
+        if event.content_type == ContentType.TEXT and event.text[0] == "/":
             user_id = event.from_user.id
             key = f"user:{user_id}"
             await self.storage.redis.incr(key)
