@@ -9,6 +9,7 @@ from users_core.middlewares.get_middlewares.feedback import PostFeedbackMiddlewa
 from aiogram import Bot, Router, F
 from aiogram.types import CallbackQuery, FSInputFile, InputMediaPhoto, Message
 from aiogram.fsm.context import FSMContext
+from aiogram.exceptions import TelegramForbiddenError
 
 
 feedback_router = Router()
@@ -44,7 +45,10 @@ async def post_feedback(
                     )
                     tasks.append(task)
                 for success_task in tasks:
-                    await success_task
+                    try:
+                        await success_task
+                    except TelegramForbiddenError:
+                        pass
                     await asyncio.sleep(0.04)
             except Exception as e:
                 logging.error(e)

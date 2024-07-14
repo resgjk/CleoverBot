@@ -30,7 +30,7 @@ from uuid import uuid4
 from aiogram import Bot, Router, F
 from aiogram.types import CallbackQuery, Message, ContentType, FSInputFile
 from aiogram.fsm.context import FSMContext
-from aiogram.exceptions import TelegramNetworkError
+from aiogram.exceptions import TelegramNetworkError, TelegramForbiddenError
 
 
 type = "for_add_project"
@@ -232,7 +232,10 @@ async def send_project_to_users(
                         )
                     tasks.append(task)
                 for success_task in tasks:
-                    await success_task
+                    try:
+                        await success_task
+                    except TelegramForbiddenError:
+                        pass
                     await asyncio.sleep(0.04)
                 await call.message.edit_text(
                     text="✅ Проект успешно опубликован!",

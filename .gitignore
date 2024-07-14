@@ -160,3 +160,5 @@ cython_debug/
 #.idea/
 CleoverBot/bot_test.py
 CleoverBot/media
+alembic.ini
+CleoverBot/migrations

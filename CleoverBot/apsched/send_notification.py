@@ -6,6 +6,7 @@ from db.models.activities import ActivityModel
 
 from aiogram import Bot
 from aiogram.types import FSInputFile
+from aiogram.exceptions import TelegramForbiddenError
 
 from sqlalchemy.orm import sessionmaker, selectinload
 from sqlalchemy import select
@@ -68,7 +69,10 @@ async def send_notifications(
                             )
                             tasks.append(task)
                     for success_task in tasks:
-                        await success_task
+                        try:
+                            await success_task
+                        except TelegramForbiddenError:
+                            pass
                         await asyncio.sleep(0.04)
                 except Exception as e:
                     logging.error(e)

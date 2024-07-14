@@ -14,6 +14,7 @@ from users_core.middlewares.get_middlewares.referral_system import (
 from aiogram import Bot, Router, F
 from aiogram.types import CallbackQuery, FSInputFile, InputMediaPhoto, Message
 from aiogram.fsm.context import FSMContext
+from aiogram.exceptions import TelegramForbiddenError
 
 
 referral_system_router = Router()
@@ -78,7 +79,10 @@ async def get_withdrawal_wallet(
             )
             tasks.append(task)
         for success_task in tasks:
-            await success_task
+            try:
+                await success_task
+            except TelegramForbiddenError:
+                pass
             await asyncio.sleep(0.04)
     else:
         await message.answer(

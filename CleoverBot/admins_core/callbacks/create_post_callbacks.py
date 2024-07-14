@@ -30,7 +30,7 @@ from aiogram.types import (
     FSInputFile,
 )
 from aiogram.fsm.context import FSMContext
-from aiogram.exceptions import TelegramNetworkError
+from aiogram.exceptions import TelegramNetworkError, TelegramForbiddenError
 
 from apscheduler_di import ContextSchedulerDecorator
 
@@ -273,7 +273,10 @@ async def send_post_to_users(
                     task = bot.send_photo(chat_id=id, photo=event_photo, caption=text)
                 tasks.append(task)
             for success_task in tasks:
-                await success_task
+                try:
+                    await success_task
+                except TelegramForbiddenError:
+                    pass
                 await asyncio.sleep(0.04)
             await state.clear()
             await call.message.edit_text(

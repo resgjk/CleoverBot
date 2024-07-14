@@ -6,6 +6,7 @@ from users_core.utils.phrases import phrases
 from users_core.keyboards.subscriptions_keyboard import get_buy_subscription_keyboard
 
 from aiogram import Bot
+from aiogram.exceptions import TelegramForbiddenError
 
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import select
@@ -35,5 +36,8 @@ async def check_subscribs(bot: Bot, session_maker: sessionmaker):
 
             if tasks:
                 for success_task in tasks:
-                    await success_task
+                    try:
+                        await success_task
+                    except TelegramForbiddenError:
+                        pass
                     await asyncio.sleep(0.04)

@@ -34,7 +34,7 @@ async def get_calendar(
 
     for event in events_news:
         text.append(f"🔹 <b>{event[0]}</b>\n\t\t•   {event[1]}")
-    caption = text_header + f"\n{'-' * 50}\n".join(text)
+    caption = text_header + f"\n{'➖' * 3}\n".join(text)
 
     media = InputMediaPhoto(
         media=calendar_photo,

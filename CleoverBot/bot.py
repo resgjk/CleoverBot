@@ -169,6 +169,8 @@ from sqlalchemy import select
 from sqlalchemy.engine import ScalarResult
 from sqlalchemy.orm import joinedload
 
+from apscheduler.job import Job
+
 
 def check_posts_media_folder():
     if not os.path.exists("media"):
@@ -308,7 +310,7 @@ async def lifespan(app: FastAPI):
             get_request_details_router,
         )
 
-        scheduler.add_job(
+        job: Job = scheduler.add_job(
             check_subscribs,
             trigger="cron",
             hour=12,
@@ -320,6 +322,7 @@ async def lifespan(app: FastAPI):
 
     yield
     await bot.delete_webhook()
+    scheduler.remove_job(job.id)
 
 
 app = FastAPI(docs_url=None, redoc_url=None, lifespan=lifespan)
