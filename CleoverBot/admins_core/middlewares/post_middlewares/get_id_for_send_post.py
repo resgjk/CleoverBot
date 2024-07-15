@@ -80,9 +80,7 @@ class SendPostMiddleware(BaseMiddleware):
                 if current_activity:
                     for user in current_activity.users:
                         if user.user_id != owner_id and user.is_subscriber:
-                            if bank != "Любой бюджет" and user.bank == bank:
-                                users_id.append(user.user_id)
-                            else:
+                            if bank == "Любой бюджет" or bank in user.bank:
                                 users_id.append(user.user_id)
                 data["users_id"] = users_id
                 await session.commit()

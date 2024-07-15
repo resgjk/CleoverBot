@@ -4,7 +4,7 @@ from db.base import Base
 
 from datetime import date
 
-from sqlalchemy import BIGINT
+from sqlalchemy import BIGINT, ARRAY, String
 from sqlalchemy.orm import relationship, mapped_column, Mapped
 
 
@@ -20,9 +20,9 @@ class UserModel(Base):
         nullable=False, default=False, unique=False
     )
     subscriber_until: Mapped[date] = mapped_column(nullable=True, unique=False)
-    bank: Mapped[Literal["Zero bank", "$100 - 1000", "$1000 - 10000", "$10k+"]] = (
-        mapped_column(nullable=False, default="Zero bank")
-    )
+    bank: Mapped[
+        list[Literal["Zero bank", "$100 - 1000", "$1000 - 10000", "$10k+"]]
+    ] = mapped_column(ARRAY(String), nullable=False, default=["Zero bank"])
     notification: Mapped[str] = mapped_column(nullable=False, default="1 Hour")
     activities: Mapped[list["ActivityModel"]] = relationship(  # type: ignore
         back_populates="users", secondary="users_to_activities"

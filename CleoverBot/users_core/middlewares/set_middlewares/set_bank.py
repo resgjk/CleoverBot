@@ -1,4 +1,5 @@
 from typing import Callable, Dict, Any, Awaitable
+import logging
 
 from db.models.users import UserModel
 
@@ -6,7 +7,7 @@ from aiogram import BaseMiddleware
 from aiogram.types import CallbackQuery
 
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy import select
+from sqlalchemy import select, func
 from sqlalchemy.engine import ScalarResult
 
 
@@ -32,7 +33,16 @@ class SetBankMiddleware(BaseMiddleware):
                     select(UserModel).where(UserModel.user_id == event.from_user.id)
                 )
                 current_user: UserModel = res.scalars().one_or_none()
-                current_user.bank = callbacks_data[event.data]
-                data["choise_bank"] = current_user.bank
+                if callbacks_data[event.data] in current_user.bank:
+                    print(current_user.bank)
+                    try:
+                        temp_arr = current_user.bank[::]
+                        temp_arr.remove(callbacks_data[event.data])
+                        current_user.bank = temp_arr
+                    except ValueError as e:
+                        logging.error(e)
+                else:
+                    current_user.bank = current_user.bank + [callbacks_data[event.data]]
                 await session.commit()
+                data["choise_bank"] = current_user.bank
         return await handler(event, data)

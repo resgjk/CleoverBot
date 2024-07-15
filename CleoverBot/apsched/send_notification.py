@@ -30,11 +30,9 @@ async def send_notifications(
                 for user in current_activity.users:
                     if user.is_subscriber and user.notification == notification:
                         if (
-                            post_details["bank"] != "Любой бюджет"
-                            and user.bank == post_details["bank"]
+                            post_details["bank"] == "Любой бюджет"
+                            or post_details["bank"] in user.bank
                         ):
-                            users_id.append(user.user_id)
-                        else:
                             users_id.append(user.user_id)
             if users_id:
                 text = []
