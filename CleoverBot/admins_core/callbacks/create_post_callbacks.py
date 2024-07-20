@@ -1,16 +1,20 @@
 import asyncio
 from uuid import uuid4
-from datetime import date, time, timezone
+from datetime import date, time, timezone, datetime
 import logging
 import re
 
 from users_core.config import scheduler
+from apsched.send_delayed_post import confirm_delayed_post
 from admins_core.utils.phrases import phrases
 from admins_core.utils.post_form import PostForm
 from admins_core.utils.post_sender import PostSender
 from admins_core.keyboards.choise_bank_keyboard import get_banks_keyboard
 from admins_core.keyboards.choise_category_keyboard import get_activities_keyboard
-from admins_core.keyboards.publick_post_keyboard import get_publick_keyboard
+from admins_core.keyboards.publick_post_keyboard import (
+    get_publick_keyboard,
+    get_refactor_keyboard,
+)
 from admins_core.middlewares.post_middlewares.get_activities_list import (
     GetActivitiesListMiddleware,
 )
@@ -40,9 +44,11 @@ from sqlalchemy.orm import sessionmaker
 create_post_router = Router()
 select_category_router = Router()
 send_post_router = Router()
+send_delayed_post_router = Router()
 
 time_pattern = r"^(?:[01]?\d|2[0-3]):[0-5]\d$"
 date_pattern = r"^(0[1-9]|[12][0-9]|3[01])\.(0[1-9]|1[0-2])\.\d{4}$"
+datetime_pattern = r"^(0[1-9]|[12][0-9]|3[01])\.(0[1-9]|1[012])\.(19|20)\d\d\s([01][0-9]|2[0-3]):([0-5][0-9])$"
 
 
 async def create_post(call: CallbackQuery, bot: Bot, state: FSMContext):
@@ -209,33 +215,40 @@ async def get_media_files(message: Message, bot: Bot, state: FSMContext):
         text, media = sender.show_post_detail_for_admin()
         media_type = context_data.get("media_type")
 
-        if media:
-            try:
-                if media_type == "photo":
+        if len(text) <= 1024:
+            if media:
+                try:
+                    if media_type == "photo":
+                        await bot.send_photo(
+                            chat_id=message.chat.id, photo=media, caption=text
+                        )
+                    elif media_type == "video":
+                        await bot.send_video(
+                            chat_id=message.chat.id, video=media, caption=text
+                        )
+                except TelegramNetworkError:
+                    event_photo = FSInputFile("users_core/utils/photos/event.png")
                     await bot.send_photo(
-                        chat_id=message.chat.id, photo=media, caption=text
+                        chat_id=message.chat.id, photo=event_photo, caption=text
                     )
-                elif media_type == "video":
-                    await bot.send_video(
-                        chat_id=message.chat.id, video=media, caption=text
-                    )
-            except TelegramNetworkError:
+            else:
                 event_photo = FSInputFile("users_core/utils/photos/event.png")
                 await bot.send_photo(
                     chat_id=message.chat.id, photo=event_photo, caption=text
                 )
-        else:
-            event_photo = FSInputFile("users_core/utils/photos/event.png")
-            await bot.send_photo(
-                chat_id=message.chat.id, photo=event_photo, caption=text
-            )
 
-        await bot.send_message(
-            text=phrases["finish_message"],
-            chat_id=message.chat.id,
-            reply_markup=get_publick_keyboard(),
-        )
-        await state.set_state(PostForm.SEND_POST_TO_USERS)
+            await bot.send_message(
+                text=phrases["finish_message"],
+                chat_id=message.chat.id,
+                reply_markup=get_publick_keyboard(),
+            )
+            await state.set_state(PostForm.SEND_POST_TO_USERS)
+        else:
+            await message.answer(
+                text="🚫 Длина текста больше 1024 символов!",
+                reply_markup=get_refactor_keyboard(),
+            )
+            await state.clear()
 
 
 async def send_post_to_users(
@@ -244,7 +257,6 @@ async def send_post_to_users(
     state: FSMContext,
     users_id: list,
     scheduler: ContextSchedulerDecorator,
-    session_maker: sessionmaker,
 ):
     await call.answer()
     context_data = await state.get_data()
@@ -286,7 +298,7 @@ async def send_post_to_users(
         except Exception as e:
             logging.error(e)
             await call.message.answer(
-                text=f"Не удалось опубликовать пост, попробуйте еще раз!\nОшибка: {str(e)}"
+                text=f"❌ Не удалось опубликовать пост, попробуйте еще раз!\nОшибка: {str(e)}"
             )
     else:
         await call.message.edit_text(
@@ -294,6 +306,57 @@ async def send_post_to_users(
             reply_markup=return_to_admin_panel_keyboard(),
         )
     await state.clear()
+
+
+async def get_datetime_to_delayed_post(
+    call: CallbackQuery,
+    bot: Bot,
+    state: FSMContext,
+):
+    await call.answer()
+    await call.message.edit_text(text=phrases["input_delayed_datetime"])
+    await state.set_state(PostForm.GET_DATETIME_TO_DELAYED_POST)
+
+
+async def send_delayed_post_to_users(
+    message: Message, bot: Bot, state: FSMContext, session_maker: sessionmaker
+):
+    if re.match(datetime_pattern, message.text):
+        str_date, str_time = message.text.split(" ")[0].split("."), message.text.split(
+            " "
+        )[1].split(":")
+        valid_datetime = datetime(
+            year=int(str_date[2]),
+            month=int(str_date[1]),
+            day=int(str_date[0]),
+            hour=int(str_time[0]),
+            minute=int(str_time[1]),
+            tzinfo=timezone.utc,
+        )
+        context_data = await state.get_data()
+        try:
+            scheduler.add_job(
+                confirm_delayed_post,
+                trigger="date",
+                run_date=valid_datetime,
+                kwargs={"context_data": context_data},
+            )
+            await message.answer(
+                text="✅ Пост будет успешно опубликован!",
+                reply_markup=return_to_admin_panel_keyboard(),
+            )
+        except Exception as e:
+            logging.error(e)
+            logging.error(e)
+            await message.answer(
+                text=f"❌ Не удалось опубликовать пост, попробуйте еще раз!\nОшибка: {str(e)}",
+                reply_markup=return_to_admin_panel_keyboard(),
+            )
+        await state.clear()
+    else:
+        await message.answer(
+            text="Неверный формат даты и времени. Введите дату и время еще раз в формате `дд.мм.гггг чч:мм` UTC"
+        )
 
 
 create_post_router.callback_query.register(create_post, F.data == "create_post")
@@ -314,3 +377,11 @@ send_post_router.callback_query.register(
     send_post_to_users, F.data == "publick_post", PostForm.SEND_POST_TO_USERS
 )
 send_post_router.callback_query.middleware.register(SendPostMiddleware(scheduler))
+send_delayed_post_router.callback_query.register(
+    get_datetime_to_delayed_post,
+    F.data == "publick_delayed_post",
+    PostForm.SEND_POST_TO_USERS,
+)
+send_delayed_post_router.message.register(
+    send_delayed_post_to_users, PostForm.GET_DATETIME_TO_DELAYED_POST
+)

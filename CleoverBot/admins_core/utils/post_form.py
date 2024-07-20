@@ -14,3 +14,4 @@ class PostForm(StatesGroup):
     GET_MEDIA_FILES = State()
     SAVE_MEDIA_AND_SHOW_POST = State()
     SEND_POST_TO_USERS = State()
+    GET_DATETIME_TO_DELAYED_POST = State()

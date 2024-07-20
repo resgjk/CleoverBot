@@ -82,6 +82,7 @@ from admins_core.callbacks.create_post_callbacks import (
     create_post_router,
     select_category_router,
     send_post_router,
+    send_delayed_post_router,
 )
 from admins_core.callbacks.users_settings import users_settings_router
 from admins_core.callbacks.return_to_admin_pannel_callback import (
@@ -308,6 +309,7 @@ async def lifespan(app: FastAPI):
             accept_withdraw_request_router,
             choice_withdraw_request_router,
             get_request_details_router,
+            send_delayed_post_router,
         )
 
         job: Job = scheduler.add_job(

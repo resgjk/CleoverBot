@@ -23,7 +23,10 @@ current_activity_events_router = Router()
 activity_event_details_router = Router()
 
 
-async def show_activities_list(call: CallbackQuery, bot: Bot, activities: dict):
+async def show_activities_list(
+    call: CallbackQuery, bot: Bot, state: FSMContext, activities: dict
+):
+    await state.clear()
     media = InputMediaPhoto(
         media=FSInputFile("users_core/utils/photos/activities.png"),
         caption=phrases["activities_list"],
